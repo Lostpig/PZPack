@@ -1,0 +1,46 @@
+﻿<UserControl x:Class="PZPack.View.MainMenu"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:svc="clr-namespace:PZPack.View.Service"
+             mc:Ignorable="d" 
+             d:DesignHeight="24" d:DesignWidth="1280">
+    <UserControl.Resources>
+        <Style x:Key="MenuOuter" TargetType="MenuItem">
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="Padding" Value="12,0,12,0" />
+            <Setter Property="Height" Value="24" />
+        </Style>
+    </UserControl.Resources>
+    <Menu x:Name="mainMenu" IsMainMenu="True">
+        <MenuItem Header="{Binding Path=(svc:Translate.File)}" Style="{StaticResource MenuOuter}">
+            <MenuItem Header="{Binding Path=(svc:Translate.Open)}" HorizontalAlignment="Stretch"
+                      Click="OnSelectOpen"/>
+            <MenuItem Header="{Binding Path=(svc:Translate.Close)}" HorizontalAlignment="Stretch"
+                      Click="OnSelectClose" IsEnabled="{Binding Path=FileOpened}" />
+            <Separator />
+            <MenuItem Header="{Binding Path=(svc:Translate.Pack)}" HorizontalAlignment="Stretch"
+                      Click="OnSelectPack"/>
+            <MenuItem Header="{Binding Path=(svc:Translate.Extract)}" HorizontalAlignment="Stretch"
+                      Click="OnExtractPack"  IsEnabled="{Binding Path=FileOpened}"/>
+            <Separator />
+            <MenuItem Header="{Binding Path=(svc:Translate.Exit)}" HorizontalAlignment="Stretch"
+                      Click="OnSelectExit"/>
+        </MenuItem>
+        <MenuItem Header="{Binding Path=(svc:Translate.Language)}" Style="{StaticResource MenuOuter}">
+            <MenuItem.ItemsSource>
+                <CompositeCollection>
+                    <CollectionContainer x:Name="languageCollection" />
+                </CompositeCollection>
+            </MenuItem.ItemsSource>
+            <MenuItem.ItemContainerStyle>
+                <Style>
+                    <Setter Property="MenuItem.Header" Value="{Binding}"/>
+                    <Setter Property="MenuItem.Tag" Value="{Binding}"/>
+                    <EventSetter Event="MenuItem.Click" Handler="OnLanguageSelect" />
+                </Style>
+            </MenuItem.ItemContainerStyle>
+        </MenuItem>
+    </Menu>
+</UserControl>

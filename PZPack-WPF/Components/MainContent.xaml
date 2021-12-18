@@ -1,0 +1,122 @@
+﻿<UserControl x:Class="PZPack.View.MainContent"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:svc="clr-namespace:PZPack.View.Service"
+             xmlns:cvt="clr-namespace:PZPack.View.Service.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="1280">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <cvt:ExtIconConverter x:Key="ExtIconConverter" />
+            <cvt:FileSizeConverter x:Key="FileSizeConverter" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <DockPanel LastChildFill="True">
+        <TreeView x:Name="folderTree"  DockPanel.Dock="Left" Width="250" Padding="5"
+                    TreeViewItem.Selected="OnItemSelected"
+                    >
+        </TreeView>
+        <Border Background="White" BorderBrush="#999999" BorderThickness="1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0" Margin="0,5,0,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="50" />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition Width="90" />
+                        <ColumnDefinition Width="16" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.Resources>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="FontSize" Value="14"/>
+                            <Setter Property="Foreground" Value="DarkBlue"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                            <Setter Property="Margin" Value="0,0,12,0"/>
+                        </Style>
+                    </Grid.Resources>
+                    <TextBlock Grid.Column="1" Text="{Binding Path=(svc:Translate.Filename)}" HorizontalAlignment="Stretch" />
+                    <Border Grid.Column="2" BorderBrush="#ccc" BorderThickness="1,0,0,0" Padding="8,0,0,0">
+                        <TextBlock Text="{Binding Path=(svc:Translate.Filetype)}" TextAlignment="Left" />
+                    </Border>
+                    <Border Grid.Column="3" BorderBrush="#ccc" BorderThickness="1,0,0,0" Padding="8,0,0,0">
+                        <TextBlock Text="{Binding Path=(svc:Translate.Size)}" TextAlignment="Left" />
+                    </Border>
+                </Grid>
+                <ItemsControl x:Name="filesContent" MouseDoubleClick="OnFileSelected" Grid.Row="1">
+                    <ItemsControl.Template>
+                        <ControlTemplate TargetType="ItemsControl">
+                            <ScrollViewer
+                                CanContentScroll="True"
+                                HorizontalScrollBarVisibility="Disabled" 
+                                VerticalScrollBarVisibility="Visible">
+                                <ItemsPresenter/>
+                            </ScrollViewer>
+                        </ControlTemplate>
+                    </ItemsControl.Template>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel IsVirtualizing="True" Orientation="Vertical" Margin="10,0,0,0"
+                                VirtualizationMode="Recycling" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <DataTemplate.Resources>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="FontSize" Value="14"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                    <Setter Property="Margin" Value="0,0,12,0"/>
+                                </Style>
+                                <Style TargetType="Image">
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="Width" Value="24"/>
+                                    <Setter Property="Height" Value="24"/>
+                                </Style>
+                                <Style TargetType="Grid">
+                                    <Setter Property="Height" Value="32"/>
+                                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#ddeeff"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataTemplate.Resources>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="40" />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="90" />
+                                    <ColumnDefinition Width="90" />
+                                </Grid.ColumnDefinitions>
+                                <Image Grid.Column="0" Source="{Binding Path=Extension, Converter={StaticResource ExtIconConverter}}" />
+                                <TextBlock Grid.Column="1" Text="{Binding Path=Name}" HorizontalAlignment="Stretch" />
+                                <TextBlock Grid.Column="2" Text="{Binding Path=Extension}" TextAlignment="Left" Foreground="#7f7f7f" />
+                                <TextBlock Grid.Column="3" Text="{Binding Path=Size, Converter={StaticResource FileSizeConverter}}" 
+                                           TextAlignment="Right" Foreground="#7f7f7f" FontFamily="Consolas" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style>
+                            <Style.Triggers>
+                                <Trigger Property="Control.IsMouseOver" Value="True">
+                                    <Setter Property="Control.ToolTip" Value="{Binding Path=Name}"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                </ItemsControl>
+            </Grid>
+        </Border>
+    </DockPanel>
+</UserControl>

@@ -1,0 +1,11 @@
+﻿/.vs
+*.user
+
+PZPack-cli/obj
+PZPack-cli/bin
+PZPack-cli/Properties
+PZPack-core/bin
+PZPack-core/obj
+PZPack-WPF/bin
+PZPack-WPF/obj
+PZPack-WPF/Properties
