@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<Version>1.0.2</Version>
+	<Version>1.0.2.1</Version>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
     <RootNamespace>PZPack.View</RootNamespace>
@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="C:\Users\zjxsz\Desktop\-1d160531e7dd52ff(1)\tempicons\i-128.png">
+    <None Include="i-128.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>

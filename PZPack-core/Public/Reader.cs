@@ -263,6 +263,13 @@ namespace PZPack.Core
 
             return size;
         }
+        public byte[] ReadOrigin(long offset, long size)
+        {
+            byte[] bytes = new byte[size];
+            stream.Seek(offset, SeekOrigin.Begin);
+            stream.Read(bytes, 0, bytes.Length);
+            return bytes;
+        }
 
         public void Dispose()
         {

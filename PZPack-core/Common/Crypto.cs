@@ -4,7 +4,7 @@ using System;
 
 namespace PZPack.Core
 {
-    internal class PZCrypto : IDisposable
+    public class PZCrypto : IDisposable
     {
         private readonly Aes Cryptor;
         private readonly byte[] Key;
@@ -75,7 +75,7 @@ namespace PZPack.Core
                     do
                     {
                         bytesRead = await encryptStream.ReadAsync(buffer, cancelToken.Value).ConfigureAwait(false);
-                        await target.WriteAsync(buffer, cancelToken.Value).ConfigureAwait(false);
+                        await target.WriteAsync(buffer.AsMemory(0, bytesRead), cancelToken.Value).ConfigureAwait(false);
                         progress?.Report((source.Position, source.Length));
                     } while (bytesRead > 0);
                 }
@@ -84,7 +84,7 @@ namespace PZPack.Core
                     do
                     {
                         bytesRead = await encryptStream.ReadAsync(buffer).ConfigureAwait(false);
-                        await target.WriteAsync(buffer).ConfigureAwait(false);
+                        await target.WriteAsync(buffer.AsMemory(0, bytesRead)).ConfigureAwait(false);
                         progress?.Report((source.Position, source.Length));
                     } while (bytesRead > 0);
                 }

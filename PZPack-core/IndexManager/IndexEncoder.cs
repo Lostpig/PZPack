@@ -14,7 +14,7 @@
         {
             int folderId = Tree.EnsureFolder(fullName);
             string name = Path.GetFileName(fullName);
-            PZFile file = new(name, folderId, offset, size );
+            PZFile file = new(name, folderId, offset, size);
             Files.Add(file);
         }
     }

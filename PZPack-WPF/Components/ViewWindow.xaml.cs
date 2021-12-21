@@ -118,7 +118,7 @@ namespace PZPack.View
             viewImage.Width = newSize.Width;
             viewImage.Height = newSize.Height;
             model.Size = newSize;
-            scaleBox.Text = (scale * 100).ToString("f0");
+            scaleBox.Text = (scale * 100).ToString("f1");
         }
 
         private void ChangeSizeUp(object sender, RoutedEventArgs e)
@@ -170,7 +170,30 @@ namespace PZPack.View
             scale = 1;
             UpdateImageScale();
         }
-        
+        private void ChangeSizeFitWidth(object sender, RoutedEventArgs e)
+        {
+            scale = scrollContent.ActualWidth / model.OriginSize.Width;
+            bool hasScroll = model.OriginSize.Height * scale > scrollContent.ActualHeight;
+            if (hasScroll)
+            {
+                double viewWidth = scrollContent.ActualWidth - SystemParameters.VerticalScrollBarWidth;
+                scale = viewWidth / model.OriginSize.Width;
+            }
+
+            UpdateImageScale();
+        }
+        private void ChangeSizeFitHeight(object sender, RoutedEventArgs e)
+        {
+            scale = scrollContent.ActualHeight / model.OriginSize.Height;
+            bool hasScroll = model.OriginSize.Width * scale > scrollContent.ActualWidth;
+            if (hasScroll)
+            {
+                double viewHeight = scrollContent.ActualHeight - SystemParameters.HorizontalScrollBarHeight;
+                scale = viewHeight / model.OriginSize.Height;
+            }
+            UpdateImageScale();
+        }
+
         private void NextFile(object sender, RoutedEventArgs e)
         {
             Move(1);

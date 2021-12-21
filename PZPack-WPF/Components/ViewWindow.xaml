@@ -40,6 +40,8 @@
                 <TextBlock Text="%" VerticalAlignment="Center" />
                 <Button Content="-" Width="Auto" Padding="10,0" Click="ChangeSizeDown" />
                 <Button Content="{Binding Path=(svc:Translate.Original_size)}" Width="Auto" Padding="10,0" Click="ChangeSizeToOriginal" />
+                <Button Content="{Binding Path=(svc:Translate.Fit_to_width)}" Width="Auto" Padding="10,0" Click="ChangeSizeFitWidth" />
+                <Button Content="{Binding Path=(svc:Translate.Fit_to_height)}" Width="Auto" Padding="10,0" Click="ChangeSizeFitHeight" />
                 <Separator />
                 <Button x:Name="btnPrev" Content="{Binding Path=(svc:Translate.Prev)}" Click="PrevFile" />
                 <Button x:Name="btnNext" Content="{Binding Path=(svc:Translate.Next)}" Click="NextFile" />

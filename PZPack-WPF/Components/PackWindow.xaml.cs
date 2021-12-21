@@ -163,7 +163,7 @@ namespace PZPack.View
             ProgressText = $"{count} / {total} ({ProgressValue:f0}%)";
 
             fileTotal = fileTotal == 0 ? 1 : fileTotal;
-            double filePercent = fileUsed / fileTotal;
+            double filePercent = ((double)fileUsed / fileTotal) * 100;
             FileProgressText = $"{FileSystem.ComputeFileSize(fileUsed)} / {FileSystem.ComputeFileSize(fileTotal)} ({filePercent:f0}%)";
             NotifyPropertyChanged(nameof(ProgressText));
             NotifyPropertyChanged(nameof(ProgressValue));

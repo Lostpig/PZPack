@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Text;
+using PZPack.Core.Compatible;
 using PZPack.Core.Exceptions;
 
 namespace PZPack.Core
@@ -104,6 +105,7 @@ namespace PZPack.Core
                 WritePackHead();
                 WritePackInfo();
                 long idxOffsetOffset = Writer.Position;
+                Writer.Seek(8, SeekOrigin.Current);
                 int count = 0;
                 int length = Files.Length;
 
@@ -126,6 +128,7 @@ namespace PZPack.Core
                         long offset = Writer.Position;
                         size = await Crypto.EncryptStream(fs, Writer, innerProgress, cancelToken);
                         Index.AppendFile(relativePath, offset, size);
+                        Debug.Assert(size == Writer.Position - offset);
                     }
 
                     count++;
@@ -133,6 +136,9 @@ namespace PZPack.Core
                 }
 
                 long indexOffset = Writer.Position;
+                byte[] indexBi = Crypto.Encrypt(PZCodec.EncodeIndexData(Index));
+                Writer.Write(indexBi);
+
                 Writer.Seek(idxOffsetOffset, SeekOrigin.Begin);
                 Writer.Write(BitConverter.GetBytes(indexOffset));
                 Writer.Flush();

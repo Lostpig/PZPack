@@ -49,6 +49,8 @@
   "Message": "消息",
   "Warning": "警告",
   "Preview": "预览",
+  "Fit to height": "适应窗口高度",
+  "Fit to width": "适应窗口宽度",
   "MSG Password empty": "密码不能为空",
   "MSG Source directory empty": "请选择源文件夹",
   "MSG Output file empty": "请设置输出文件",
