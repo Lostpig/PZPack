@@ -199,13 +199,13 @@ namespace PZPack.Core
         {
             return Index.GetAllFiles();
         }
-        public Task<string> UnpackFile(PZFile file, string output, string rename, IProgress<(long, long)>? progress = default, CancellationToken? cancelToken = null)
+        public Task<long> UnpackFile(PZFile file, string output, string rename, IProgress<(long, long)>? progress = default, CancellationToken? cancelToken = null)
         {
             string name = rename ?? file.Name;
             string fullName = Path.Join(output, name);
             return UnpackFile(file, fullName, progress, cancelToken);
         }
-        public async Task<string> UnpackFile(PZFile file, string fullOutput, IProgress<(long, long)>? progress = default, CancellationToken? cancelToken = null)
+        public async Task<long> UnpackFile(PZFile file, string fullOutput, IProgress<(long, long)>? progress = default, CancellationToken? cancelToken = null)
         {
             if (File.Exists(fullOutput))
             {
@@ -218,12 +218,13 @@ namespace PZPack.Core
             }
 
             EnsureDirectory(dir);
+            long length = 0;
             using (FileStream fs = File.Create(fullOutput))
             {
-                await crypto.DecryptStream(stream, fs, file.Offset, file.Size, progress, cancelToken);
+                length = await crypto.DecryptStream(stream, fs, file.Offset, file.Size, progress, cancelToken);
             }
 
-            return fullOutput;
+            return length;
         }
         public async Task<byte[]> ReadFile(PZFile file)
         {

@@ -1,28 +1,67 @@
 ﻿using System;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
+using System.Collections.Generic;
 
 namespace PZPack.View.Service.Converters
 {
     internal class ExtIconConverter : IValueConverter
     {
-        static private byte[] GetExtensionIcon(string ext)
+        enum IconType
         {
-            byte[] buffer = ext switch
+            Picture,
+            Video,
+            Audio,
+            Other
+        }
+
+        private static Dictionary<IconType, BitmapImage> imageCache = new();
+        private static IconType GetExtensionType(string ext)
+        {
+            return ext switch
             {
                 ".jpg" or ".jpeg" or ".png" or ".bmp" or ".gif" or ".webp"
-                    => View.StaticResources.IconImage,
+                    => IconType.Picture,
                 ".mp4" or ".avi" or ".mkv" or ".wmv"
-                    => View.StaticResources.IconVideo,
+                    => IconType.Video,
                 ".mp3" or ".ogg" or ".flac" or ".ape"
-                    => View.StaticResources.IconVideo,
-                ".zip" or ".rar" or ".7z"
-                    => View.StaticResources.IconZip,
-                _ => View.StaticResources.IconFile
+                    => IconType.Audio,
+                _ => IconType.Other
             };
-            return buffer;
+        }
+        static private BitmapImage GetExtensionIcon(string ext)
+        {
+            IconType iconType = GetExtensionType(ext);
+            if (!imageCache.ContainsKey(iconType))
+            {
+                Bitmap bitmap = ext switch
+                {
+                    ".jpg" or ".jpeg" or ".png" or ".bmp" or ".gif" or ".webp"
+                        => View.StaticResources.file_picture,
+                    ".mp4" or ".avi" or ".mkv" or ".wmv"
+                        => View.StaticResources.file_video,
+                    ".mp3" or ".ogg" or ".flac" or ".ape"
+                        => View.StaticResources.file_audio,
+                    _ => View.StaticResources.file_other
+                };
+                using MemoryStream ms = new MemoryStream();
+                bitmap.Save(ms, ImageFormat.Png);
+
+                BitmapImage image = new BitmapImage();
+                image.BeginInit();
+                image.CacheOption = BitmapCacheOption.OnLoad;
+                image.StreamSource = ms;
+                image.EndInit();
+
+                imageCache.Add(iconType, image);
+            }
+
+
+            return imageCache[iconType];
         }
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -32,13 +71,7 @@ namespace PZPack.View.Service.Converters
                 fileExt = ext;
             }
 
-            byte[] buffer = GetExtensionIcon(fileExt);
-
-            BitmapImage bitmap = new();
-            bitmap.BeginInit();
-            bitmap.StreamSource = new MemoryStream(buffer);
-            bitmap.EndInit();
-            return bitmap;
+            return GetExtensionIcon(fileExt);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

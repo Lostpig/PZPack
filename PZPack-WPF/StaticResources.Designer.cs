@@ -61,62 +61,42 @@ namespace PZPack.View {
         }
         
         /// <summary>
-        ///   查找 System.Byte[] 类型的本地化资源。
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static byte[] IconAudio {
+        internal static System.Drawing.Bitmap file_audio {
             get {
-                object obj = ResourceManager.GetObject("IconAudio", resourceCulture);
-                return ((byte[])(obj));
+                object obj = ResourceManager.GetObject("file_audio", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   查找 System.Byte[] 类型的本地化资源。
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static byte[] IconFile {
+        internal static System.Drawing.Bitmap file_other {
             get {
-                object obj = ResourceManager.GetObject("IconFile", resourceCulture);
-                return ((byte[])(obj));
+                object obj = ResourceManager.GetObject("file_other", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   查找 System.Byte[] 类型的本地化资源。
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static byte[] IconImage {
+        internal static System.Drawing.Bitmap file_picture {
             get {
-                object obj = ResourceManager.GetObject("IconImage", resourceCulture);
-                return ((byte[])(obj));
+                object obj = ResourceManager.GetObject("file_picture", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   查找 System.Byte[] 类型的本地化资源。
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static byte[] IconText {
+        internal static System.Drawing.Bitmap file_video {
             get {
-                object obj = ResourceManager.GetObject("IconText", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Byte[] 类型的本地化资源。
-        /// </summary>
-        internal static byte[] IconVideo {
-            get {
-                object obj = ResourceManager.GetObject("IconVideo", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Byte[] 类型的本地化资源。
-        /// </summary>
-        internal static byte[] IconZip {
-            get {
-                object obj = ResourceManager.GetObject("IconZip", resourceCulture);
-                return ((byte[])(obj));
+                object obj = ResourceManager.GetObject("file_video", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
     }

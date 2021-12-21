@@ -52,6 +52,7 @@ namespace PZPack.View.Service
             [TranslateBind("Error")] public static string Error { get; set; }
             [TranslateBind("Message")] public static string Message { get; set; }
             [TranslateBind("Warning")] public static string Warning { get; set; }
+            [TranslateBind("Preview")] public static string Preview { get; set; }
             [TranslateBind("MSG Password empty")] public static string MSG_Password_empty { get; set; }
             [TranslateBind("MSG Source directory empty")] public static string MSG_Source_directory_empty { get; set; }
             [TranslateBind("MSG Output file empty")] public static string MSG_Output_file_empty { get; set; }

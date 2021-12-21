@@ -46,6 +46,8 @@ namespace PZPack.View
                 var startTime = DateTime.Now;
                 long size = await Reader.Instance.UnpackAll(output, reporter, ctoken);
                 var usedTime = DateTime.Now - startTime;
+
+                model.UpdateProgress(Reader.Instance.FileCount, Reader.Instance.FileCount, size, size);
                 Alert.ShowMessage(Translate.Extracted_complete);
                 model.UpdateComplete(size, usedTime);
             }
@@ -86,8 +88,10 @@ namespace PZPack.View
             try
             {
                 var startTime = DateTime.Now;
-                await Reader.Instance.UnpackFile(file, output, reporter, ctoken);
+                long length = await Reader.Instance.UnpackFile(file, output, reporter, ctoken);
                 var usedTime = DateTime.Now - startTime;
+
+                model.UpdateProgress(1, 1, length, length);
                 Alert.ShowMessage(Translate.Extracted_complete);
                 model.UpdateComplete(file.Size, usedTime);
             }

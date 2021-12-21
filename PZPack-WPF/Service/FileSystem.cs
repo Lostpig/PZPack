@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using System.Diagnostics;
+using PZPack.Core;
 
 namespace PZPack.View.Service
 {
@@ -39,6 +40,21 @@ namespace PZPack.View.Service
             Microsoft.Win32.SaveFileDialog dlg = new();
             dlg.DefaultExt = ".pzpk";
             dlg.Filter = "PZPack File (.pzpk)|*.pzpk";
+
+            Nullable<bool> result = dlg.ShowDialog();
+
+            if (result == true)
+            {
+                string filename = dlg.FileName;
+                return filename;
+            }
+            return null;
+        }
+        static public string? OpenSaveExtractFileDialog(PZFile file)
+        {
+            Microsoft.Win32.SaveFileDialog dlg = new();
+            dlg.DefaultExt = file.Extension;
+            dlg.FileName = file.Name;
 
             Nullable<bool> result = dlg.ShowDialog();
 

@@ -48,6 +48,7 @@
   "Error": "错误",
   "Message": "消息",
   "Warning": "警告",
+  "Preview": "预览",
   "MSG Password empty": "密码不能为空",
   "MSG Source directory empty": "请选择源文件夹",
   "MSG Output file empty": "请设置输出文件",

@@ -11,11 +11,12 @@
         <ResourceDictionary>
             <cvt:ExtIconConverter x:Key="ExtIconConverter" />
             <cvt:FileSizeConverter x:Key="FileSizeConverter" />
+            <cvt:FileCouldPreviewConverter x:Key="CouldPreviewConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
     <DockPanel LastChildFill="True">
         <TreeView x:Name="folderTree"  DockPanel.Dock="Left" Width="250" Padding="5"
-                    TreeViewItem.Selected="OnItemSelected"
+                    TreeViewItem.Selected="OnFolderSelected"
                     >
         </TreeView>
         <Border Background="White" BorderBrush="#999999" BorderThickness="1">
@@ -98,6 +99,12 @@
                                     <ColumnDefinition Width="90" />
                                     <ColumnDefinition Width="90" />
                                 </Grid.ColumnDefinitions>
+                                <Grid.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="{Binding Path=(svc:Translate.Preview)}" Click="OnFileSelected" IsEnabled="{Binding Path=Name, Converter={StaticResource CouldPreviewConverter}}"/>
+                                        <MenuItem Header="{Binding Path=(svc:Translate.Extract_to)}" Click="OnFileExtrect"/>
+                                    </ContextMenu>
+                                </Grid.ContextMenu>
                                 <Image Grid.Column="0" Source="{Binding Path=Extension, Converter={StaticResource ExtIconConverter}}" />
                                 <TextBlock Grid.Column="1" Text="{Binding Path=Name}" HorizontalAlignment="Stretch" />
                                 <TextBlock Grid.Column="2" Text="{Binding Path=Extension}" TextAlignment="Left" Foreground="#7f7f7f" />

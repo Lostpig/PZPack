@@ -7,9 +7,9 @@ namespace PZPack.View.Service
 {
     internal class Alert
     {
-        public static MessageBoxResult Show(string message, string caption)
+        public static MessageBoxResult Show(string message, string caption, MessageBoxImage icon)
         {
-            return MessageBox.Show(message, caption, MessageBoxButton.OK);
+            return MessageBox.Show(message, caption, MessageBoxButton.OK, icon);
         }
         public static MessageBoxResult ShowException(Exception ex)
         {
@@ -33,15 +33,15 @@ namespace PZPack.View.Service
                     string.IsNullOrEmpty(ex.Message) ? Translate.EX_Unknown : string.Format(Translate.EX_Exception, ex.Message)
             };
 
-            return Show(message, Translate.Error);
+            return Show(message, Translate.Error, MessageBoxImage.Error);
         }
         public static MessageBoxResult ShowMessage(string message)
         {
-            return Show(message, Translate.Message);
+            return Show(message, Translate.Message, MessageBoxImage.Information);
         }
         public static MessageBoxResult ShowWarning(string message)
         {
-            return Show(message, Translate.Warning);
+            return Show(message, Translate.Warning, MessageBoxImage.Warning);
         }
     }
 }

@@ -51,10 +51,19 @@ namespace PZPack.View.Service
             string? output = FileSystem.OpenSelectDirectryDialog();
             if (output == null) return;
 
-            ExtractWindow win = new();
-            win.Show();
-
+            ExtractWindow win = new() { Owner = Application.Current.MainWindow };
             win.StartExtractAll(output);
+            win.ShowDialog();
+            
+        }
+        public static void OpenExtractWindow(PZFile file)
+        {
+            string? output = FileSystem.OpenSaveExtractFileDialog(file);
+            if (output == null) return;
+
+            ExtractWindow win = new() { Owner = Application.Current.MainWindow };
+            win.StartExtractFile(file, output);
+            win.ShowDialog();
         }
 
         private static void ViewPtr_Closed(object? sender, System.EventArgs e)

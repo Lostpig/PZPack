@@ -1,13 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<Version>1.0.1</Version>
+	<Version>1.0.2</Version>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
     <RootNamespace>PZPack.View</RootNamespace>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
+    <PackageIcon>i-128.png</PackageIcon>
+    <ApplicationIcon>bitbug_favicon.ico</ApplicationIcon>
     <!--<PublishSingleFile>true</PublishSingleFile>-->
     <!--<PublishReadyToRun>true</PublishReadyToRun>-->
     <!--<RuntimeIdentifier>win-x64</RuntimeIdentifier>-->
@@ -16,6 +18,17 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <Optimize>False</Optimize>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="bitbug_favicon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="C:\Users\zjxsz\Desktop\-1d160531e7dd52ff(1)\tempicons\i-128.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />

@@ -28,7 +28,7 @@ namespace PZPack.View
             }
         }
 
-        private void OnItemSelected(object sender, RoutedEventArgs e)
+        private void OnFolderSelected(object sender, RoutedEventArgs e)
         {
             TreeViewItem item = (TreeViewItem)e.OriginalSource;
             IFolderNode node = (IFolderNode)item.DataContext;
@@ -49,6 +49,16 @@ namespace PZPack.View
                     int index = Array.IndexOf(arr, file);
                     index = index < 0 ? 0 : index;
                     Dialogs.OpenViewWindow(arr, index);
+                }
+            }
+        }
+        private void OnFileExtrect(object sender, RoutedEventArgs e)
+        {
+            if (e.OriginalSource is FrameworkElement sp)
+            {
+                if (sp.DataContext is PZFile file)
+                {
+                    Dialogs.OpenExtractWindow(file);
                 }
             }
         }
