@@ -24,6 +24,7 @@
   "Cancel": "取消",
   "Filename": "文件名",
   "Size": "大小",
+  "Original size": "原始大小",
   "Filetype": "文件类型",
   "Source directory": "打包目录",
   "Choose directory": "选择目录",

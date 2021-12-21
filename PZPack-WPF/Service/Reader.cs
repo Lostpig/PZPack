@@ -18,7 +18,7 @@ namespace PZPack.View.Service
             }
         }
         static public PZReader? Instance { get; private set; }
-        static public void Open(string source, string password)
+        static public bool Open(string source, string password)
         {
             Close();
 
@@ -36,7 +36,11 @@ namespace PZPack.View.Service
             {
                 PZReaderChanged?.Invoke(null, new PZReaderChangeEventArgs(PZReaderChangeAction.OPEN, source));
             }
+
+            return Instance != null;
         }
+
+
         static public void Close()
         {
             if (Instance != null)

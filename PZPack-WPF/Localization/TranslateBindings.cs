@@ -28,6 +28,7 @@ namespace PZPack.View.Service
             [TranslateBind("Cancel")] public static string Cancel { get; set; }
             [TranslateBind("Filename")] public static string Filename { get; set; }
             [TranslateBind("Size")] public static string Size { get; set; }
+            [TranslateBind("Original size")] public static string Original_size { get; set; }
             [TranslateBind("Filetype")] public static string Filetype { get; set; }
             [TranslateBind("Source directory")] public static string Source_directory { get; set; }
             [TranslateBind("Choose directory")] public static string Choose_directory { get; set; }

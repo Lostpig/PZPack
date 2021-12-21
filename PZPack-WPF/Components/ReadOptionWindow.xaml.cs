@@ -35,17 +35,20 @@ namespace PZPack.View
                 return;
             }
 
-            DialogResult = true;
-            Close();
+            bool success = Reader.Open(Source, Password);
+
+            if (success)
+            {
+                Close();
+            }
         }
         private void OnCancel(object sender, RoutedEventArgs e)
         {
-            DialogResult = false;
             Close();
         }
 
-        public string Source { get => VModel.Source; }
-        public string Password { get => VModel.Password; }
+        private string Source { get => VModel.Source; }
+        private string Password { get => VModel.Password; }
     }
 
     internal class ROWindowModel : INotifyPropertyChanged

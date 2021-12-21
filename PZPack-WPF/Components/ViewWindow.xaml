@@ -8,10 +8,14 @@
         Title="{Binding Path=(svc:Translate.View_Window)}" Height="450" Width="800">
     <Window.Resources>
         <Style TargetType="Separator">
-            <Setter Property="Width" Value="2" />
-            <Setter Property="VerticalAlignment" Value="Stretch" />
-            <Setter Property="Margin" Value="8,0,8,0" />
-            <Setter Property="Background" Value="#999999" />
+            <Setter Property="OverridesDefaultStyle" Value="true" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Separator}">
+                        <Border Width="1" Height="Auto" Margin="8,0" Background="#999"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Resources>
     <Grid>
@@ -30,11 +34,12 @@
                         <Setter Property="VerticalAlignment" Value="Center"/>
                     </Style>
                 </StackPanel.Resources>
-                <Button Content="+" Click="ChangeSizeUp" />
+                <Button Content="+" Width="Auto" Padding="10,0" Click="ChangeSizeUp" />
                 <TextBox x:Name="scaleBox" Width="40" VerticalAlignment="Center" KeyDown="OnScaleKeyDown" LostKeyboardFocus="OnScaleLostFocus"
                          TextAlignment="Right" VerticalContentAlignment="Center"/>
-                <TextBlock Text="%"  VerticalAlignment="Center" />
-                <Button Content="-" Click="ChangeSizeDown" />
+                <TextBlock Text="%" VerticalAlignment="Center" />
+                <Button Content="-" Width="Auto" Padding="10,0" Click="ChangeSizeDown" />
+                <Button Content="{Binding Path=(svc:Translate.Original_size)}" Width="Auto" Padding="10,0" Click="ChangeSizeToOriginal" />
                 <Separator />
                 <Button x:Name="btnPrev" Content="{Binding Path=(svc:Translate.Prev)}" Click="PrevFile" />
                 <Button x:Name="btnNext" Content="{Binding Path=(svc:Translate.Next)}" Click="NextFile" />

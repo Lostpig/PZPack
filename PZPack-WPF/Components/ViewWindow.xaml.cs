@@ -16,6 +16,7 @@ namespace PZPack.View
     public partial class ViewWindow : Window
     {
         private PZFile? current;
+        private bool fileChangeFlag = false;
         private int index = 0;
         private readonly List<PZFile> list;
         private readonly ViewWindowModel model;
@@ -28,6 +29,29 @@ namespace PZPack.View
             list = new List<PZFile>();
 
             this.DataContext = model;
+        }
+
+        protected override void OnContentRendered(EventArgs e)
+        {
+            base.OnContentRendered(e);
+            scrollContent.LayoutUpdated += ScrollContent_LayoutUpdated;
+        }
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
+            scrollContent.LayoutUpdated -= ScrollContent_LayoutUpdated;
+        }
+
+        private void ScrollContent_LayoutUpdated(object? sender, EventArgs e)
+        {
+            if (!fileChangeFlag) return;
+
+            scrollContent.ScrollToVerticalOffset(0);
+            if (scrollContent.ScrollableWidth > 0)
+            {
+                scrollContent.ScrollToHorizontalOffset(scrollContent.ScrollableWidth / 2);
+            }
+            fileChangeFlag = false;
         }
 
         public void BindFiles(PZFile file, PZFile[] files)
@@ -63,6 +87,8 @@ namespace PZPack.View
                 scale = model.LockScale ? scale : 1;
                 UpdateImageScale();
                 model.ChangeFile(newFile.Name, index + 1, list.Count, bytes.Length);
+
+                fileChangeFlag = true;
             }
         }
         void Move(int offset)
@@ -139,6 +165,12 @@ namespace PZPack.View
             scale = newScale;
             UpdateImageScale();
         }
+        private void ChangeSizeToOriginal(object sender, RoutedEventArgs e)
+        {
+            scale = 1;
+            UpdateImageScale();
+        }
+        
         private void NextFile(object sender, RoutedEventArgs e)
         {
             Move(1);

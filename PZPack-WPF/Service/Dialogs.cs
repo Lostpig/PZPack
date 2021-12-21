@@ -10,14 +10,7 @@ namespace PZPack.View.Service
         public static void OpenReadOptionWindow()
         {
             ReadOptionWindow win = new() { Owner = Application.Current.MainWindow };
-            bool? ok = win.ShowDialog();
-
-            if (ok == true)
-            {
-                string source = win.Source;
-                string password = win.Password;
-                Reader.Open(source, password);
-            }
+            win.ShowDialog();
         }
         public static void OpenPackWindow()
         {
