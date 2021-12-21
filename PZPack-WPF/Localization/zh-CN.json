@@ -39,5 +39,27 @@
   "Extract": "提取",
   "Extract to": "提取到..",
   "Extracting": "提取中...",
-  "Extracted size": "提取文件大小："
+  "Extracted size": "提取文件大小：",
+  "Extracted complete": "提取操作已完成",
+  "Extracted canceled": "提取操作已取消",
+  "Packing complete": "打包操作已完成",
+  "Packing canceled": "打包操作已取消",
+  "Error": "错误",
+  "Message": "消息",
+  "Warning": "警告",
+  "MSG Password empty": "密码不能为空",
+  "MSG Source directory empty": "请选择源文件夹",
+  "MSG Output file empty": "请设置输出文件",
+
+  "EX SourceDirectoryIsEmpty": "错误：源目录【{0}】为空文件夹",
+  "EX OutputDirectoryIsNotEmpty": "错误：输出目标目录【{0}】不是空文件夹",
+  "EX OutputFileAlreadyExists": "错误：输出目标文件【{0}】已存在",
+  "EX FileVersionNotCompatiblity": "错误：文件版本【{0}】与当前应用不兼容（应用版本: {1}）",
+  "EX PZSignCheckedException": "错误：文件签名验证失败",
+  "EX PZPasswordIncorrect": "错误：文件密码错误",
+  "EX FileNotFound": "错误：未找到文件【{0}】",
+  "EX DirectoryNotFound": "错误：未找到目录【{0}】",
+  "EX PZFileNotOpened": "错误：文件未打开",
+  "EX Exception": "错误: {0}",
+  "EX Unknown": "错误: 未知错误"
 }

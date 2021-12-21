@@ -43,9 +43,9 @@ namespace PZPack.View
         async void LoadImage()
         {
             PZFile newFile = list[index];
-            if (current.HasValue)
+            if (current != null)
             {
-                if (current.Value.FolderId == newFile.FolderId && current.Value.Name == newFile.Name) return;
+                if (current.FolderId == newFile.FolderId && current.Name == newFile.Name) return;
             }
 
             current = newFile;

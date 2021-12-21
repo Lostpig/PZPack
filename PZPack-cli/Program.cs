@@ -1,18 +1,7 @@
 ﻿using PZPack.Cli;
 
-// Test.TestFolderTree();
-// Test.TestCrypto();
-// Test.TestStreamCrypto();
-// Test.TestFileEncrypt();
-// Test.TestFileDecrypt();
-// Test.TestMultiFileEncrypt();
-// Test.TestMultiFileDecrypt();
-
-// Test.FullEncodeTest();
-// Test.UnpackTest();
-
 Console.WriteLine("PZPack .Net console application");
-Console.WriteLine($"PZPack Version = {PZPack.Core.Common.Version}");
+Console.WriteLine($"PZPack Core Version = {PZPack.Core.Version.Current}");
 Console.WriteLine("Please select opearte:");
 
 string[] options = new string[]
@@ -29,5 +18,11 @@ switch (selected)
     case 0: Operates.Pack(); break;
     case 1: Operates.Unpack(); break;
     case 2: Operates.ViewInfo(); break;
-    default:    break;
+    default: break;
 }
+
+Console.WriteLine("PZPack excute complete");
+Console.WriteLine("Press any key close");
+var _ = Console.ReadKey(true).Key;
+
+Environment.Exit(0);

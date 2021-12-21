@@ -8,44 +8,7 @@ namespace PZPack.Core
         {
             return new FolderTree();
         }
-        static public IFolderNode Decode(byte[] bytes)
-        {
-            Dictionary<int, PZFolder> folderMap = new();
-            using (MemoryStream memStream = new(bytes))
-            {
-                memStream.Seek(0, SeekOrigin.Begin);
-                while (memStream.Position < memStream.Length)
-                {
-                    byte[] lenBi = new byte[4];
-                    memStream.Read(lenBi, 0, 4);
-                    int len = BitConverter.ToInt32(lenBi);
-                    byte[] folderBi = new byte[len];
-                    memStream.Read(folderBi, 0, len);
 
-                    PZFolder folder = PZFolder.FromBytes(folderBi);
-                    folderMap.Add(folder.Id, folder);
-                }
-            }
-
-            folderMap.Remove(IdCreator.RootId);
-            Node root = Node.CreateRoot();
-            foreach (var folder in folderMap.Values)
-            {
-                PZFolder temp = folder;
-                List<PZFolder> tempList = new();
-                while (true)
-                {
-                    tempList.Add(temp);
-                    if (temp.ParentId == IdCreator.RootId) { break; }
-                    temp = folderMap[temp.ParentId];
-                }
-
-                PZFolder[] arr = tempList.Reverse<PZFolder>().ToArray();
-                root.ReAdd(arr, 0);
-            }
-
-            return root;
-        }
         static public void EachNodes(IFolderNode node, Action<IFolderNode> func)
         {
             func(node);
@@ -61,21 +24,7 @@ namespace PZPack.Core
             return map;
         }
 
-        class IdCreator
-        {
-            public const int RootId = 10000;
-            private int Countor;
-            public IdCreator()
-            {
-                Countor = RootId + 1;
-            }
-            public int Next()
-            {
-                Countor++;
-                return Countor;
-            }
-        }
-        class Node : IFolderNode
+        internal class Node : IFolderNode
         {
             public static Node CreateRoot()
             {
@@ -90,7 +39,7 @@ namespace PZPack.Core
 
             private Node()
             {
-                Id = IdCreator.RootId;
+                Id = FolderIdCreator.RootId;
                 ParentId = 0;
                 Name = "";
                 FullName = "";
@@ -104,7 +53,7 @@ namespace PZPack.Core
                 FullName = Path.Join(parent.FullName, Name);
                 children = new Dictionary<string, Node>();
             }
-            public Node Add(string[] folders, int index, IdCreator idc)
+            public Node Add(string[] folders, int index, FolderIdCreator idc)
             {
                 if (index == folders.Length) { return this; }
 
@@ -133,17 +82,21 @@ namespace PZPack.Core
             }
         }
 
-        private readonly IdCreator Idc;
+        private readonly FolderIdCreator Idc;
         private readonly Node Root;
         private readonly Dictionary<string, int> cache;
         private FolderTree()
         {
             cache = new Dictionary<string, int>();
-            Idc = new IdCreator();
+            Idc = new FolderIdCreator();
             Root = Node.CreateRoot();
             cache.Add(Root.Name, Root.Id);
         }
 
+        public IFolderNode GetRoot()
+        {
+            return Root;
+        }
         public int EnsureFolder(string path)
         {
             string? folderPath = Path.GetDirectoryName(path);
@@ -161,24 +114,6 @@ namespace PZPack.Core
             Node node = Root.Add(folders, 0, Idc);
             cache.Add(folderPath, node.Id);
             return node.Id;
-        }
-        public byte[] Encode()
-        {
-            byte[] result;
-
-            using (MemoryStream stream = new(Common.MemInitLength))
-            {
-                EachNodes(Root, (node) =>
-                {
-                    PZFolder folder = new(node.Name, node.Id, node.ParentId);
-                    stream.Write(folder.ToBytes());
-                });
-
-                stream.Flush();
-                result = stream.ToArray();
-            }
-
-            return result;
         }
     }
 }

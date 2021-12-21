@@ -44,6 +44,27 @@ namespace PZPack.View.Service
             [TranslateBind("Extract to")] public static string Extract_to { get; set; }
             [TranslateBind("Extracting")] public static string Extracting { get; set; }
             [TranslateBind("Extracted size")] public static string Extracted_size { get; set; }
+            [TranslateBind("Extracted complete")] public static string Extracted_complete { get; set; }
+            [TranslateBind("Extracted canceled")] public static string Extracted_canceled { get; set; }
+            [TranslateBind("Packing complete")] public static string Packing_complete { get; set; }
+            [TranslateBind("Packing canceled")] public static string Packing_canceled { get; set; }
+            [TranslateBind("Error")] public static string Error { get; set; }
+            [TranslateBind("Message")] public static string Message { get; set; }
+            [TranslateBind("Warning")] public static string Warning { get; set; }
+            [TranslateBind("MSG Password empty")] public static string MSG_Password_empty { get; set; }
+            [TranslateBind("MSG Source directory empty")] public static string MSG_Source_directory_empty { get; set; }
+            [TranslateBind("MSG Output file empty")] public static string MSG_Output_file_empty { get; set; }
+            [TranslateBind("EX SourceDirectoryIsEmpty")] public static string EX_SourceDirectoryIsEmpty { get; set; }
+            [TranslateBind("EX OutputDirectoryIsNotEmpty")] public static string EX_OutputDirectoryIsNotEmpty { get; set; }
+            [TranslateBind("EX OutputFileAlreadyExists")] public static string EX_OutputFileAlreadyExists { get; set; }
+            [TranslateBind("EX FileVersionNotCompatiblity")] public static string EX_FileVersionNotCompatiblity { get; set; }
+            [TranslateBind("EX PZSignCheckedException")] public static string EX_PZSignCheckedException { get; set; }
+            [TranslateBind("EX PZPasswordIncorrect")] public static string EX_PZPasswordIncorrect { get; set; }
+            [TranslateBind("EX FileNotFound")] public static string EX_FileNotFound { get; set; }
+            [TranslateBind("EX DirectoryNotFound")] public static string EX_DirectoryNotFound { get; set; }
+            [TranslateBind("EX PZFileNotOpened")] public static string EX_PZFileNotOpened { get; set; }
+            [TranslateBind("EX Exception")] public static string EX_Exception { get; set; }
+            [TranslateBind("EX Unknown")] public static string EX_Unknown { get; set; }
         #pragma warning restore CS8618
     }
 }

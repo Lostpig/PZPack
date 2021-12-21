@@ -28,7 +28,7 @@ namespace PZPack.View.Service
             } 
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK);
+                Alert.ShowException(ex);
                 Instance = null;
             }
 

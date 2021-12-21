@@ -46,19 +46,19 @@ namespace PZPack.View
                 var startTime = DateTime.Now;
                 long size = await Reader.Instance.UnpackAll(output, reporter, ctoken);
                 var usedTime = DateTime.Now - startTime;
-                MessageBox.Show($"Extract complete", "Message", MessageBoxButton.OK);
+                Alert.ShowMessage(Translate.Extracted_complete);
                 model.UpdateComplete(size, usedTime);
             }
             catch (OperationCanceledException)
             {
                 Debug.WriteLine("Extract task canceled");
-                MessageBox.Show("Packing task canceled", "Warning", MessageBoxButton.OK);
+                Alert.ShowMessage(Translate.Extracted_canceled);
                 Close();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("Extract task failed");
-                MessageBox.Show(ex.Message ?? "Unknown error", "Error", MessageBoxButton.OK);
+                Alert.ShowException(ex);
                 Close();
             }
             finally
@@ -88,18 +88,18 @@ namespace PZPack.View
                 var startTime = DateTime.Now;
                 await Reader.Instance.UnpackFile(file, output, reporter, ctoken);
                 var usedTime = DateTime.Now - startTime;
-                MessageBox.Show($"Extract complete", "Message", MessageBoxButton.OK);
+                Alert.ShowMessage(Translate.Extracted_complete);
                 model.UpdateComplete(file.Size, usedTime);
             }
             catch (OperationCanceledException)
             {
                 Debug.WriteLine("Extract task canceled");
-                MessageBox.Show("Extract task canceled", "Warning", MessageBoxButton.OK);
+                Alert.ShowMessage(Translate.Extracted_canceled);
                 Close();
             }
             catch(Exception ex)
             {
-                MessageBox.Show(ex.Message ?? "Unknown error", "Error", MessageBoxButton.OK);
+                Alert.ShowException(ex);
                 Close();
             }
             finally
@@ -107,11 +107,10 @@ namespace PZPack.View
                 cancelSource.Dispose();
                 cancelSource = null;
             }
-            
         }
         private void NoFileOpened()
         {
-            MessageBox.Show("No opened PZPack file available");
+            Alert.ShowWarning(Translate.EX_PZFileNotOpened);
             Close();
         }
 

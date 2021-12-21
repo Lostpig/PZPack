@@ -50,27 +50,27 @@ namespace PZPack.View
         {
             if (string.IsNullOrWhiteSpace(model.Password))
             {
-                MessageBox.Show("Password is empty", "Warning", MessageBoxButton.OK);
+                Alert.ShowWarning(Translate.MSG_Password_empty);
                 return false;
             }
             if (string.IsNullOrWhiteSpace(model.Source))
             {
-                MessageBox.Show("Please select a source directory first", "Warning", MessageBoxButton.OK);
+                Alert.ShowWarning(Translate.MSG_Source_directory_empty);
                 return false;
             }
             if (!Directory.Exists(model.Source))
             {
-                MessageBox.Show("Source directory not exits", "Warning", MessageBoxButton.OK);
+                Alert.ShowWarning(string.Format(Translate.EX_DirectoryNotFound, model.Source));
                 return false;
             }
             if (string.IsNullOrWhiteSpace(model.Target))
             {
-                MessageBox.Show("Please setting save file first", "Warning", MessageBoxButton.OK);
+                Alert.ShowWarning(Translate.MSG_Output_file_empty);
                 return false;
             }
             if (File.Exists(model.Target))
             {
-                MessageBox.Show("Save file is already exists", "Warning", MessageBoxButton.OK);
+                Alert.ShowWarning(string.Format(Translate.EX_OutputFileAlreadyExists, model.Target));
                 return false;
             }
 
@@ -89,27 +89,26 @@ namespace PZPack.View
                 (int count, int total, long fileUsed, long fileTotal) = n;
                 model.UpdateProgress(count, total, fileUsed, fileTotal);
             });
-            PackOption option = new(model.Password, model.Remark);
+            PZPackInfo info = new(model.Password, model.Remark);
 
-            
             try
             {
                 var startTime = DateTime.Now;
-                long size = await PZPacker.Pack(model.Source, model.Target, option, reporter, token);
+                long size = await PZPacker.Pack(model.Source, model.Target, info, reporter, token);
                 var usedTime = DateTime.Now - startTime;
 
-                MessageBox.Show($"Packing complete", "Message", MessageBoxButton.OK);
+                Alert.ShowMessage(Translate.Packing_complete);
                 model.UpdateComplete(size, usedTime);
             }
             catch (OperationCanceledException)
             {
                 Debug.WriteLine("Packing task canceled");
-                MessageBox.Show("Packing tack canceled", "Warning", MessageBoxButton.OK);
+                Alert.ShowMessage(Translate.Packing_canceled);
                 model.UpdateState(PackState.Setting);
             }
             catch(Exception ex)
             {
-                MessageBox.Show(ex.Message ?? "Unknown error", "Error", MessageBoxButton.OK);
+                Alert.ShowException(ex);
                 model.UpdateState(PackState.Setting);
             }
             finally

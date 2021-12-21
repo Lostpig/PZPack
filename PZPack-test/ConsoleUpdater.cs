@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PZPack.Cli
+namespace PZPack.Test
 {
     class ConsoleUpdater
     {

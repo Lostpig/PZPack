@@ -55,11 +55,11 @@ namespace PZPack.Cli
             string? description = Console.ReadLine();
 
             var updater = new ConsoleUpdater();
-            var progress = new ProgressReporter<(int, int)>((tp) =>
+            var progress = new ProgressReporter<(int, int, long, long)>((v) =>
             {
-                (int count, int total) = tp;
-                double prec = (count / Convert.ToDouble(total)) * 100;
-                updater.Update($"{prec:F1}% ({count} / {total})");
+                (int count, int total, long processed, long size) = v;
+                double prec = processed / size * 100;
+                updater.Update($"{processed:f1}% ({count} / {total})");
             });
 
             updater.Begin();
@@ -67,8 +67,10 @@ namespace PZPack.Cli
             var startTime = DateTime.Now;
             try
             {
-                PackOption option = new(password, description ?? "");
-                len = PZPacker.Pack(inputPath, outputPath, option, progress);
+                PZPackInfo info = new(password, description ?? "");
+                var task = PZPacker.Pack(inputPath, outputPath, info, progress);
+                task.Wait();
+                len = task.Result;
             }
             catch (Exception ex)
             {
@@ -121,30 +123,35 @@ namespace PZPack.Cli
             }
 
             var updater = new ConsoleUpdater();
-            var progress = new ProgressReporter<(int, int)>((tp) =>
+            var progress = new ProgressReporter<(int, int, long, long)>((v) =>
             {
-                (int count, int total) = tp;
-                double prec = (count / Convert.ToDouble(total)) * 100;
-                updater.Update($"{prec:F1}% ({count} / {total})");
+                (int count, int total, long processed, long size) = v;
+                double prec = processed / size * 100;
+                updater.Update($"{processed:f1}% ({count} / {total})");
             });
 
-            updater.Begin();
+            
             long len = 0;
             int files = 0;
             var startTime = DateTime.Now;
             try
             {
                 PZReader reader = PZReader.Open(inputPath, password);
-                reader.UnpackAll(outputPath, progress);
-                len = reader.PackSize;
+                Console.WriteLine($"File version: {reader.FileVersion}");
+
+                updater.Begin();
+                Task<long> task = reader.UnpackAll(outputPath, progress);
+                task.Wait();
+                len = task.Result;
                 files = reader.FileCount;
             }
             catch (Exception ex)
             {
                 updater.End();
                 Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Error on unpack:");
                 Console.WriteLine(ex.Message);
-                Console.Clear();
+                Console.ResetColor();
                 return;
             }
             var endTime = DateTime.Now;
@@ -186,6 +193,7 @@ namespace PZPack.Cli
             {
                 PZReader reader = PZReader.Open(inputPath, password);
                 Console.WriteLine($"Load pzpk file {inputPath}");
+                Console.WriteLine($"File version = {reader.FileVersion}");
                 Console.WriteLine($"Description: {reader.Description}");
                 Console.WriteLine($"Files count: {reader.FileCount}");
                 Console.WriteLine($"Folders count: {reader.FolderCount}");

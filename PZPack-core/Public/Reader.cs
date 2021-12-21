@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PZPack.Core.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace PZPack.Core
         {
             if (!File.Exists(source))
             {
-                throw new FileNotFoundException($"File not found: {source}");
+                throw new FileNotFoundException($"File {source} not found", source);
             }
             FileStream sourceStream = File.OpenRead(source);
             PZCrypto crypto = new(password);
@@ -30,7 +31,7 @@ namespace PZPack.Core
             int version = BitConverter.ToInt32(versionBi);
             if (!Compatibles.IsCompatibleVersion(version))
             {
-                throw new Exception($"PZPack file version {version} is not compatiblity (Current version is {Common.Version})");
+                throw new FileVersionNotCompatiblityException(version);
             }
             Debug.WriteLineIf(version != Common.Version, $"Open file is old verison {version}");
 
@@ -40,7 +41,7 @@ namespace PZPack.Core
             string signHex = PZCrypto.HashHex(Common.Sign);
             if (fileSign != signHex)
             {
-                throw new Exception($"PZPack file sign check failed");
+                throw new PZSignCheckedException();
             }
 
             byte[] pwHashBi = new byte[32];
@@ -49,7 +50,7 @@ namespace PZPack.Core
             string pwHashHex = Convert.ToHexString(crypto.GetPwCheckHash());
             if (filePwHash != pwHashHex)
             {
-                throw new Exception($"PZPack file password check failed");
+                throw new PZPasswordIncorrectException();
             }
 
             return version;
@@ -69,7 +70,7 @@ namespace PZPack.Core
                 bool isEmpty = scan(root);
                 if (!isEmpty)
                 {
-                    throw new Exception($"Directory {path} is not empty");
+                    throw new OutputDirectoryIsNotEmptyException(path);
                 }
             }
 
@@ -107,6 +108,7 @@ namespace PZPack.Core
         public int FileCount { get => Index.FileCount; }
         public int FolderCount { get => Index.FolderCount; }
         public long PackSize { get => stream.Length; }
+        public int FileVersion { get => fileVersion; }
 
         private readonly int fileVersion;
         private readonly PZCrypto crypto;
@@ -150,7 +152,7 @@ namespace PZPack.Core
             t.Wait();
             byte[] idxBi = ms.ToArray();
 
-            return Compatible.Decoder.DecodeIndexData(idxBi, fileVersion);
+            return Compatible.PZCodec.DecodeIndexData(idxBi, fileVersion);
         }
         private string GetDescription()
         {
@@ -207,12 +209,12 @@ namespace PZPack.Core
         {
             if (File.Exists(fullOutput))
             {
-                throw new Exception($"Unpack target file {fullOutput} is already exists");
+                throw new OutputFileAlreadyExistsException(fullOutput);
             }
             string? dir = Path.GetDirectoryName(fullOutput);
             if (dir == null)
             {
-                throw new Exception($"Unpack target file path {fullOutput} invalid");
+                throw new DirectoryNotFoundException(fullOutput);
             }
 
             EnsureDirectory(dir);

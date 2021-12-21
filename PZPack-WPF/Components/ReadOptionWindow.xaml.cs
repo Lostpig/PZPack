@@ -31,7 +31,7 @@ namespace PZPack.View
             string password = VModel.Password;
             if (string.IsNullOrWhiteSpace(password))
             {
-                MessageBox.Show("Password is empty", "Warning", MessageBoxButton.OK);
+                Alert.ShowMessage(Translate.MSG_Password_empty);
                 return;
             }
 

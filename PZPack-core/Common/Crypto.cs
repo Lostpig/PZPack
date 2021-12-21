@@ -4,7 +4,7 @@ using System;
 
 namespace PZPack.Core
 {
-    public class PZCrypto : IDisposable
+    internal class PZCrypto : IDisposable
     {
         private readonly Aes Cryptor;
         private readonly byte[] Key;
