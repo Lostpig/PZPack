@@ -26,6 +26,7 @@
   "Size": "大小",
   "Original size": "原始大小",
   "Filetype": "文件类型",
+  "File version": "文件版本：",
   "Source directory": "打包目录",
   "Choose directory": "选择目录",
   "Target file": "目标文件",

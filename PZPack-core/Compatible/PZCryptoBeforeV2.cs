@@ -1,46 +1,48 @@
 ﻿using System.Security.Cryptography;
-using System.Text;
-using System;
 
-namespace PZPack.Core
+namespace PZPack.Core.Compatible
 {
-    public class PZCrypto : IDisposable
+    internal class PZCryptoBeforeV2: IPZCrypto
     {
-        private readonly Aes Cryptor;
+        const int KeySize = 256;
+        const int IVSize = 128;
         private readonly byte[] Key;
-        private readonly byte[] Nonce;
-        public PZCrypto(string password)
-        {
-            Cryptor = Aes.Create();
-            Cryptor.Mode = CipherMode.CBC;
+        private readonly byte[] IV;
 
-            byte[] key = new byte[Cryptor.KeySize / 8];
-            byte[] pwHash = Hash(password);
+        public PZCryptoBeforeV2(string password)
+        {
+            byte[] key = new byte[KeySize / 8];
+            byte[] pwHash = PZHash.Hash(password);
             Array.Copy(pwHash, 0, key, 0, key.Length);
             Key = key;
 
-            byte[] nonce = new byte[Cryptor.BlockSize / 8];
-            byte[] ivHash = Hash(pwHash);
-            Array.Copy(ivHash, 0, nonce, 0, nonce.Length);
-            Nonce = nonce;
+            byte[] iv = new byte[IVSize / 8];
+            byte[] ivHash = PZHash.Hash(pwHash);
+            Array.Copy(ivHash, 0, iv, 0, iv.Length);
+            IV = iv;
+        }
+
+        private static Aes NewCryptor()
+        {
+            Aes cryptor = Aes.Create();
+            cryptor.Mode = CipherMode.CBC;
+            cryptor.KeySize = KeySize;
+            return cryptor;
         }
 
         public byte[] GetPwCheckHash()
         {
-            string hex = HashHex(Key);
-            return Hash(hex);
+            string hex = PZHash.HashHex(Key);
+            return PZHash.Hash(hex);
         }
         public byte[] Encrypt(byte[] bytes)
         {
             byte[] result;
 
-            using (ICryptoTransform encryptor = Cryptor.CreateEncryptor(Key, Nonce))
-            using (MemoryStream memStream = new())
-            using (CryptoStream cryptoStream = new(memStream, encryptor, CryptoStreamMode.Write))
+            using (MemoryStream targetStream = new(), sourceStream = new(bytes))
             {
-                cryptoStream.Write(bytes, 0, bytes.Length);
-                cryptoStream.FlushFinalBlock();
-                result = memStream.ToArray();
+                EncryptStream(sourceStream, targetStream);
+                result = targetStream.ToArray();
             }
 
             return result;
@@ -49,24 +51,72 @@ namespace PZPack.Core
         {
             byte[] result;
 
-            using (ICryptoTransform decryptor = Cryptor.CreateDecryptor(Key, Nonce))
-            using (MemoryStream memStream = new())
-            using (CryptoStream cryptoStream = new(memStream, decryptor, CryptoStreamMode.Write))
+            using (MemoryStream targetStream = new(), sourceStream = new(bytes))
             {
-                cryptoStream.Write(bytes, 0, bytes.Length);
-                cryptoStream.FlushFinalBlock();
-                result = memStream.ToArray();
+                DecryptStream(sourceStream, targetStream, 0, bytes.Length);
+                result = targetStream.ToArray();
             }
 
             return result;
         }
 
-        public async Task<long> EncryptStream(Stream source, Stream target, IProgress<(long, long)>? progress = default, CancellationToken? cancelToken = null)
+        public long EncryptStream(Stream source, Stream target)
         {
             long startPos = target.Position;
             byte[] buffer = new byte[8192];
 
-            using (ICryptoTransform encryptor = Cryptor.CreateEncryptor(Key, Nonce))
+            using (Aes crypto = NewCryptor())
+            using (ICryptoTransform encryptor = crypto.CreateEncryptor(Key, IV))
+            using (CryptoStream encryptStream = new(source, encryptor, CryptoStreamMode.Read))
+            {
+                int bytesRead;
+                do
+                {
+                    bytesRead = encryptStream.Read(buffer);
+                    target.Write(buffer, 0, bytesRead);
+                } while (bytesRead > 0);
+            }
+
+            return target.Position - startPos;
+        }
+        public long DecryptStream(Stream source, Stream target, long offset, long size)
+        {
+            byte[] buffer = new byte[8192];
+            long resultLen = 0;
+
+            source.Seek(offset, SeekOrigin.Begin);
+            using (Aes crypto = NewCryptor())
+            using (ICryptoTransform decryptor = crypto.CreateDecryptor(Key, IV))
+            using (CryptoStream decryptStream = new(target, decryptor, CryptoStreamMode.Write))
+            {
+                long remain = size;
+                int bytesRead;
+                int bytesWrite;
+
+                do
+                {
+                    bytesRead = source.Read(buffer);
+                    if (remain < bytesRead) bytesWrite = (int)remain;
+                    else bytesWrite = bytesRead;
+
+                    decryptStream.Write(buffer, 0, bytesWrite);
+                    remain -= bytesRead;
+                } while (remain > 0);
+                decryptStream.FlushFinalBlock();
+
+                resultLen = target.Length;
+            }
+
+            return resultLen;
+        }
+
+        public async Task<long> EncryptStreamAsync(Stream source, Stream target, IProgress<(long, long)>? progress = default, CancellationToken? cancelToken = null)
+        {
+            long startPos = target.Position;
+            byte[] buffer = new byte[8192];
+
+            using (Aes crypto = NewCryptor())
+            using (ICryptoTransform encryptor = crypto.CreateEncryptor(Key, IV))
             using (CryptoStream encryptStream = new(source, encryptor, CryptoStreamMode.Read))
             {
                 int bytesRead;
@@ -92,19 +142,21 @@ namespace PZPack.Core
 
             return target.Position - startPos;
         }
-        public async Task<long> DecryptStream(Stream source, Stream target, long offset, long size, IProgress<(long, long)>? progress = default, CancellationToken? cancelToken = null)
+        public async Task<long> DecryptStreamAsync(Stream source, Stream target, long offset, long size, IProgress<(long, long)>? progress = default, CancellationToken? cancelToken = null)
         {
             byte[] buffer = new byte[8192];
             long resultLen = 0;
 
-            using (ICryptoTransform decryptor = Cryptor.CreateDecryptor(Key, Nonce))
+            source.Seek(offset, SeekOrigin.Begin);
+
+            using (Aes crypto = NewCryptor())
+            using (ICryptoTransform decryptor = crypto.CreateDecryptor(Key, IV))
             using (CryptoStream decryptStream = new(target, decryptor, CryptoStreamMode.Write))
             {
                 long remain = size;
                 int bytesRead;
                 int bytesWrite;
 
-                source.Seek(offset, SeekOrigin.Begin);
                 if (cancelToken.HasValue)
                 {
                     do
@@ -139,32 +191,8 @@ namespace PZPack.Core
             return resultLen;
         }
 
-        public static byte[] Hash(string text)
-        {
-            byte[] bytes = Encoding.UTF8.GetBytes(text);
-            return Hash(bytes);
-        }
-        public static byte[] Hash(byte[] source)
-        {
-            SHA256 sHA256 = SHA256.Create();
-            return sHA256.ComputeHash(source);
-        }
-        public static string HashHex(string text)
-        {
-            byte[] hashBytes = Hash(text);
-            return Convert.ToHexString(hashBytes);
-        }
-        public static string HashHex(byte[] source)
-        {
-            byte[] hashBytes = Hash(source);
-            return Convert.ToHexString(hashBytes);
-        }
-
         public void Dispose()
         {
-            Cryptor.Clear();
-            Cryptor.Dispose();
-
             GC.SuppressFinalize(this);
         }
     }

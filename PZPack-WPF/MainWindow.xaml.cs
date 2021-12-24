@@ -16,12 +16,6 @@ namespace PZPack.View
             InitializeComponent();
             VModel = new MainWindowModel();
             this.DataContext = VModel;
-
-            ReaderHandler = new((sender, e) =>
-            {
-                VModel.Update(e.Action == Service.PZReaderChangeAction.OPEN);
-                mainContent.Update(e.Action == Service.PZReaderChangeAction.OPEN);
-            });
         }
 
         private void OnOpenFile(object sender, RoutedEventArgs e)
@@ -29,12 +23,16 @@ namespace PZPack.View
             Dialogs.OpenReadOptionWindow();
         }
 
-        internal EventHandler<Service.PZReaderChangeEventArgs> ReaderHandler;
+        private void Reader_PZReaderChanged(object? sender, PZReaderChangeEventArgs e)
+        {
+            VModel.Update(e.Action == Service.PZReaderChangeAction.OPEN);
+            mainContent.Update(e.Action == Service.PZReaderChangeAction.OPEN);
+        }
 
         protected override void OnContentRendered(EventArgs e)
         {
             base.OnContentRendered(e);
-            Service.Reader.PZReaderChanged += ReaderHandler;
+            Service.Reader.PZReaderChanged += Reader_PZReaderChanged; ;
 
             /// TEST: DELETE BEFORE RELEASE
             // Service.Reader.Open(@"D:\Media\pictures2.pzpk", "4294967296");
@@ -42,7 +40,7 @@ namespace PZPack.View
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
-            Service.Reader.PZReaderChanged -= ReaderHandler;
+            Service.Reader.PZReaderChanged -= Reader_PZReaderChanged;
         }
     }
 
@@ -73,6 +71,7 @@ namespace PZPack.View
         public string FileSize { get; set; } = "0MB";
         public string FileInnerCounts { get; set; } = "0";
         public string FileDescription { get; set; } = "-";
+        public string FileVersion { get; set; } = "-";
 
         public bool FileOpened
         {
@@ -107,6 +106,7 @@ namespace PZPack.View
                 FileSize = FileSystem.ComputeFileSize(Reader.Instance.PackSize);
                 FileInnerCounts = Reader.Instance.FileCount.ToString();
                 FileDescription = Reader.Instance.Description;
+                FileVersion = Reader.Instance.FileVersion.ToString();
 
                 NotifyFileInfoUpdate();
             }
@@ -117,6 +117,7 @@ namespace PZPack.View
             FileSize = "0.0MB";
             FileInnerCounts = "0";
             FileDescription = "-";
+            FileVersion = "-";
 
             NotifyFileInfoUpdate();
         }
@@ -126,6 +127,7 @@ namespace PZPack.View
             NotifyPropertyChanged(nameof(FileSize));
             NotifyPropertyChanged(nameof(FileInnerCounts));
             NotifyPropertyChanged(nameof(FileDescription));
+            NotifyPropertyChanged(nameof(FileVersion));
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

@@ -12,7 +12,7 @@ namespace PZPack.Core
         {
             return version switch
             {
-                1 => true,
+                1 or 2 => true,
                 Common.Version => true,
                 _ => false
             };

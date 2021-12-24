@@ -4,6 +4,6 @@
     {
         internal const int MemInitLength = 65536;
         internal const string Sign = "PZPACK";
-        internal const int Version = 2;
+        internal const int Version = 3;
     }
 }

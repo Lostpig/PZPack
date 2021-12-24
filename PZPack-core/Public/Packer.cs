@@ -36,7 +36,7 @@ namespace PZPack.Core
         private void WritePackHead()
         {
             byte[] versionBi = BitConverter.GetBytes(Common.Version);
-            byte[] signBi = PZCrypto.Hash(Common.Sign);
+            byte[] signBi = PZHash.Hash(Common.Sign);
             byte[] pwHashBi = Crypto.GetPwCheckHash();
 
             Writer.Write(versionBi, 0, versionBi.Length);
@@ -72,7 +72,7 @@ namespace PZPack.Core
         private readonly string Source;
         private readonly string Output;
         private readonly string Description;
-        private readonly PZCrypto Crypto;
+        private readonly IPZCrypto Crypto;
 
         private bool IsComplete = false;
         private bool HasError = false;
@@ -86,7 +86,7 @@ namespace PZPack.Core
             Source = source;
             Output = output;
             Description = info.Description;
-            Crypto = new(info.Password);
+            Crypto = PZCryptoCreater.CreateCrypto(info.Password, PZVersion.Current);
 
             if (File.Exists(Output))
             {
@@ -126,7 +126,7 @@ namespace PZPack.Core
                     using (FileStream fs = file.OpenRead())
                     {
                         long offset = Writer.Position;
-                        size = await Crypto.EncryptStream(fs, Writer, innerProgress, cancelToken);
+                        size = await Crypto.EncryptStreamAsync(fs, Writer, innerProgress, cancelToken);
                         Index.AppendFile(relativePath, offset, size);
                         Debug.Assert(size == Writer.Position - offset);
                     }

@@ -1,7 +1,7 @@
 ﻿using PZPack.Cli;
 
 Console.WriteLine("PZPack .Net console application");
-Console.WriteLine($"PZPack Core Version = {PZPack.Core.Version.Current}");
+Console.WriteLine($"PZPack Core Version = {PZPack.Core.PZVersion.Current}");
 Console.WriteLine("Please select opearte:");
 
 string[] options = new string[]

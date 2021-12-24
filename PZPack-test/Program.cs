@@ -1,9 +1,8 @@
 ﻿using PZPack.Test;
 
-var task1 = Tests.TestBytesEncodeAndDecode();
-task1.Wait();
+Tests.TestBytesEncodeAndDecode();
 
-var task2 = Tests.EncodeAndDocodeTest();
-task2.Wait();
+var task = Tests.EncodeAndDocodeTest();
+task.Wait();
 
 Console.WriteLine("Test complete");

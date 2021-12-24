@@ -30,6 +30,7 @@ namespace PZPack.View.Service
             [TranslateBind("Size")] public static string Size { get; set; }
             [TranslateBind("Original size")] public static string Original_size { get; set; }
             [TranslateBind("Filetype")] public static string Filetype { get; set; }
+            [TranslateBind("File version")] public static string File_version { get; set; }
             [TranslateBind("Source directory")] public static string Source_directory { get; set; }
             [TranslateBind("Choose directory")] public static string Choose_directory { get; set; }
             [TranslateBind("Target file")] public static string Target_file { get; set; }

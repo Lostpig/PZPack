@@ -1,10 +1,6 @@
 ﻿using PZPack.Core.Exceptions;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace PZPack.Core
 {
@@ -17,15 +13,16 @@ namespace PZPack.Core
                 throw new FileNotFoundException($"File {source} not found", source);
             }
             FileStream sourceStream = File.OpenRead(source);
-            PZCrypto crypto = new(password);
 
-            int version = CheckFileHead(sourceStream, crypto);
+            int version = GetFileVersion(sourceStream);
+            IPZCrypto crypto = PZCryptoCreater.CreateCrypto(password, version);
+
+            CheckFileHead(sourceStream, crypto);
             return new PZReader(source, sourceStream, crypto, version);
         }
-        private static int CheckFileHead(FileStream stream, PZCrypto crypto)
+        private static int GetFileVersion(FileStream stream)
         {
             stream.Seek(0, SeekOrigin.Begin);
-
             byte[] versionBi = new byte[4];
             stream.Read(versionBi);
             int version = BitConverter.ToInt32(versionBi);
@@ -35,10 +32,15 @@ namespace PZPack.Core
             }
             Debug.WriteLineIf(version != Common.Version, $"Open file is old verison {version}");
 
+            return version;
+        }
+        private static void CheckFileHead(FileStream stream, IPZCrypto crypto)
+        {
+            stream.Seek(4, SeekOrigin.Begin);
             byte[] signBi = new byte[32];
             stream.Read(signBi);
             string fileSign = Convert.ToHexString(signBi);
-            string signHex = PZCrypto.HashHex(Common.Sign);
+            string signHex = PZHash.HashHex(Common.Sign);
             if (fileSign != signHex)
             {
                 throw new PZSignCheckedException();
@@ -52,8 +54,6 @@ namespace PZPack.Core
             {
                 throw new PZPasswordIncorrectException();
             }
-
-            return version;
         }
         private static void EnsureDirectory(string path)
         {
@@ -111,7 +111,7 @@ namespace PZPack.Core
         public int FileVersion { get => fileVersion; }
 
         private readonly int fileVersion;
-        private readonly PZCrypto crypto;
+        private readonly IPZCrypto crypto;
         private readonly FileStream stream;
         private IndexDecoder? idx;
         private string? desc;
@@ -127,7 +127,7 @@ namespace PZPack.Core
             }
         }
 
-        private PZReader(string source, FileStream stream, PZCrypto crypto, int version)
+        private PZReader(string source, FileStream stream, IPZCrypto crypto, int version)
         {
             Source = source;
             this.crypto = crypto;
@@ -148,8 +148,7 @@ namespace PZPack.Core
             long idxOffset = BitConverter.ToInt64(idxOffsetBi);
             int size = (int)(stream.Length - idxOffset);
             using MemoryStream ms = new();
-            Task t = crypto.DecryptStream(stream, ms, idxOffset, size);
-            t.Wait();
+            crypto.DecryptStream(stream, ms, idxOffset, size);
             byte[] idxBi = ms.ToArray();
 
             return Compatible.PZCodec.DecodeIndexData(idxBi, fileVersion);
@@ -221,7 +220,7 @@ namespace PZPack.Core
             long length = 0;
             using (FileStream fs = File.Create(fullOutput))
             {
-                length = await crypto.DecryptStream(stream, fs, file.Offset, file.Size, progress, cancelToken);
+                length = await crypto.DecryptStreamAsync(stream, fs, file.Offset, file.Size, progress, cancelToken);
             }
 
             return length;
@@ -229,7 +228,7 @@ namespace PZPack.Core
         public async Task<byte[]> ReadFile(PZFile file)
         {
             using MemoryStream ms = new();
-            await crypto.DecryptStream(stream, ms, file.Offset, file.Size);
+            await crypto.DecryptStreamAsync(stream, ms, file.Offset, file.Size);
             return ms.ToArray();
         }
         public async Task<long> UnpackAll(string output, IProgress<(int, int, long, long)>? progress = default, CancellationToken? cancelToken = null)

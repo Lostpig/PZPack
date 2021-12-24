@@ -1,6 +1,6 @@
 ﻿namespace PZPack.Core
 {
-    public class Version
+    public class PZVersion
     {
         public static int Current { get => Common.Version; }
         public static bool CompatibleVersion(int version)

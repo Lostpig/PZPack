@@ -203,7 +203,7 @@ namespace PZPack.Cli
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex.Message);
-                Console.Clear();
+                Console.ResetColor();
                 return;
             }
         }
