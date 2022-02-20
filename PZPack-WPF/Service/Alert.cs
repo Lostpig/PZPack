@@ -26,7 +26,7 @@ namespace PZPack.View.Service
                 OutputFileAlreadyExistsException exf =>
                     string.Format(Translate.EX_OutputFileAlreadyExists, exf.FileName),
                 FileVersionNotCompatiblityException exf => 
-                    string.Format(Translate.EX_FileVersionNotCompatiblity, exf.Version),
+                    string.Format(Translate.EX_FileVersionNotCompatiblity, exf.Version, Core.PZVersion.Current),
                 PZSignCheckedException => Translate.EX_PZSignCheckedException,
                 PZPasswordIncorrectException => Translate.EX_PZPasswordIncorrect,
                 _ => 

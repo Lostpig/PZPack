@@ -15,64 +15,6 @@ namespace PZPack.Test
 
             return true;
         }
-        public static async Task EncodeAndDocodeTest()
-        {
-            string source = @"D:\Code\Test\Files\Resources";
-            string output = @"D:\Code\Test\Files\Output.pzpk";
-            string description = "test";
-            string password = "12345678";
-
-            if (File.Exists(output))
-            {
-                File.Delete(output);
-            }
-
-            Console.WriteLine("Encode test start");
-            var updater = new ConsoleUpdater();
-            await PZPacker.Pack(
-                source,
-                output,
-                new PZPackInfo(password, description),
-                new ProgressReporter<(int, int, long, long)>((v) =>
-                {
-                    (int count, int total, long processed, long size) = v;
-                    double prec = processed / size;
-                    updater.Update($"Progress: ${prec:f1}% (${count} / ${total})");
-                })
-            );
-            updater.End();
-            Console.WriteLine("Encode test complete");
-
-            Console.WriteLine("Decode test start");
-            var reader = PZReader.Open(output, password);
-            var decryptor = PZCryptoCreater.CreateCrypto(password, PZVersion.Current);
-            Debug.Assert(reader.Description == description);
-
-            PZFile[] packfiles = reader.GetAllFiles();
-            FileInfo[] files = new DirectoryInfo(source).GetFiles();
-            foreach (FileInfo file in files)
-            {
-                PZFile include = packfiles.First(f => f.Name == file.Name);
-                Debug.Assert(include != null);
-
-                byte[] ibytes = await reader.ReadFile(include);
-                byte[] obytes = File.ReadAllBytes(file.FullName);
-                byte[] oebytes = decryptor.Encrypt(obytes);
-
-                byte[] ebytes = reader.ReadOrigin(include.Offset, include.Size);
-                byte[] dbytes = decryptor.Decrypt(ebytes);
-
-                bool isEqual = CompareBytes(ibytes, obytes);
-                bool isEqual2 = CompareBytes(dbytes, obytes);
-                bool isEqualE = CompareBytes(oebytes, ebytes);
-                Debug.Assert(isEqual);
-                Debug.Assert(isEqual2);
-                Debug.Assert(!isEqualE);
-            }
-
-            reader.Dispose();
-            Console.WriteLine("Decode test complete");
-        }
 
         public static void TestBytesEncodeAndDecode()
         {

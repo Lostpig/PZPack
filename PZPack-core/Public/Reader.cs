@@ -57,6 +57,11 @@ namespace PZPack.Core
         }
         private static void EnsureDirectory(string path)
         {
+            if (File.Exists(path))
+            {
+                throw new PathIsNotDirectoryException(path);
+            }
+
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);

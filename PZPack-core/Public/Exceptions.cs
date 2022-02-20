@@ -43,4 +43,13 @@ namespace PZPack.Core.Exceptions
     {
         public PZPasswordIncorrectException(string? message = default) : base(message) { }
     }
+    public class PathIsNotDirectoryException : Exception
+    {
+        public string DirectoryPath { get; init; }
+        public PathIsNotDirectoryException(string dirPath, string? message = default) : base(message)
+        {
+            DirectoryPath = dirPath;
+        }
+    }
+
 }
