@@ -3,7 +3,7 @@ using System.Text;
 
 namespace PZPack.Core
 {
-    internal static class PZHash
+    public static class PZHash
     {
         public static byte[] Hash(string text)
         {

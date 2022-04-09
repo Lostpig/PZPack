@@ -25,7 +25,9 @@ namespace PZPack.View.Service
             try
             {
                 Instance = PZReader.Open(source, password);
-            } 
+                DashServer.Instance.Binding(Instance);
+                DashServer.Instance.Start();
+            }
             catch (Exception ex)
             {
                 Alert.ShowException(ex);
@@ -34,17 +36,17 @@ namespace PZPack.View.Service
 
             if (Instance != null)
             {
-                PZReaderChanged?.Invoke(null, new PZReaderChangeEventArgs(PZReaderChangeAction.OPEN, source));
+                PZReaderChanged?.Invoke(null, new PZReaderChangeEventArgs(PZReaderChangeAction.OPEN, source, Instance.PZType));
             }
 
             return Instance != null;
         }
 
-
         static public void Close()
         {
             if (Instance != null)
             {
+                DashServer.Instance.Binding(null);
                 Instance.Dispose();
                 Instance = null;
 
@@ -72,11 +74,13 @@ namespace PZPack.View.Service
     {
         public string? Source { get; private set; }
         public PZReaderChangeAction Action { get; private set; }
+        public PZTypes? Type { get; private set; }
 
-        public PZReaderChangeEventArgs(PZReaderChangeAction action, string? source = null)
+        public PZReaderChangeEventArgs(PZReaderChangeAction action, string? source = null, PZTypes? type = null)
         {
             Action = action;
             Source = source;
+            Type = type;
         }
 
     }

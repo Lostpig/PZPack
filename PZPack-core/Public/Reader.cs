@@ -17,8 +17,8 @@ namespace PZPack.Core
             int version = GetFileVersion(sourceStream);
             IPZCrypto crypto = PZCryptoCreater.CreateCrypto(password, version);
 
-            CheckFileHead(sourceStream, crypto);
-            return new PZReader(source, sourceStream, crypto, version);
+            PZTypes type = CheckFileHead(sourceStream, crypto);
+            return new PZReader(source, sourceStream, crypto, type, version);
         }
         private static int GetFileVersion(FileStream stream)
         {
@@ -34,14 +34,25 @@ namespace PZPack.Core
 
             return version;
         }
-        private static void CheckFileHead(FileStream stream, IPZCrypto crypto)
+        private static PZTypes CheckFileHead(FileStream stream, IPZCrypto crypto)
         {
             stream.Seek(4, SeekOrigin.Begin);
             byte[] signBi = new byte[32];
             stream.Read(signBi);
             string fileSign = Convert.ToHexString(signBi);
-            string signHex = PZHash.HashHex(Common.Sign);
-            if (fileSign != signHex)
+
+            PZTypes resultType;
+            string pzpackSign = Common.HashSignHex(PZTypes.PZPACK);
+            string pzvideoSign = Common.HashSignHex(PZTypes.PZVIDEO);
+            if (fileSign == pzpackSign)
+            {
+                resultType = PZTypes.PZPACK;
+            }
+            else if (fileSign == pzvideoSign)
+            {
+                resultType = PZTypes.PZVIDEO;
+            }
+            else
             {
                 throw new PZSignCheckedException();
             }
@@ -54,6 +65,8 @@ namespace PZPack.Core
             {
                 throw new PZPasswordIncorrectException();
             }
+
+            return resultType;
         }
         private static void EnsureDirectory(string path)
         {
@@ -114,10 +127,12 @@ namespace PZPack.Core
         public int FolderCount { get => Index.FolderCount; }
         public long PackSize { get => stream.Length; }
         public int FileVersion { get => fileVersion; }
+        public PZTypes PZType { get => pztype; }
 
         private readonly int fileVersion;
         private readonly IPZCrypto crypto;
         private readonly FileStream stream;
+        private readonly PZTypes pztype;
         private IndexDecoder? idx;
         private string? desc;
         private IndexDecoder Index
@@ -132,11 +147,12 @@ namespace PZPack.Core
             }
         }
 
-        private PZReader(string source, FileStream stream, IPZCrypto crypto, int version)
+        private PZReader(string source, FileStream stream, IPZCrypto crypto, PZTypes type, int version)
         {
             Source = source;
             this.crypto = crypto;
             this.stream = stream;
+            pztype = type;
             fileVersion = version;
         }
         private IndexDecoder GetIndex()
@@ -234,6 +250,12 @@ namespace PZPack.Core
         {
             using MemoryStream ms = new();
             await crypto.DecryptStreamAsync(stream, ms, file.Offset, file.Size);
+            return ms.ToArray();
+        }
+        public byte[] ReadFileSync(PZFile file)
+        {
+            using MemoryStream ms = new();
+            crypto.DecryptStream(stream, ms, file.Offset, file.Size);
             return ms.ToArray();
         }
         public async Task<long> UnpackAll(string output, IProgress<(int, int, long, long)>? progress = default, CancellationToken? cancelToken = null)

@@ -25,6 +25,9 @@
             <MenuItem Header="{Binding Path=(svc:Translate.Extract)}" HorizontalAlignment="Stretch"
                       Click="OnExtractPack"  IsEnabled="{Binding Path=FileOpened}"/>
             <Separator />
+            <MenuItem Header="{Binding Path=(svc:Translate.Setting)}" HorizontalAlignment="Stretch"
+                      Click="OnSetiingOpen"/>
+            <Separator />
             <MenuItem Header="{Binding Path=(svc:Translate.Exit)}" HorizontalAlignment="Stretch"
                       Click="OnSelectExit"/>
         </MenuItem>

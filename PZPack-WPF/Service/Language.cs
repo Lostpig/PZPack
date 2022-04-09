@@ -47,7 +47,6 @@ namespace PZPack.View.Service
             string[] langFiles = files
                 .Where(f => Path.GetExtension(f).ToLower() == ".json")
                 .Select(f => Path.GetFileNameWithoutExtension(f))
-                .Where(f => f != "setting")
                 .ToArray();
 
             _languages.Clear();
@@ -55,40 +54,17 @@ namespace PZPack.View.Service
         }
         private static string ReadLanguageSet ()
         {
-            string rootPath = System.AppDomain.CurrentDomain.BaseDirectory;
-            string filePath = Path.Join(rootPath, "Localization", "setting.json");
-
-            string? userSetCurrent = null;
-            if (File.Exists(filePath))
-            {
-                string langJson = File.ReadAllText(filePath, Encoding.UTF8);
-                Dictionary<string, string>? map = JsonConvert.DeserializeObject<Dictionary<string, string>>(langJson);
-                if (map != null && map.ContainsKey("current"))
-                {
-                    userSetCurrent = map["current"];
-                }
-            }
-            if (userSetCurrent == null)
+            string userSetCurrent = Config.Instance.Language;
+            if (String.IsNullOrEmpty(userSetCurrent))
             {
                 userSetCurrent = DefaultLanguage;
+                Config.Instance.Language = userSetCurrent;
             }
-
-            if (!_languages.Contains(userSetCurrent) && _languages.Count > 0)
-            {
-                userSetCurrent = _languages[0];
-            }
-
             return userSetCurrent;
         }
         private static void SaveLanguageSet (string lang)
         {
-            string rootPath = System.AppDomain.CurrentDomain.BaseDirectory;
-            Dictionary<string, string> map = new();
-            string filePath = Path.Join(rootPath, "Localization", "setting.json");
-            map.Add("current", lang);
-
-            string json = JsonConvert.SerializeObject(map);
-            File.WriteAllText(filePath, json);
+            Config.Instance.Language = lang;
         }
         private static void LoadLanguage(string lang)
         {

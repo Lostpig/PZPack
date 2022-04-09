@@ -18,6 +18,7 @@ namespace PZPack.View
             {
                 Service.Reader.Close();
             }
+            Service.DashServer.Close();
 
             base.OnExit(e);
         }

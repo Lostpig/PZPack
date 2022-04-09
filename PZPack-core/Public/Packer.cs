@@ -36,7 +36,7 @@ namespace PZPack.Core
         private void WritePackHead()
         {
             byte[] versionBi = BitConverter.GetBytes(Common.Version);
-            byte[] signBi = PZHash.Hash(Common.Sign);
+            byte[] signBi = Common.HashSign(PZTypes.PZPACK);
             byte[] pwHashBi = Crypto.GetPwCheckHash();
 
             Writer.Write(versionBi, 0, versionBi.Length);

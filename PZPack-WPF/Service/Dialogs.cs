@@ -45,6 +45,11 @@ namespace PZPack.View.Service
                 viewPtr.WindowState = WindowState.Maximized;
             }
         }
+        public static void OpenSettingWindow()
+        {
+            SettingWindow win = new() { Owner = Application.Current.MainWindow };
+            win.ShowDialog();
+        }
 
         public static void OpenExtractAllWindow ()
         {

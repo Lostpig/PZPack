@@ -45,7 +45,8 @@
                     Content="{Binding Path=(svc:Translate.Open_file), Mode=OneWay}"
                     Click="OnOpenFile"/>
         </Grid>
-        <local:MainContent x:Name="mainContent" Grid.ColumnSpan="2" Grid.Row="1" Visibility="{Binding Path=ContentVisible, Mode=OneWay}" />
+        <local:MainContent x:Name="mainContent" Grid.ColumnSpan="2" Grid.Row="1" />
+        <local:VideoExplorer x:Name="videoContent" Grid.ColumnSpan="2" Grid.Row="1" />
 
         <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.ColumnSpan="2">
             <StackPanel.Resources>

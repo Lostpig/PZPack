@@ -53,6 +53,10 @@ namespace PZPack.View
         {
             Dialogs.OpenExtractAllWindow();
         }
-        
+
+        private void OnSetiingOpen(object sender, RoutedEventArgs e)
+        {
+            Dialogs.OpenSettingWindow();
+        }
     }
 }

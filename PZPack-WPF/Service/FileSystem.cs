@@ -7,11 +7,11 @@ namespace PZPack.View.Service
 {
     internal class FileSystem
     {
-        static public string? OpenSelectFileDialog()
+        static public string? OpenSelectFileDialog(string filter)
         {
             Microsoft.Win32.OpenFileDialog dlg = new();
-            dlg.DefaultExt = ".pzpk";
-            dlg.Filter = "PZPack File (.pzpk)|*.pzpk";
+            // dlg.DefaultExt = ".pzpk";
+            dlg.Filter = filter;
             dlg.Multiselect = false;
 
             Nullable<bool> result = dlg.ShowDialog();

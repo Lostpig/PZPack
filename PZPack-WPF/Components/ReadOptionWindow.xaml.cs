@@ -20,7 +20,7 @@ namespace PZPack.View
 
         private void OnSelectFile(object sender, RoutedEventArgs e)
         {
-            string? path = FileSystem.OpenSelectFileDialog();
+            string? path = FileSystem.OpenSelectFileDialog("PZPack Files|*.pzpk;*.pzmv");
             if (path != null)
             {
                 VModel.Source = path;

@@ -25,14 +25,32 @@ namespace PZPack.View
 
         private void Reader_PZReaderChanged(object? sender, PZReaderChangeEventArgs e)
         {
-            VModel.Update(e.Action == Service.PZReaderChangeAction.OPEN);
-            mainContent.Update(e.Action == Service.PZReaderChangeAction.OPEN);
+            VModel.Update(e);
+            if (e.Type == Core.PZTypes.PZPACK)
+            {
+                mainContent.Visibility = Visibility.Visible;
+                mainContent.Update(true);
+            }
+            else if (e.Type == Core.PZTypes.PZVIDEO)
+            {
+                videoContent.Visibility = Visibility.Visible;
+                videoContent.Update(true);
+            }
+            else
+            {
+                mainContent.Visibility = Visibility.Collapsed;
+                videoContent.Visibility = Visibility.Collapsed;
+                mainContent.Update(false);
+                videoContent.Update(false);
+            }
         }
 
         protected override void OnContentRendered(EventArgs e)
         {
             base.OnContentRendered(e);
-            Service.Reader.PZReaderChanged += Reader_PZReaderChanged; ;
+            Service.Reader.PZReaderChanged += Reader_PZReaderChanged;
+            mainContent.Visibility = Visibility.Collapsed;
+            videoContent.Visibility = Visibility.Collapsed;
 
             /// TEST: DELETE BEFORE RELEASE
             // Service.Reader.Open(@"D:\Media\pictures2.pzpk", "4294967296");
@@ -46,7 +64,7 @@ namespace PZPack.View
 
     enum AppState
     {
-        WAIT, BROWSER, VIEWING
+        WAIT, BROWSER, BROWSERVIDEO, VIEWING
     }
 
     internal class MainWindowModel : INotifyPropertyChanged
@@ -66,6 +84,13 @@ namespace PZPack.View
                 return State == AppState.BROWSER ? Visibility.Visible : Visibility.Collapsed;
             }
         }
+        public Visibility VideoContentVisible
+        {
+            get
+            {
+                return State == AppState.BROWSERVIDEO ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
 
         public string FileSource { get; set; } = "-";
         public string FileSize { get; set; } = "0MB";
@@ -81,11 +106,11 @@ namespace PZPack.View
             }
         }
 
-        public void Update(bool fileOpen)
+        public void Update(PZReaderChangeEventArgs e)
         {
-            if (fileOpen == true)
+            if (e.Action == Service.PZReaderChangeAction.OPEN)
             {
-                State = AppState.BROWSER;
+                State = e.Type == Core.PZTypes.PZPACK ? AppState.BROWSER : AppState.BROWSERVIDEO;
                 LoadFileInfo();
             }
             else
@@ -96,9 +121,10 @@ namespace PZPack.View
 
             NotifyPropertyChanged(nameof(BackdropVisible));
             NotifyPropertyChanged(nameof(ContentVisible));
+            NotifyPropertyChanged(nameof(VideoContentVisible));
             NotifyPropertyChanged(nameof(FileOpened));
         }
-        private void LoadFileInfo ()
+        private void LoadFileInfo()
         {
             if (Reader.Instance != null)
             {

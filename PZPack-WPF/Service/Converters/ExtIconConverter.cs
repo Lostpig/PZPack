@@ -33,7 +33,7 @@ namespace PZPack.View.Service.Converters
                 _ => IconType.Other
             };
         }
-        static private BitmapImage GetExtensionIcon(string ext)
+        static public BitmapImage GetExtensionIcon(string ext)
         {
             IconType iconType = GetExtensionType(ext);
             if (!imageCache.ContainsKey(iconType))

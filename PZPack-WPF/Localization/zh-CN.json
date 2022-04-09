@@ -56,6 +56,16 @@
   "MSG Source directory empty": "请选择源文件夹",
   "MSG Output file empty": "请设置输出文件",
 
+  "Setting": "设置",
+  "External player": "外部播放器",
+  "Save": "保存",
+  "Duration": "时长",
+  "Play": "播放",
+  "Play All": "全部播放",
+
+  "EX ServerNotBinding": "错误：DASH服务器未正确启动",
+  "EX ExternalPlayerNotSet": "错误：没有设置外部播放器",
+  "EX ExternalPlayerPathNotExists": "错误：外部播放器路径不是正确的可执行文件",
   "EX SourceDirectoryIsEmpty": "错误：源目录【{0}】为空文件夹",
   "EX OutputDirectoryIsNotEmpty": "错误：输出目标目录【{0}】不是空文件夹",
   "EX OutputFileAlreadyExists": "错误：输出目标文件【{0}】已存在",
