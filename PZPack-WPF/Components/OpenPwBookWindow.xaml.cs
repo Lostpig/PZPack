@@ -6,51 +6,58 @@ using PZPack.View.Service;
 namespace PZPack.View
 {
     /// <summary>
-    /// ReadOptionWindow.xaml 的交互逻辑
+    /// OpenPwBookWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class ReadOptionWindow : Window
+    public partial class OpenPwBookWindow : Window
     {
-        readonly private ROWindowModel VModel;
-        public ReadOptionWindow(string source)
+        private readonly bool IsCreate;
+        readonly private OPBWindowModel VModel;
+        public OpenPwBookWindow(string source, bool isCreate)
         {
             InitializeComponent();
+            IsCreate = isCreate;
+
             VModel = new();
             VModel.Source = source;
-            this.DataContext = VModel;
+            DataContext = VModel;
         }
 
-        private void OnOpenFile(object sender, RoutedEventArgs e)
+        private void OnOpen(object sender, RoutedEventArgs e)
         {
-            string password = VModel.Password;
+            string password = VModel.MasterPw;
             if (string.IsNullOrWhiteSpace(password))
             {
                 Alert.ShowMessage(Translate.MSG_Password_empty);
                 return;
             }
 
-            bool success = Reader.Open(Source, Password);
-
-            if (success)
+            try
             {
+                if (IsCreate) PWBook.Create(VModel.Source, password);
+                else PWBook.Load(VModel.Source, password);
+
+                DialogResult = true;
                 Close();
+            }
+            catch (Exception ex)
+            {
+                Alert.ShowException(ex);
             }
         }
         private void OnCancel(object sender, RoutedEventArgs e)
         {
+            DialogResult = false;
             Close();
         }
-
-        private string Source { get => VModel.Source; }
-        private string Password { get => VModel.Password; }
     }
 
-    internal class ROWindowModel : INotifyPropertyChanged
+    internal class OPBWindowModel : INotifyPropertyChanged
     {
         private string _password;
-        public string Password { get => _password; set { _password = value; NotifyPropertyChanged(nameof(Password)); } }
+        public string MasterPw { get => _password; set { _password = value; NotifyPropertyChanged(nameof(MasterPw)); } }
         private string _source;
         public string Source { get => _source; set { _source = value; NotifyPropertyChanged(nameof(Source)); } }
-        public ROWindowModel()
+        public OPBWindowModel()
         {
             _password = "";
             _source = "";

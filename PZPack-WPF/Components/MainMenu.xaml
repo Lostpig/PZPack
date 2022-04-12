@@ -31,6 +31,17 @@
             <MenuItem Header="{Binding Path=(svc:Translate.Exit)}" HorizontalAlignment="Stretch"
                       Click="OnSelectExit"/>
         </MenuItem>
+        <MenuItem Header="{Binding Path=(svc:Translate.Password_Book)}" Style="{StaticResource MenuOuter}">
+            <MenuItem Header="{Binding Path=(svc:Translate.Manage_Current)}" HorizontalAlignment="Stretch"
+                      Click="OnManagePwBook" IsEnabled="{Binding Path=PWBookOpened}"/>
+            <Separator />
+            <MenuItem Header="{Binding Path=(svc:Translate.Create)}" HorizontalAlignment="Stretch"
+                      Click="OnCreatePwBook"/>
+            <MenuItem Header="{Binding Path=(svc:Translate.Open)}" HorizontalAlignment="Stretch"
+                      Click="OnOpenPwBook"/>
+            <MenuItem Header="{Binding Path=(svc:Translate.Close)}" HorizontalAlignment="Stretch"
+                      Click="OnClosePwBook" IsEnabled="{Binding Path=PWBookOpened}" />
+        </MenuItem>
         <MenuItem Header="{Binding Path=(svc:Translate.Language)}" Style="{StaticResource MenuOuter}">
             <MenuItem.ItemsSource>
                 <CompositeCollection>

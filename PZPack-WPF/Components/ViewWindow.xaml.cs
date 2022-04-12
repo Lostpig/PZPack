@@ -205,6 +205,7 @@ namespace PZPack.View
 
         struct MouseState
         {
+            public MouseState() { }
             public double LastX = 0;
             public double LastY = 0;
             public bool Active = false;

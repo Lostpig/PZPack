@@ -35,11 +35,11 @@ namespace PZPack.View.Service
             }
             return null;
         }
-        static public string? OpenSaveFileDialog()
+        static public string? OpenSaveFileDialog(string filter)
         {
             Microsoft.Win32.SaveFileDialog dlg = new();
-            dlg.DefaultExt = ".pzpk";
-            dlg.Filter = "PZPack File (.pzpk)|*.pzpk";
+            // dlg.DefaultExt = ".pzpk";
+            dlg.Filter = filter;
 
             Nullable<bool> result = dlg.ShowDialog();
 

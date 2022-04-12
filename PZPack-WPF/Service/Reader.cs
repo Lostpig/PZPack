@@ -1,6 +1,6 @@
 ﻿using PZPack.Core;
 using System;
-using System.Windows;
+using System.IO;
 
 namespace PZPack.View.Service
 {
@@ -20,11 +20,16 @@ namespace PZPack.View.Service
         static public PZReader? Instance { get; private set; }
         static public bool Open(string source, string password)
         {
+            var key = PZCryptoCreater.CreateKey(password);
+            return Open(source, key);
+        }
+        static public bool Open(string source, byte[] key)
+        {
             Close();
 
             try
             {
-                Instance = PZReader.Open(source, password);
+                Instance = PZReader.Open(source, key);
                 DashServer.Instance.Binding(Instance);
                 DashServer.Instance.Start();
             }
@@ -40,6 +45,17 @@ namespace PZPack.View.Service
             }
 
             return Instance != null;
+        }
+        static public bool TryOpen(string source)
+        {
+            if (PWBook.Current == null) return false;
+
+            var fstream = new FileStream(source, FileMode.Open, FileAccess.Read);
+            string pwHash = PZReader.GetFilePwCheckHash(fstream);
+            var pwRecord = PWBook.Current.GetRecord(pwHash);
+            if (pwRecord == null) return false;
+
+            return Open(source, pwRecord.Key);
         }
 
         static public void Close()

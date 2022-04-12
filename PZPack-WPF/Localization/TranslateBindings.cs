@@ -65,6 +65,15 @@ namespace PZPack.View.Service
             [TranslateBind("Duration")] public static string Duration { get; set; }
             [TranslateBind("Play")] public static string Play { get; set; }
             [TranslateBind("Play All")] public static string Play_All { get; set; }
+            [TranslateBind("Password Book")] public static string Password_Book { get; set; }
+            [TranslateBind("Create")] public static string Create { get; set; }
+            [TranslateBind("Master Password")] public static string Master_Password { get; set; }
+            [TranslateBind("Manage Current")] public static string Manage_Current { get; set; }
+            [TranslateBind("Delete")] public static string Delete { get; set; }
+            [TranslateBind("Add Password")] public static string Add_Password { get; set; }
+            [TranslateBind("New Password")] public static string New_Password { get; set; }
+            [TranslateBind("Password Book Not Opened")] public static string Password_Book_Not_Opened { get; set; }
+            [TranslateBind("Save Completed")] public static string Save_Completed { get; set; }
             [TranslateBind("EX ServerNotBinding")] public static string EX_ServerNotBinding { get; set; }
             [TranslateBind("EX ExternalPlayerNotSet")] public static string EX_ExternalPlayerNotSet { get; set; }
             [TranslateBind("EX ExternalPlayerPathNotExists")] public static string EX_ExternalPlayerPathNotExists { get; set; }

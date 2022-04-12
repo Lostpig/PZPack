@@ -63,6 +63,16 @@
   "Play": "播放",
   "Play All": "全部播放",
 
+  "Password Book": "密码本",
+  "Create": "创建",
+  "Master Password": "主密码",
+  "Manage Current": "管理当前密码本",
+  "Delete": "删除",
+  "Add Password": "添加密码",
+  "New Password": "新密码",
+  "Password Book Not Opened": "没有已打开的密码本",
+  "Save Completed": "保存成功",
+
   "EX ServerNotBinding": "错误：DASH服务器未正确启动",
   "EX ExternalPlayerNotSet": "错误：没有设置外部播放器",
   "EX ExternalPlayerPathNotExists": "错误：外部播放器路径不是正确的可执行文件",

@@ -35,7 +35,7 @@ namespace PZPack.View
         }
         private void OnChooseTarget(object sender, RoutedEventArgs e)
         {
-            string? target = FileSystem.OpenSaveFileDialog();
+            string? target = FileSystem.OpenSaveFileDialog("PZPack File (.pzpk)|*.pzpk");
             if (target != null)
             {
                 model.UpdateTarget(target);

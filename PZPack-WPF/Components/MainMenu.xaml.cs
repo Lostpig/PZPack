@@ -13,7 +13,6 @@ namespace PZPack.View
     /// </summary>
     public partial class MainMenu : UserControl
     {
-
         public MainMenu()
         {
             InitializeComponent();
@@ -57,6 +56,23 @@ namespace PZPack.View
         private void OnSetiingOpen(object sender, RoutedEventArgs e)
         {
             Dialogs.OpenSettingWindow();
+        }
+
+        private void OnCreatePwBook(object sender, RoutedEventArgs e)
+        {
+            Dialogs.OpenPwBookOpenWindow(true);
+        }
+        private void OnOpenPwBook(object sender, RoutedEventArgs e)
+        {
+            Dialogs.OpenPwBookOpenWindow(false);
+        }
+        private void OnClosePwBook(object sender, RoutedEventArgs e)
+        {
+            PWBook.Close();
+        }
+        private void OnManagePwBook(object sender, RoutedEventArgs e)
+        {
+            Dialogs.OpenPwBookManageWindow();
         }
     }
 }

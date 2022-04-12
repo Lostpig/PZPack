@@ -6,7 +6,7 @@ namespace PZPack.Core
 {
     public class PZReader : IDisposable
     {
-        public static PZReader Open(string source, string password)
+        public static PZReader Open(string source, byte[] key)
         {
             if (!File.Exists(source))
             {
@@ -15,12 +15,18 @@ namespace PZPack.Core
             FileStream sourceStream = File.OpenRead(source);
 
             int version = GetFileVersion(sourceStream);
-            IPZCrypto crypto = PZCryptoCreater.CreateCrypto(password, version);
+            PZTypes type = GetFileType(sourceStream);
+            IPZCrypto crypto = PZCryptoCreater.CreateCrypto(key, version);
 
-            PZTypes type = CheckFileHead(sourceStream, crypto);
+            CheckFileHead(sourceStream, crypto);
             return new PZReader(source, sourceStream, crypto, type, version);
         }
-        private static int GetFileVersion(FileStream stream)
+        public static PZReader Open(string source, string password)
+        {
+            var key = PZCryptoCreater.CreateKey(password);
+            return Open(source, key);
+        }
+        public static int GetFileVersion(FileStream stream)
         {
             stream.Seek(0, SeekOrigin.Begin);
             byte[] versionBi = new byte[4];
@@ -34,7 +40,7 @@ namespace PZPack.Core
 
             return version;
         }
-        private static PZTypes CheckFileHead(FileStream stream, IPZCrypto crypto)
+        public static PZTypes GetFileType(FileStream stream)
         {
             stream.Seek(4, SeekOrigin.Begin);
             byte[] signBi = new byte[32];
@@ -57,16 +63,24 @@ namespace PZPack.Core
                 throw new PZSignCheckedException();
             }
 
+            return resultType;
+        }
+        public static string GetFilePwCheckHash(FileStream stream)
+        {
+            stream.Seek(36, SeekOrigin.Begin);
             byte[] pwHashBi = new byte[32];
             stream.Read(pwHashBi);
             string filePwHash = Convert.ToHexString(pwHashBi);
+            return filePwHash;
+        }
+        private static void CheckFileHead(FileStream stream, IPZCrypto crypto)
+        {
+            string fileHash = GetFilePwCheckHash(stream);
             string pwHashHex = Convert.ToHexString(crypto.GetPwCheckHash());
-            if (filePwHash != pwHashHex)
+            if (fileHash != pwHashHex)
             {
                 throw new PZPasswordIncorrectException();
             }
-
-            return resultType;
         }
         private static void EnsureDirectory(string path)
         {
@@ -306,7 +320,4 @@ namespace PZPack.Core
             GC.SuppressFinalize(this);
         }
     }
-
-
-
 }

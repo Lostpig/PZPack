@@ -34,7 +34,7 @@ namespace PZPack.View.Service
                 return bindingHash != null && bindingReader != null;
             }
         }
-        public string? hash { get => bindingHash; }
+        public string? Hash { get => bindingHash; }
 
         public void Start()
         {
@@ -43,8 +43,58 @@ namespace PZPack.View.Service
             listener.Prefixes.Add(string.Format("http://localhost:{0}/", port));
             listener.IgnoreWriteExceptions = true;
             listener.Start();
-            listener.BeginGetContext(new AsyncCallback(GetContext), listener);
+            WaitForRequest();
         }
+        private async void WaitForRequest()
+        {
+            HttpListenerContext context = await listener.GetContextAsync();
+            HandleRequest(context);
+            WaitForRequest();
+        }
+        internal void HandleRequest(HttpListenerContext context) 
+        {
+            HttpListenerRequest request = context.Request;
+            HttpListenerResponse response = context.Response;
+
+            if (bindingHash == null || bindingReader == null)
+            {
+                ResponseError(response, "pzpack file not opened");
+                return;
+            }
+
+            string raw = request.RawUrl ?? "";
+            string[] parts = raw.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            string hash = parts[0];
+
+            if (hash != bindingHash)
+            {
+                ResponseError(response, "file hash valid failed");
+                return;
+            }
+
+            if (parts.Length == 2 && parts[1] == "playlist.pls")
+            {
+                ResponsePlaylist(response);
+                return;
+            }
+
+            if (parts.Length == 3)
+            {
+                bool success = int.TryParse(parts[1], out int fid);
+                if (!success)
+                {
+                    ResponseError(response, "url invalid");
+                    return;
+                }
+
+                string filename = parts[2] == "play.mpd" ? "output.mpd" : parts[2];
+                ResponseFile(response, fid, filename);
+                return;
+            }
+
+            ResponseError(response, "url invalid");
+        }
+
         public void CloseServer()
         {
             try
@@ -72,55 +122,6 @@ namespace PZPack.View.Service
             else
             {
                 bindingHash = null;
-            }
-        }
-
-        void GetContext(IAsyncResult ar)
-        {
-            if (ar.AsyncState is HttpListener httpListener)
-            {
-                HttpListenerContext context = httpListener.EndGetContext(ar);
-                if (!(httpListener.IsListening))
-                {
-                    return;
-                }
-
-                httpListener.BeginGetContext(new AsyncCallback(GetContext), httpListener);
-
-                HttpListenerRequest request = context.Request;
-                HttpListenerResponse response = context.Response;
-
-                if (bindingHash == null || bindingReader == null)
-                {
-                    ResponseError(response, "pzpack file not opened");
-                    return;
-                }
-
-                string raw = request.RawUrl ?? "";
-                string[] parts = raw.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-                string hash = parts[0];
-
-                if (parts.Length == 2 && parts[1] == "playlist.pls")
-                {
-                    ResponsePlaylist(response);
-                    return;
-                }
-
-                if (parts.Length == 3)
-                {
-                    bool success = int.TryParse(parts[1], out int fid);
-                    if (!success)
-                    {
-                        ResponseError(response, "url invalid");
-                        return;
-                    }
-
-                    string filename = parts[2] == "play.mpd" ? "output.mpd" : parts[2];
-                    ResponseFile(response, fid, filename);
-                    return;
-                }
-
-                ResponseError(response, "url invalid");
             }
         }
 

@@ -25,7 +25,7 @@ namespace PZPack.View.Service
             }
 
             var server = DashServer.Instance;
-            string url = $"http://localhost:{server.port}/{server.hash!}/{folder.Id}/output.mpd";
+            string url = $"http://localhost:{server.port}/{server.Hash!}/{folder.Id}/output.mpd";
             Process.Start(expalyerPath, url);
         }
         public static void PlayAll()
@@ -43,7 +43,7 @@ namespace PZPack.View.Service
             }
 
             var server = DashServer.Instance;
-            string url = $"http://localhost:{server.port}/{server.hash!}/playlist.pls";
+            string url = $"http://localhost:{server.port}/{server.Hash!}/playlist.pls";
             Process.Start(expalyerPath, url);
         }
     }

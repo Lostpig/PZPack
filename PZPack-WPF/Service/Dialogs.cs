@@ -9,8 +9,15 @@ namespace PZPack.View.Service
         static private ViewWindow? viewPtr;
         public static void OpenReadOptionWindow()
         {
-            ReadOptionWindow win = new() { Owner = Application.Current.MainWindow };
-            win.ShowDialog();
+            string? path = FileSystem.OpenSelectFileDialog("PZPack Files|*.pzpk;*.pzmv");
+            if (path != null)
+            {
+                bool openSuccess = Reader.TryOpen(path);
+                if (openSuccess) return;
+
+                ReadOptionWindow win = new(path) { Owner = Application.Current.MainWindow };
+                win.ShowDialog();
+            }
         }
         public static void OpenPackWindow()
         {
@@ -51,7 +58,35 @@ namespace PZPack.View.Service
             win.ShowDialog();
         }
 
-        public static void OpenExtractAllWindow ()
+        public static void OpenPwBookOpenWindow(bool isCreate)
+        {
+            string? path;
+            if (isCreate)
+            {
+                path = FileSystem.OpenSaveFileDialog("PZPasswordBook File|*.pzpwb");
+            }
+            else
+            {
+                path = FileSystem.OpenSelectFileDialog("PZPasswordBook File|*.pzpwb");
+            }
+            if (path == null) return;
+
+            OpenPwBookWindow win = new(path, isCreate) { Owner = Application.Current.MainWindow };
+            bool? isOpened = win.ShowDialog();
+
+            if (isOpened == true && isCreate)
+            {
+                OpenPwBookManageWindow();
+            }
+        }
+        public static void OpenPwBookManageWindow()
+        {
+            if (PWBook.Current == null) return;
+            PWBookWindow win = new() { Owner = Application.Current.MainWindow };
+            win.ShowDialog();
+        }
+
+        public static void OpenExtractAllWindow()
         {
             string? output = FileSystem.OpenSelectDirectryDialog();
             if (output == null) return;
@@ -59,7 +94,7 @@ namespace PZPack.View.Service
             ExtractWindow win = new() { Owner = Application.Current.MainWindow };
             win.StartExtractAll(output);
             win.ShowDialog();
-            
+
         }
         public static void OpenExtractWindow(PZFile file)
         {

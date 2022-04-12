@@ -44,17 +44,25 @@ namespace PZPack.View
                 videoContent.Update(false);
             }
         }
+        private void PWBook_PWBookChanged(object? sender, PZPwBookChangeEventArgs e)
+        {
+            VModel.SetPwBookOpened(e.Opened);
+        }
 
         protected override void OnContentRendered(EventArgs e)
         {
             base.OnContentRendered(e);
             Service.Reader.PZReaderChanged += Reader_PZReaderChanged;
+            Service.PWBook.PWBookChanged += PWBook_PWBookChanged;
             mainContent.Visibility = Visibility.Collapsed;
             videoContent.Visibility = Visibility.Collapsed;
 
             /// TEST: DELETE BEFORE RELEASE
             // Service.Reader.Open(@"D:\Media\pictures2.pzpk", "4294967296");
         }
+
+
+
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
@@ -103,6 +111,20 @@ namespace PZPack.View
             get
             {
                 return State != AppState.WAIT;
+            }
+        }
+
+        public void SetPwBookOpened(bool opened)
+        {
+            _pwbookOpened = opened;
+            NotifyPropertyChanged(nameof(PWBookOpened));
+        }
+        private bool _pwbookOpened = false;
+        public bool PWBookOpened
+        {
+            get
+            {
+                return _pwbookOpened;
             }
         }
 
