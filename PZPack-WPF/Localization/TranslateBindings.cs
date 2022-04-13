@@ -59,12 +59,16 @@ namespace PZPack.View.Service
             [TranslateBind("MSG Password empty")] public static string MSG_Password_empty { get; set; }
             [TranslateBind("MSG Source directory empty")] public static string MSG_Source_directory_empty { get; set; }
             [TranslateBind("MSG Output file empty")] public static string MSG_Output_file_empty { get; set; }
+            [TranslateBind("MSG Preview image failed")] public static string MSG_Preview_image_failed { get; set; }
             [TranslateBind("Setting")] public static string Setting { get; set; }
             [TranslateBind("External player")] public static string External_player { get; set; }
             [TranslateBind("Save")] public static string Save { get; set; }
             [TranslateBind("Duration")] public static string Duration { get; set; }
             [TranslateBind("Play")] public static string Play { get; set; }
             [TranslateBind("Play All")] public static string Play_All { get; set; }
+            [TranslateBind("Fullscreen")] public static string Fullscreen { get; set; }
+            [TranslateBind("To Fullscreen")] public static string To_Fullscreen { get; set; }
+            [TranslateBind("Exit Fullscreen")] public static string Exit_Fullscreen { get; set; }
             [TranslateBind("Password Book")] public static string Password_Book { get; set; }
             [TranslateBind("Create")] public static string Create { get; set; }
             [TranslateBind("Master Password")] public static string Master_Password { get; set; }

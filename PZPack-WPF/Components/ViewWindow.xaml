@@ -17,61 +17,78 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="hoverPanel">
+            <Setter Property="Control.Opacity" Value="0"/>
+            <Style.Triggers>
+                <Trigger Property="Control.IsMouseOver" Value="True">
+                    <Setter Property="Control.Opacity" Value="1"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="40"/>
+            <RowDefinition  Height="40"/>
             <RowDefinition />
-            <RowDefinition Height="20"/>
+            <RowDefinition  Height="30"/>
         </Grid.RowDefinitions>
-        <Border BorderThickness="1" BorderBrush="#999999" Grid.Row="0">
-            <StackPanel Orientation="Horizontal">
-                <StackPanel.Resources>
-                    <Style TargetType="Button">
-                        <Setter Property="Margin" Value="5,5,5,5" />
-                        <Setter Property="Width" Value="50" />
-                        <Setter Property="Height" Value="25" />
-                        <Setter Property="VerticalAlignment" Value="Center"/>
-                    </Style>
-                </StackPanel.Resources>
-                <Button Content="+" Width="Auto" Padding="10,0" Click="ChangeSizeUp" />
-                <TextBox x:Name="scaleBox" Width="40" VerticalAlignment="Center" KeyDown="OnScaleKeyDown" LostKeyboardFocus="OnScaleLostFocus"
-                         TextAlignment="Right" VerticalContentAlignment="Center"/>
-                <TextBlock Text="%" VerticalAlignment="Center" />
-                <Button Content="-" Width="Auto" Padding="10,0" Click="ChangeSizeDown" />
-                <Button Content="{Binding Path=(svc:Translate.Original_size)}" Width="Auto" Padding="10,0" Click="ChangeSizeToOriginal" />
-                <Button Content="{Binding Path=(svc:Translate.Fit_to_width)}" Width="Auto" Padding="10,0" Click="ChangeSizeFitWidth" />
-                <Button Content="{Binding Path=(svc:Translate.Fit_to_height)}" Width="Auto" Padding="10,0" Click="ChangeSizeFitHeight" />
-                <Separator />
-                <Button x:Name="btnPrev" Content="{Binding Path=(svc:Translate.Prev)}" Click="PrevFile" />
-                <Button x:Name="btnNext" Content="{Binding Path=(svc:Translate.Next)}" Click="NextFile" />
-                <Separator />
-                <CheckBox Content="{Binding Path=(svc:Translate.Lock_Scale)}" IsThreeState="False" IsChecked="{Binding Path=LockScale}"  VerticalAlignment="Center" />
-            </StackPanel>
-        </Border>
-
-        <ScrollViewer x:Name="scrollContent" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Grid.Row="1" 
-                      MouseDown="OnMouseDown" MouseUp="OnMouseUp" MouseMove="OnMouseMove" PreviewMouseWheel="OnMouseWheel">
+        <ScrollViewer x:Name="scrollContent" 
+                      HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" 
+                      Grid.Row="0" Grid.RowSpan="3"
+                      MouseDown="OnMouseDown" MouseUp="OnMouseUp" MouseMove="OnMouseMove" PreviewMouseWheel="OnMouseWheel"
+                      >
             <Image x:Name="viewImage" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
         </ScrollViewer>
-        <Border BorderThickness="1" BorderBrush="#999999" Grid.Row="2">
-            <StackPanel Orientation="Horizontal">
-                <StackPanel.Resources>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="VerticalAlignment" Value="Center" />
-                    </Style>
-                </StackPanel.Resources>
-                <TextBlock Text="{Binding Path=FileName}" Margin="10,0,0,0" />
-                <Separator />
-                <TextBlock Text="{Binding Path=CurrentIndex}" />
-                <TextBlock Text=" / " />
-                <TextBlock Text="{Binding Path=FileCount}" />
-                <Separator />
-                <TextBlock Text="{Binding Path=SizeText}" />
-                <Separator />
-                <TextBlock Text="{Binding Path=FileSize}" />
-            </StackPanel>
-        </Border>
-    </Grid>
 
+        <StackPanel HorizontalAlignment="Center" Background="Transparent" Grid.Row="0" 
+                    Style="{StaticResource hoverPanel}">
+            <Border BorderThickness="1" BorderBrush="#767676" Background="White" Padding="5,5">
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel.Resources>
+                        <Style TargetType="Button">
+                            <Setter Property="Margin" Value="5,0" />
+                            <Setter Property="Width" Value="50" />
+                            <Setter Property="Height" Value="25" />
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
+                    </StackPanel.Resources>
+                    <Button Content="+" Width="Auto" Padding="10,0" Click="ChangeSizeUp" />
+                    <TextBox x:Name="scaleBox" Width="40" VerticalAlignment="Center" KeyDown="OnScaleKeyDown" LostKeyboardFocus="OnScaleLostFocus"
+                         TextAlignment="Right" VerticalContentAlignment="Center"/>
+                    <TextBlock Text="%" VerticalAlignment="Center" />
+                    <Button Content="-" Width="Auto" Padding="10,0" Click="ChangeSizeDown" />
+                    <Button Content="{Binding Path=(svc:Translate.Original_size)}" Width="Auto" Padding="10,0" Click="ChangeSizeToOriginal" />
+                    <Button Content="{Binding Path=(svc:Translate.Fit_to_width)}" Width="Auto" Padding="10,0" Click="ChangeSizeFitWidth" />
+                    <Button Content="{Binding Path=(svc:Translate.Fit_to_height)}" Width="Auto" Padding="10,0" Click="ChangeSizeFitHeight" />
+                    <Separator />
+                    <Button x:Name="btnPrev" Content="{Binding Path=(svc:Translate.Prev)}" Click="PrevFile" />
+                    <Button x:Name="btnNext" Content="{Binding Path=(svc:Translate.Next)}" Click="NextFile" />
+                    <Separator />
+                    <CheckBox Content="{Binding Path=(svc:Translate.Lock_Scale)}" IsThreeState="False" IsChecked="{Binding Path=LockScale}"  VerticalAlignment="Center" />
+                    <Separator />
+                    <Button Content="{Binding Path=FullScreenText}" Width="75" Click="ToggleFullScreen" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+        <StackPanel HorizontalAlignment="Center" Background="Transparent" Grid.Row="2" Style="{StaticResource hoverPanel}">
+            <Border BorderThickness="1"  BorderBrush="#767676" Background="White" Padding="10,5">
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel.Resources>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                        </Style>
+                    </StackPanel.Resources>
+                    <TextBlock Text="{Binding Path=FileName}" />
+                    <Separator />
+                    <TextBlock Text="{Binding Path=CurrentIndex}" />
+                    <TextBlock Text=" / " />
+                    <TextBlock Text="{Binding Path=FileCount}" />
+                    <Separator />
+                    <TextBlock Text="{Binding Path=SizeText}" />
+                    <Separator />
+                    <TextBlock Text="{Binding Path=FileSize}" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </Grid>
 </Window>

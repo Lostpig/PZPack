@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using PZPack.Core;
 using PZPack.View.Service;
-using System.IO;
 using System.ComponentModel;
 using System;
 using System.Windows.Input;
+using System.Diagnostics;
 
 namespace PZPack.View
 {
@@ -22,6 +23,8 @@ namespace PZPack.View
         private readonly ViewWindowModel model;
         private double scale = 1;
         static readonly double[] scalelist = new double[] { 0.1, 0.2, 0.3, 0.4, 0.5, 0.75, 1, 1.25, 1.5, 2, 2.5, 3, 4, 5 };
+        private WindowState rememberState;
+
         public ViewWindow()
         {
             InitializeComponent();
@@ -29,11 +32,44 @@ namespace PZPack.View
             list = new List<PZFile>();
 
             this.DataContext = model;
+            model.PropertyChanged += Model_PropertyChanged;
+
+            rememberState = this.WindowState;
+        }
+
+        private void Model_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(model.Fullscreen))
+            {
+                if (model.Fullscreen)
+                {
+                    rememberState = this.WindowState;
+                    this.Visibility = Visibility.Collapsed;
+                    this.WindowState = WindowState.Normal;
+
+                    this.Topmost = true;
+                    this.WindowStyle = WindowStyle.None;
+                    this.ResizeMode = ResizeMode.NoResize;
+
+                    this.WindowState = WindowState.Maximized;
+                    this.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    this.Topmost = false;
+                    this.WindowStyle = WindowStyle.SingleBorderWindow;
+                    this.ResizeMode = ResizeMode.CanResize;
+
+                    this.WindowState = rememberState;
+                }
+            }
         }
 
         protected override void OnContentRendered(EventArgs e)
         {
             base.OnContentRendered(e);
+            scrollContent.VerticalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Hidden;
+            scrollContent.HorizontalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Hidden;
             scrollContent.LayoutUpdated += ScrollContent_LayoutUpdated;
         }
         protected override void OnClosing(CancelEventArgs e)
@@ -73,23 +109,30 @@ namespace PZPack.View
             }
 
             current = newFile;
-            if (Reader.Instance != null)
+            try
             {
-                byte[] bytes = await Reader.Instance.ReadFile(newFile);
-                BitmapImage bitmap = new();
-                bitmap.BeginInit();
-                bitmap.StreamSource = new MemoryStream(bytes);
-                bitmap.EndInit();
-
-                viewImage.Source = bitmap;
-                model.OriginSize = new Size(bitmap.PixelWidth, bitmap.PixelHeight);
-
-                scale = model.LockScale ? scale : 1;
-                UpdateImageScale();
-                model.ChangeFile(newFile.Name, index + 1, list.Count, bytes.Length);
-
-                fileChangeFlag = true;
+                BitmapSource? imgSource = await ImageLoader.TryLoadImageSource(current);
+                if (imgSource != null)
+                {
+                    viewImage.Source = imgSource;
+                    model.OriginSize = new Size(imgSource.PixelWidth, imgSource.PixelHeight);
+                    scale = model.LockScale ? scale : 1;
+                    UpdateImageScale();
+                }
+                else
+                {
+                    throw new Exception("ImageSource not loaded");
+                }
             }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                Alert.ShowWarning(Translate.MSG_Preview_image_failed);
+                viewImage.Source = null;
+            }
+
+            model.ChangeFile(newFile.Name, index + 1, list.Count, (int)newFile.Size);
+            fileChangeFlag = true;
         }
         void Move(int offset)
         {
@@ -201,6 +244,11 @@ namespace PZPack.View
         private void PrevFile(object sender, RoutedEventArgs e)
         {
             Move(-1);
+        }
+
+        private void ToggleFullScreen(object sender, RoutedEventArgs e)
+        {
+            model.Fullscreen = !model.Fullscreen;
         }
 
         struct MouseState
@@ -368,6 +416,24 @@ namespace PZPack.View
                 }
             }
         }
+
+        private bool _fullscreen = false;
+        public bool Fullscreen
+        {
+            get => _fullscreen; set
+            {
+                _fullscreen = value;
+                NotifyPropertyChanged(nameof(Fullscreen));
+            }
+        }
+        public string FullScreenText
+        {
+            get
+            {
+                return Fullscreen ? Translate.Exit_Fullscreen : Translate.To_Fullscreen;
+            }
+        }
+
 
         public ViewWindowModel()
         {

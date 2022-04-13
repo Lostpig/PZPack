@@ -106,6 +106,13 @@ namespace PZPack.View.Service
             win.ShowDialog();
         }
 
+        public static void CloseViewWindow()
+        {
+            if (viewPtr != null)
+            {
+                viewPtr.Close();
+            }
+        }
         private static void ViewPtr_Closed(object? sender, System.EventArgs e)
         {
             if (viewPtr != null)

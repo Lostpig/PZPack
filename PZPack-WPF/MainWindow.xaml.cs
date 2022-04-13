@@ -61,8 +61,11 @@ namespace PZPack.View
             // Service.Reader.Open(@"D:\Media\pictures2.pzpk", "4294967296");
         }
 
-
-
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
+            Service.Dialogs.CloseViewWindow();
+        }
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);

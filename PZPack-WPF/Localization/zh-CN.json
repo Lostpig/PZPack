@@ -55,6 +55,7 @@
   "MSG Password empty": "密码不能为空",
   "MSG Source directory empty": "请选择源文件夹",
   "MSG Output file empty": "请设置输出文件",
+  "MSG Preview image failed": "载入图片预览失败",
 
   "Setting": "设置",
   "External player": "外部播放器",
@@ -62,6 +63,9 @@
   "Duration": "时长",
   "Play": "播放",
   "Play All": "全部播放",
+  "Fullscreen": "全屏",
+  "To Fullscreen": "全屏显示",
+  "Exit Fullscreen": "退出全屏",
 
   "Password Book": "密码本",
   "Create": "创建",
