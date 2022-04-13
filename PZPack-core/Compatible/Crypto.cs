@@ -220,7 +220,7 @@ namespace PZPack.Core.Compatible
             source.Seek(offset, SeekOrigin.Begin);
             await source.ReadAsync(IV);
 
-            return await baseInst.DecryptStreamAsync(source, target, IV, offset, size, progress, cancelToken);
+            return await baseInst.DecryptStreamAsync(source, target, IV, offset + 16, size - 16, progress, cancelToken);
         }
 
         public void Dispose()
