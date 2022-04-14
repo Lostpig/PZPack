@@ -424,6 +424,7 @@ namespace PZPack.View
             {
                 _fullscreen = value;
                 NotifyPropertyChanged(nameof(Fullscreen));
+                NotifyPropertyChanged(nameof(FullScreenText));
             }
         }
         public string FullScreenText
