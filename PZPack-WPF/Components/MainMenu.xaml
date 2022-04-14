@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:svc="clr-namespace:PZPack.View.Service"
+             xmlns:local="clr-namespace:PZPack.View"
              mc:Ignorable="d" 
              d:DesignHeight="24" d:DesignWidth="1280">
     <UserControl.Resources>
@@ -53,6 +54,40 @@
                     <Setter Property="MenuItem.Header" Value="{Binding}"/>
                     <Setter Property="MenuItem.Tag" Value="{Binding}"/>
                     <EventSetter Event="MenuItem.Click" Handler="OnLanguageSelect" />
+                </Style>
+            </MenuItem.ItemContainerStyle>
+        </MenuItem>
+        <MenuItem Header="{Binding Path=(svc:Translate.History)}" Style="{StaticResource MenuOuter}">
+            <MenuItem.Resources>
+                <ControlTemplate x:Key="MenuSeparatorTemplate">
+                    <Separator />
+                </ControlTemplate>
+            </MenuItem.Resources>
+            <MenuItem.ItemsSource>
+                <CompositeCollection>
+                    <CollectionContainer x:Name="historyCollection" />
+                </CompositeCollection>
+            </MenuItem.ItemsSource>
+            <MenuItem.ItemContainerStyle>
+                <Style TargetType="{x:Type MenuItem}">
+                    <EventSetter Event="MenuItem.Click" Handler="OnHistorySelect" />
+                    <Setter Property="MenuItem.Tag" Value="{Binding}"/>
+
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Path=Type}" Value="0">
+                            <Setter Property="Header" Value="{Binding Path=(svc:Translate.Empty)}" />
+                            <Setter Property="IsEnabled" Value="False" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Path=Type}" Value="1">
+                            <Setter Property="Template" Value="{StaticResource MenuSeparatorTemplate}" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Path=Type}" Value="2">
+                            <Setter Property="Header" Value="{Binding Path=(svc:Translate.Clear)}" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Path=Type}" Value="3">
+                            <Setter Property="MenuItem.Header" Value="{Binding Path=Caption}"/>
+                        </DataTrigger>
+                    </Style.Triggers>
                 </Style>
             </MenuItem.ItemContainerStyle>
         </MenuItem>

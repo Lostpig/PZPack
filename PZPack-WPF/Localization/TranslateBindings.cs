@@ -78,6 +78,10 @@ namespace PZPack.View.Service
             [TranslateBind("New Password")] public static string New_Password { get; set; }
             [TranslateBind("Password Book Not Opened")] public static string Password_Book_Not_Opened { get; set; }
             [TranslateBind("Save Completed")] public static string Save_Completed { get; set; }
+            [TranslateBind("History")] public static string History { get; set; }
+            [TranslateBind("Empty")] public static string Empty { get; set; }
+            [TranslateBind("Clear")] public static string Clear { get; set; }
+            [TranslateBind("CONFIRM File not exists")] public static string CONFIRM_File_not_exists { get; set; }
             [TranslateBind("EX ServerNotBinding")] public static string EX_ServerNotBinding { get; set; }
             [TranslateBind("EX ExternalPlayerNotSet")] public static string EX_ExternalPlayerNotSet { get; set; }
             [TranslateBind("EX ExternalPlayerPathNotExists")] public static string EX_ExternalPlayerPathNotExists { get; set; }

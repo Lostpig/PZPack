@@ -77,6 +77,11 @@
   "Password Book Not Opened": "没有已打开的密码本",
   "Save Completed": "保存成功",
 
+  "History": "历史记录",
+  "Empty": "空",
+  "Clear": "清空",
+  "CONFIRM File not exists": "文件【{0}】不存在，是否删除该条历史记录？",
+
   "EX ServerNotBinding": "错误：DASH服务器未正确启动",
   "EX ExternalPlayerNotSet": "错误：没有设置外部播放器",
   "EX ExternalPlayerPathNotExists": "错误：外部播放器路径不是正确的可执行文件",

@@ -19,7 +19,7 @@ namespace PZPack.View
         private PZFile? current;
         private bool fileChangeFlag = false;
         private int index = 0;
-        private readonly List<PZFile> list;
+        private List<PZFile> list;
         private readonly ViewWindowModel model;
         private double scale = 1;
         static readonly double[] scalelist = new double[] { 0.1, 0.2, 0.3, 0.4, 0.5, 0.75, 1, 1.25, 1.5, 2, 2.5, 3, 4, 5 };
@@ -90,13 +90,12 @@ namespace PZPack.View
             fileChangeFlag = false;
         }
 
-        public void BindFiles(PZFile file, PZFile[] files)
+        public void BindFiles(PZFile file, List<PZFile> files)
         {
-            index = Array.IndexOf(files, file);
+            index = files.IndexOf(file);
             index = index < 0 ? 0 : index;
 
-            list.Clear();
-            list.AddRange(files);
+            list = files;
             LoadImage();
             UpdateButtonState();
         }

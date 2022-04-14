@@ -1,8 +1,11 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
-using PZPack.View.Service;
+using System.Linq;
+using System.Collections.Generic;
 using PZPack.Core;
-using System;
+using PZPack.View.Service;
+using PZPack.View.Utils;
 
 namespace PZPack.View
 {
@@ -35,7 +38,8 @@ namespace PZPack.View
 
             if (node != null && Reader.Instance!=null)
             {
-                PZFile[] files = Reader.Instance.GetFiles(node.Id);
+                var files = Reader.Instance.GetFiles(node.Id).ToList();
+                files.Sort(NaturalPZFileComparer.Instance);
                 filesContent.ItemsSource = files;
             }
         }
@@ -45,10 +49,10 @@ namespace PZPack.View
             {
                 if (sp.DataContext is PZFile file)
                 {
-                    PZFile[] arr = (PZFile[])filesContent.ItemsSource;
-                    int index = Array.IndexOf(arr, file);
+                    List<PZFile> list = (List<PZFile>)filesContent.ItemsSource;
+                    int index = list.IndexOf(file);
                     index = index < 0 ? 0 : index;
-                    Dialogs.OpenViewWindow(arr, index);
+                    Dialogs.OpenViewWindow(list, index);
                 }
             }
         }

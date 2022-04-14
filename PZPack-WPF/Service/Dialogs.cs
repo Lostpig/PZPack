@@ -1,32 +1,40 @@
-﻿using PZPack.Core;
-using System.Windows;
+﻿using System.Windows;
 using System.Linq;
+using System.IO;
+using System.Collections.Generic;
+using PZPack.Core;
 
 namespace PZPack.View.Service
 {
     internal class Dialogs
     {
         static private ViewWindow? viewPtr;
-        public static void OpenReadOptionWindow()
+        public static void TryOpenPZFile()
         {
-            string? path = FileSystem.OpenSelectFileDialog("PZPack Files|*.pzpk;*.pzmv");
+            string? path = FileSystem.OpenSelectFileDialog("PZPack Files|*.pzpk;*.pzmv", Config.Instance.LastOpenDirectory);
             if (path != null)
             {
+                Config.Instance.LastOpenDirectory = Path.GetDirectoryName(path) ?? "";
+
                 bool openSuccess = Reader.TryOpen(path);
                 if (openSuccess) return;
 
-                ReadOptionWindow win = new(path) { Owner = Application.Current.MainWindow };
-                win.ShowDialog();
+                OpenReadOptionWindow(path);
             }
+        }
+        public static void OpenReadOptionWindow(string path)
+        {
+            ReadOptionWindow win = new(path) { Owner = Application.Current.MainWindow };
+            win.ShowDialog();
         }
         public static void OpenPackWindow()
         {
             PackWindow win = new() { Owner = Application.Current.MainWindow };
             win.ShowDialog();
         }
-        public static void OpenViewWindow(PZFile[] files, int index)
+        public static void OpenViewWindow(List<PZFile> list, int index)
         {
-            PZFile file = files[index];
+            PZFile file = list[index];
             if (!Reader.IsPicture(file)) return;
 
             if (viewPtr == null)
@@ -35,7 +43,7 @@ namespace PZPack.View.Service
                 viewPtr.Closed += ViewPtr_Closed;
             }
 
-            PZFile[] pictures = files.Where(f => Reader.IsPicture(f)).ToArray();
+            List<PZFile> pictures = list.Where(f => Reader.IsPicture(f)).ToList();
             viewPtr.BindFiles(file, pictures);
 
             if (viewPtr.IsVisible)
@@ -63,14 +71,15 @@ namespace PZPack.View.Service
             string? path;
             if (isCreate)
             {
-                path = FileSystem.OpenSaveFileDialog("PZPasswordBook File|*.pzpwb");
+                path = FileSystem.OpenSaveFileDialog("PZPasswordBook File|*.pzpwb", Config.Instance.LastPWBookDirectory);
             }
             else
             {
-                path = FileSystem.OpenSelectFileDialog("PZPasswordBook File|*.pzpwb");
+                path = FileSystem.OpenSelectFileDialog("PZPasswordBook File|*.pzpwb", Config.Instance.LastPWBookDirectory);
             }
             if (path == null) return;
 
+            Config.Instance.LastPWBookDirectory = Path.GetDirectoryName(path) ?? "";
             OpenPwBookWindow win = new(path, isCreate) { Owner = Application.Current.MainWindow };
             bool? isOpened = win.ShowDialog();
 
@@ -94,7 +103,6 @@ namespace PZPack.View.Service
             ExtractWindow win = new() { Owner = Application.Current.MainWindow };
             win.StartExtractAll(output);
             win.ShowDialog();
-
         }
         public static void OpenExtractWindow(PZFile file)
         {

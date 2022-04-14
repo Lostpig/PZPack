@@ -7,14 +7,18 @@ namespace PZPack.View.Service
 {
     internal class FileSystem
     {
-        static public string? OpenSelectFileDialog(string filter)
+        static public string? OpenSelectFileDialog(string filter, string? initDir = null)
         {
             Microsoft.Win32.OpenFileDialog dlg = new();
             // dlg.DefaultExt = ".pzpk";
             dlg.Filter = filter;
             dlg.Multiselect = false;
+            if (!string.IsNullOrEmpty(initDir))
+            {
+                dlg.InitialDirectory = initDir;
+            }
 
-            Nullable<bool> result = dlg.ShowDialog();
+            bool? result = dlg.ShowDialog();
 
             if (result == true)
             {
@@ -35,13 +39,17 @@ namespace PZPack.View.Service
             }
             return null;
         }
-        static public string? OpenSaveFileDialog(string filter)
+        static public string? OpenSaveFileDialog(string filter, string? initDir = null)
         {
             Microsoft.Win32.SaveFileDialog dlg = new();
             // dlg.DefaultExt = ".pzpk";
             dlg.Filter = filter;
+            if (!string.IsNullOrEmpty(initDir))
+            {
+                dlg.InitialDirectory = initDir;
+            }
 
-            Nullable<bool> result = dlg.ShowDialog();
+            bool? result = dlg.ShowDialog();
 
             if (result == true)
             {
@@ -56,7 +64,7 @@ namespace PZPack.View.Service
             dlg.DefaultExt = file.Extension;
             dlg.FileName = file.Name;
 
-            Nullable<bool> result = dlg.ShowDialog();
+            bool? result = dlg.ShowDialog();
 
             if (result == true)
             {

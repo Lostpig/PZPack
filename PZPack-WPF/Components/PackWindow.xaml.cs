@@ -35,7 +35,7 @@ namespace PZPack.View
         }
         private void OnChooseTarget(object sender, RoutedEventArgs e)
         {
-            string? target = FileSystem.OpenSaveFileDialog("PZPack File (.pzpk)|*.pzpk");
+            string? target = FileSystem.OpenSaveFileDialog("PZPack File (.pzpk)|*.pzpk", Config.Instance.LastSaveDirectory);
             if (target != null)
             {
                 model.UpdateTarget(target);
@@ -79,6 +79,7 @@ namespace PZPack.View
         private async void StartPacking()
         {
             if (!CheckSetting()) return;
+            Config.Instance.LastSaveDirectory = Path.GetDirectoryName(model.Target) ?? "";
 
             model.UpdateState(PackState.Packing);
             cancelSource = new CancellationTokenSource();

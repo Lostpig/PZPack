@@ -1,11 +1,10 @@
-﻿using System;
-using System.ComponentModel;
-using System.Linq;
+﻿using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using PZPack.Core;
 using PZPack.View.Service;
+using PZPack.View.Utils;
 
 namespace PZPack.View
 {
@@ -40,7 +39,8 @@ namespace PZPack.View
             }
 
             var root = Reader.Instance.GetFolderNode();
-            var videos = root.GetChildren().ToArray();
+            var videos = root.GetChildren().ToList();
+            videos.Sort(NaturalPZFolderComparer.Instance);
 
             videosContent.ItemsSource = videos;
         }

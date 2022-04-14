@@ -6,6 +6,9 @@ namespace PZPack.View.Service
 {
     internal class Config
     {
+        private const string NS_UserSetting = "UserSetting";
+        private const string NS_Application = "Application";
+
         private static Config? _instance;
         public static Config Instance
         {
@@ -20,20 +23,54 @@ namespace PZPack.View.Service
 
         public string ExternalPlayer
         {
-            get { return _data["UserSetting"]["ExternalPlayer"]; }
+            get { return _data[NS_UserSetting][nameof(ExternalPlayer)]; }
             set
             {
-                _data["UserSetting"]["ExternalPlayer"] = value;
+                _data[NS_UserSetting][nameof(ExternalPlayer)] = value;
                 Save();
             }
         }
 
         public string Language
         {
-            get { return _data["UserSetting"]["Language"]; }
+            get { return _data[NS_UserSetting][nameof(Language)]; }
             set
             {
-                _data["UserSetting"]["Language"] = value;
+                _data[NS_UserSetting][nameof(Language)] = value;
+                Save();
+            }
+        }
+
+        public string LastOpenDirectory
+        {
+            get { return _data[NS_Application][nameof(LastOpenDirectory)]; }
+            set
+            {
+                if (string.IsNullOrEmpty(value)) return;
+
+                _data[NS_Application][nameof(LastOpenDirectory)] = value;
+                Save();
+            }
+        }
+        public string LastSaveDirectory
+        {
+            get { return _data[NS_Application][nameof(LastSaveDirectory)]; }
+            set
+            {
+                if (string.IsNullOrEmpty(value)) return;
+
+                _data[NS_Application][nameof(LastSaveDirectory)] = value;
+                Save();
+            }
+        }
+        public string LastPWBookDirectory
+        {
+            get { return _data[NS_Application][nameof(LastPWBookDirectory)]; }
+            set
+            {
+                if (string.IsNullOrEmpty(value)) return;
+
+                _data[NS_Application][nameof(LastPWBookDirectory)] = value;
                 Save();
             }
         }

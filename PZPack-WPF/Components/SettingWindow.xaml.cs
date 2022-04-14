@@ -1,4 +1,5 @@
 ﻿using PZPack.View.Service;
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
@@ -20,7 +21,10 @@ namespace PZPack.View
 
         private void OnSelectFile(object sender, RoutedEventArgs e)
         {
-            string? path = FileSystem.OpenSelectFileDialog("Exe file|*.exe");
+            string currentDir =
+                Path.GetDirectoryName(Config.Instance.ExternalPlayer)
+                ?? Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            string? path = FileSystem.OpenSelectFileDialog("Exe file|*.exe", currentDir);
             if (path != null)
             {
                 VModel.ExPlayer = path;

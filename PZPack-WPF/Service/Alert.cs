@@ -43,5 +43,14 @@ namespace PZPack.View.Service
         {
             return Show(message, Translate.Warning, MessageBoxImage.Warning);
         }
+
+        public static MessageBoxResult ShowMessageConfirm(string message)
+        {
+            return MessageBox.Show(message, Translate.Message, MessageBoxButton.YesNo, MessageBoxImage.Information);
+        }
+        public static MessageBoxResult ShowWarningConfirm(string message)
+        {
+            return MessageBox.Show(message, Translate.Warning, MessageBoxButton.YesNo, MessageBoxImage.Warning);
+        }
     }
 }

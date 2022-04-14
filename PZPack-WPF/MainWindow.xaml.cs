@@ -20,7 +20,7 @@ namespace PZPack.View
 
         private void OnOpenFile(object sender, RoutedEventArgs e)
         {
-            Dialogs.OpenReadOptionWindow();
+            Dialogs.TryOpenPZFile();
         }
 
         private void Reader_PZReaderChanged(object? sender, PZReaderChangeEventArgs e)

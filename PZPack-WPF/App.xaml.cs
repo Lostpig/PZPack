@@ -12,12 +12,14 @@ namespace PZPack.View
             base.OnStartup(e);
             Service.Language.Init();
         }
+
         protected override void OnExit(ExitEventArgs e)
         {
             if (Service.Reader.Instance != null)
             {
                 Service.Reader.Close();
             }
+            Service.PZHistory.Instance.Save();
             Service.DashServer.Close();
 
             base.OnExit(e);

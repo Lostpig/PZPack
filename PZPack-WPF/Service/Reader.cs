@@ -42,6 +42,7 @@ namespace PZPack.View.Service
             if (Instance != null)
             {
                 PZReaderChanged?.Invoke(null, new PZReaderChangeEventArgs(PZReaderChangeAction.OPEN, source, Instance.PZType));
+                PZHistory.Instance.PushHistory(source);
             }
 
             return Instance != null;
