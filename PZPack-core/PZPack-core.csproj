@@ -8,4 +8,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="D:\Code\my-project\pzpk\PZPack\PZPack-core\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="D:\Code\my-project\pzpk\PZPack\PZPack-core\.editorconfig" />
+  </ItemGroup>
+
 </Project>

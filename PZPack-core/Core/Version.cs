@@ -2,7 +2,7 @@
 {
     public class PZVersion
     {
-        public static int Current { get => Common.Version; }
+        public static int Current { get => PZCommon.Version; }
         public static bool CompatibleVersion(int version)
         {
             return Compatibles.IsCompatibleVersion(version);

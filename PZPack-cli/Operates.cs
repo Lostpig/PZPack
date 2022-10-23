@@ -1,4 +1,6 @@
 ﻿using PZPack.Core;
+using PZPack.Core.Index;
+using PZPack.Core.Exceptions;
 
 namespace PZPack.Cli
 {
@@ -12,6 +14,42 @@ namespace PZPack.Cli
     }
     internal class Operates
     {
+        private static IndexDesigner ScanDirectory(string path)
+        {
+            DirectoryInfo root = new(path);
+            if (!root.Exists)
+            {
+                throw new DirectoryNotFoundException(path);
+            }
+
+            IndexDesigner designer = new();
+
+            scan(root, designer.Root);
+
+            List<PZDesigningFile> files = designer.GetAllFiles();
+            if (files.Count == 0)
+            {
+                throw new SourceDirectoryIsEmptyException(path);
+            }
+            return designer;
+
+            void scan(DirectoryInfo dir, PZDesigningFolder parent)
+            {
+                var current = designer.AddFolder(dir.Name, parent);
+                var files = dir.GetFiles();
+                foreach(var f in files)
+                {
+                    designer.AddFile(f.FullName, f.Name, current);
+                }
+
+                DirectoryInfo[] subDirs = dir.GetDirectories();
+                foreach (DirectoryInfo subDir in subDirs)
+                {
+                    scan(subDir, current);
+                }
+            }
+        }
+
         static public void Pack()
         {
             string? inputPath = null;
@@ -51,15 +89,11 @@ namespace PZPack.Cli
                 password = Console.ReadLine();
             }
 
-            Console.WriteLine("Please enter description (optional):");
-            string? description = Console.ReadLine();
-
             var updater = new ConsoleUpdater();
-            var progress = new ProgressReporter<(int, int, long, long)>((v) =>
+            var progress = new ProgressReporter<PackProgressArg>((v) =>
             {
-                (int count, int total, long processed, long size) = v;
-                double prec = processed / size * 100;
-                updater.Update($"{processed:f1}% ({count} / {total})");
+                double prec = v.CurrentBytes == 0 ? 0 : v.CurrentProcessedBytes / v.CurrentBytes * 100;
+                updater.Update($"{prec:f1}% ({v.ProcessedFileCount} / {v.TotalFileCount})");
             });
 
             updater.Begin();
@@ -67,8 +101,8 @@ namespace PZPack.Cli
             var startTime = DateTime.Now;
             try
             {
-                PZPackInfo info = new(password, description ?? "");
-                var task = PZPacker.Pack(inputPath, outputPath, info, progress);
+                var designer = ScanDirectory(inputPath);
+                var task = PZPacker.Pack(outputPath, designer, password, 65536, progress);
                 task.Wait();
                 len = task.Result;
             }
@@ -123,11 +157,10 @@ namespace PZPack.Cli
             }
 
             var updater = new ConsoleUpdater();
-            var progress = new ProgressReporter<(int, int, long, long)>((v) =>
+            var progress = new ProgressReporter<ExtractProgressArg>((v) =>
             {
-                (int count, int total, long processed, long size) = v;
-                double prec = processed / size * 100;
-                updater.Update($"{processed:f1}% ({count} / {total})");
+                double prec = v.CurrentBytes == 0 ? 0 : v.CurrentProcessedBytes / v.CurrentBytes * 100;
+                updater.Update($"{prec:f1}% ({v.ProcessedFileCount} / {v.TotalFileCount})");
             });
 
             
@@ -137,13 +170,13 @@ namespace PZPack.Cli
             try
             {
                 PZReader reader = PZReader.Open(inputPath, password);
-                Console.WriteLine($"File version: {reader.FileVersion}");
+                Console.WriteLine($"File version: {reader.Version}");
 
                 updater.Begin();
-                Task<long> task = reader.UnpackAll(outputPath, progress);
+                Task<long> task = reader.ExtractBatchAsync(reader.Index.Root, outputPath, progress);
                 task.Wait();
                 len = task.Result;
-                files = reader.FileCount;
+                files = reader.Index.GetFilesRecursion(reader.Index.Root).Length;
             }
             catch (Exception ex)
             {
@@ -193,11 +226,9 @@ namespace PZPack.Cli
             {
                 PZReader reader = PZReader.Open(inputPath, password);
                 Console.WriteLine($"Load pzpk file {inputPath}");
-                Console.WriteLine($"File version = {reader.FileVersion}");
-                Console.WriteLine($"Description: {reader.Description}");
-                Console.WriteLine($"Files count: {reader.FileCount}");
-                Console.WriteLine($"Folders count: {reader.FolderCount}");
-                Console.WriteLine($"Size: {reader.PackSize} bytes");
+                Console.WriteLine($"File version = {reader.Version}");
+                Console.WriteLine($"BlockSize: {reader.BlockSize}");
+                Console.WriteLine($"Size: {reader.Info.FileSize} bytes");
             }
             catch (Exception ex)
             {

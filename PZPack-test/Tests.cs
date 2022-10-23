@@ -1,4 +1,5 @@
 ﻿using PZPack.Core;
+using PZPack.Core.Crypto;
 using System.Diagnostics;
 
 namespace PZPack.Test
@@ -10,7 +11,10 @@ namespace PZPack.Test
             if (a.Length != b.Length) return false;
             for (int i = 0; i < a.Length; i++)
             {
-                if (a[i] != b[i]) return false;
+                if (a[i] != b[i])
+                {
+                    return false;
+                }
             }
 
             return true;
@@ -18,8 +22,8 @@ namespace PZPack.Test
 
         public static void TestBytesEncodeAndDecode()
         {
-            IPZCrypto crypto = PZCryptoCreater.CreateCrypto("123456", PZVersion.Current);
-            byte[] testBuf = new byte[10000];
+            IPZCrypto crypto = PZCrypto.CreateCrypto("123456", PZVersion.Current, 16);
+            byte[] testBuf = new byte[200];
             for (int i = 0; i < testBuf.Length; i++)
             {
                 byte x = (byte)(Random.Shared.Next() % 256);
