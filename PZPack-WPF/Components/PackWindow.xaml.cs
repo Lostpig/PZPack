@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using PZPack.View.Service;
 using System.IO;
-using System.Threading.Tasks;
 using PZPack.Core;
 using System.Threading;
 using System;
@@ -76,7 +75,7 @@ namespace PZPack.View
 
             return true;
         }
-        private async void StartPacking()
+        private void StartPacking()
         {
             if (!CheckSetting()) return;
             Config.Instance.LastSaveDirectory = Path.GetDirectoryName(model.Target) ?? "";
@@ -90,16 +89,14 @@ namespace PZPack.View
                 (int count, int total, long fileUsed, long fileTotal) = n;
                 model.UpdateProgress(count, total, fileUsed, fileTotal);
             });
-            PZPackInfo info = new(model.Password, model.Remark);
 
             try
             {
                 var startTime = DateTime.Now;
-                long size = await PZPacker.Pack(model.Source, model.Target, info, reporter, token);
+                // long size = await PZPacker.Pack(model.Source, model.Target, reporter, token);
                 var usedTime = DateTime.Now - startTime;
 
                 Alert.ShowMessage(Translate.Packing_complete);
-                model.UpdateComplete(size, usedTime);
             }
             catch (OperationCanceledException)
             {

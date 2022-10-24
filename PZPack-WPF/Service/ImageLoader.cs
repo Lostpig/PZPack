@@ -1,9 +1,8 @@
-﻿using System.Windows.Media;
-using System.IO;
+﻿using System.IO;
 using System.Windows.Media.Imaging;
 using System.Diagnostics;
 using System;
-using PZPack.Core;
+using PZPack.Core.Index;
 using System.Threading.Tasks;
 
 namespace PZPack.View.Service
@@ -16,7 +15,7 @@ namespace PZPack.View.Service
             if (Reader.Instance == null) return source;
 
             bool success = false;
-            byte[] data = await Reader.Instance.ReadFile(file);
+            byte[] data = await Reader.Instance.ReadFileAsync(file);
             using var stream = new MemoryStream(data);
             try
             {

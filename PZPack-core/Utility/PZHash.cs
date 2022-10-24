@@ -3,7 +3,7 @@ using System.Text;
 
 namespace PZPack.Core.Utility;
 
-internal class PZHash
+public class PZHash
 {
     public static byte[] Sha256(string text)
     {

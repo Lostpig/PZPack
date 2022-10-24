@@ -19,7 +19,7 @@ namespace PZPack.View.Service.Converters
             Other
         }
 
-        private static Dictionary<IconType, BitmapImage> imageCache = new();
+        private static readonly Dictionary<IconType, BitmapImage> imageCache = new();
         private static IconType GetExtensionType(string ext)
         {
             return ext switch
@@ -48,10 +48,10 @@ namespace PZPack.View.Service.Converters
                         => View.StaticResources.file_audio,
                     _ => View.StaticResources.file_other
                 };
-                using MemoryStream ms = new MemoryStream();
+                using MemoryStream ms = new();
                 bitmap.Save(ms, ImageFormat.Png);
 
-                BitmapImage image = new BitmapImage();
+                BitmapImage image = new();
                 image.BeginInit();
                 image.CacheOption = BitmapCacheOption.OnLoad;
                 image.StreamSource = ms;

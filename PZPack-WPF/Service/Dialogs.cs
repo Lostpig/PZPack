@@ -2,7 +2,7 @@
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
-using PZPack.Core;
+using PZPack.Core.Index;
 
 namespace PZPack.View.Service
 {
@@ -32,7 +32,7 @@ namespace PZPack.View.Service
             PackWindow win = new() { Owner = Application.Current.MainWindow };
             win.ShowDialog();
         }
-        public static void OpenViewWindow(List<PZFile> list, int index)
+        public static void OpenViewWindow(PZFile[] list, int index)
         {
             PZFile file = list[index];
             if (!Reader.IsPicture(file)) return;

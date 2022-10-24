@@ -7,32 +7,12 @@ namespace PZPack.Core.Crypto;
 
 internal class PZCryptoBase : IDisposable
 {
-    static internal Aes CreateAes()
-    {
-        Aes cryptor = Aes.Create();
-        cryptor.Mode = CipherMode.CBC;
-        cryptor.Padding = PaddingMode.PKCS7;
-        cryptor.KeySize = 256;
-        cryptor.GenerateIV();
-
-        return cryptor;
-    }
-    static internal byte[] CreateKey(string password)
-    {
-        return PZHash.Sha256(password);
-    }
-    static internal byte[] CreateKeyHash(byte[] key)
-    {
-        string hex = PZHash.Sha256Hex(key);
-        return PZHash.Sha256(hex);
-    }
-
     internal readonly byte[] Key;
     internal readonly byte[] Hash;
     internal PZCryptoBase(byte[] key)
     {
         Key = key;
-        Hash = CreateKeyHash(Key);
+        Hash = PZCrypto.CreateKeyHash(Key);
     }
 
     public long EncryptStreamBlock(BlockReader source, Stream destination)
@@ -41,13 +21,12 @@ internal class PZCryptoBase : IDisposable
         long byteEncrypt = 0;
 
         int bytesRead;
-        for (int i = 0; i < source.Count; i++)
+        while (!source.End)
         {
-            bytesRead = source.ReadBlock(i, buffer);
+            bytesRead = source.ReadNext(buffer);
             using MemoryStream mem = new(buffer, 0, bytesRead);
             byteEncrypt += EncryptStream(mem, destination);
         }
-
         return byteEncrypt;
     }
     public long DecryptStreamBlock(BlockReader source, Stream destination)
@@ -57,9 +36,9 @@ internal class PZCryptoBase : IDisposable
         long byteDecrypt = 0;
 
         int bytesRead;
-        for (int i = 0; i < source.Count; i++)
+        while (!source.End)
         {
-            bytesRead = source.ReadBlock(i, buffer);
+            bytesRead = source.ReadNext(buffer);
             using MemoryStream mem = new(buffer, 0, bytesRead);
             mem.Read(IV, 0, IV.Length);
 
@@ -75,9 +54,9 @@ internal class PZCryptoBase : IDisposable
         long byteEncrypt = 0;
 
         int bytesRead;
-        for (int i = 0; i < source.Count; i++)
+        while (!source.End)
         {
-            bytesRead = source.ReadBlock(i, buffer);
+            bytesRead = source.ReadNext(buffer);
             using MemoryStream mem = new(buffer, 0, bytesRead);
             byteEncrypt += await EncryptStreamAsync(mem, destination, cancelToken);
         }
@@ -91,9 +70,9 @@ internal class PZCryptoBase : IDisposable
         long byteDecrypt = 0;
 
         int bytesRead;
-        for (int i = 0; i < source.Count; i++)
+        while (!source.End)
         {
-            bytesRead = source.ReadBlock(i, buffer);
+            bytesRead = source.ReadNext(buffer);
             using MemoryStream mem = new(buffer, 0, bytesRead);
             mem.Read(IV, 0, IV.Length);
 
@@ -107,7 +86,7 @@ internal class PZCryptoBase : IDisposable
     {
         long originPositon = destination.Position;
 
-        using Aes crypto = CreateAes();
+        using Aes crypto = PZCrypto.CreateAes();
         using ICryptoTransform encryptor = crypto.CreateEncryptor(Key, crypto.IV);
         using CryptoStream encryptStream = new(source, encryptor, CryptoStreamMode.Read);
 
@@ -120,7 +99,7 @@ internal class PZCryptoBase : IDisposable
     {
         long originPositon = destination.Position;
 
-        using Aes crypto = CreateAes();
+        using Aes crypto = PZCrypto.CreateAes();
         using ICryptoTransform decryptor = crypto.CreateDecryptor(Key, IV);
         using CryptoStream decryptStream = new(destination, decryptor, CryptoStreamMode.Write, true);
 
@@ -133,7 +112,7 @@ internal class PZCryptoBase : IDisposable
     {
         long originPositon = destination.Position;
 
-        using Aes crypto = CreateAes();
+        using Aes crypto = PZCrypto.CreateAes();
         using ICryptoTransform encryptor = crypto.CreateEncryptor(Key, crypto.IV);
         using CryptoStream encryptStream = new(source, encryptor, CryptoStreamMode.Read);
 
@@ -146,9 +125,9 @@ internal class PZCryptoBase : IDisposable
     {
         long originPositon = destination.Position;
 
-        using Aes crypto = CreateAes();
+        using Aes crypto = PZCrypto.CreateAes();
         using ICryptoTransform decryptor = crypto.CreateDecryptor(Key, IV);
-        using CryptoStream decryptStream = new(destination, decryptor, CryptoStreamMode.Write);
+        using CryptoStream decryptStream = new(destination, decryptor, CryptoStreamMode.Write, true);
 
         await source.CopyToAsync(decryptStream, cancelToken);
 
@@ -161,7 +140,8 @@ internal class PZCryptoBase : IDisposable
     }
 }
 
-internal class BlockReader
+
+internal class StreamBlockWrapper
 {
     private readonly Stream _innerStream;
     private readonly long _offset;
@@ -169,11 +149,11 @@ internal class BlockReader
     private readonly int _blockSize;
     private readonly int _count;
 
-    private IProgress<(long, long)>? _progress;
-
     public int Count => _count;
     public int BlockSize => _blockSize;
-    public BlockReader(Stream innerStream, long offset, long length, int blockSize)
+    public long Length => _length;
+
+    public StreamBlockWrapper(Stream innerStream, long offset, long length, int blockSize)
     {
         _innerStream = innerStream;
         _offset = offset;
@@ -181,18 +161,13 @@ internal class BlockReader
         _blockSize = blockSize;
         _count = ComputeBlockCount();
     }
-    public int ComputeBlockCount ()
+    private int ComputeBlockCount()
     {
         int count = (int)(_length / _blockSize);
         if (_length % _blockSize != 0) count += 1;
         return count;
     }
-    public void BindingProgress(IProgress<(long, long)>? progress)
-    {
-        _progress = progress;
-    }
-
-    public int GetBlockSize(int blockIndex)
+    private int GetBlockSize(int blockIndex)
     {
         if (_length % _blockSize == 0 || blockIndex < _count - 1)
         {
@@ -201,19 +176,54 @@ internal class BlockReader
 
         return (int)(_length % _blockSize);
     }
-    public long GetBlockOffset(int blockIndex)
+    private long GetBlockOffset(int blockIndex)
     {
         return _blockSize * blockIndex + _offset;
     }
     public int ReadBlock(int blockIndex, byte[] buffer)
     {
+        if (blockIndex < 0 || blockIndex >= Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(blockIndex));
+        }
+
         long currentBlockOffset = GetBlockOffset(blockIndex);
         int currentBlockSize = GetBlockSize(blockIndex);
 
         _innerStream.Seek(currentBlockOffset, SeekOrigin.Begin);
         int readed = _innerStream.Read(buffer, 0, currentBlockSize);
-        _progress?.Report((currentBlockOffset + readed - _offset, _length));
-
         return readed;
+    }
+}
+
+internal class BlockReader
+{
+    private readonly StreamBlockWrapper _wrapper;
+    private int _position;
+    private long _bytesRead;
+    private readonly IProgress<(long, long)>? _progress;
+
+    public int Count => _wrapper.Count;
+    public int BlockSize => _wrapper.BlockSize;
+    public int Position => _position;
+    public bool End => Position >= Count;
+
+    public BlockReader(StreamBlockWrapper wrapper, IProgress<(long, long)>? progress = default)
+    {
+        _wrapper = wrapper;
+        _position = 0;
+        _bytesRead = 0;
+        _progress = progress;
+    }
+    public int ReadNext(byte[] buffer)
+    {
+        if (End) return 0;
+
+        var bytesRead = _wrapper.ReadBlock(_position, buffer);
+        _position++;
+        _bytesRead += bytesRead;
+        _progress?.Report((_bytesRead, _wrapper.Length));
+
+        return bytesRead;
     }
 }

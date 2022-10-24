@@ -24,7 +24,7 @@ internal class IndexDecoder
         ReadOnlySpan<byte> foldersBuffer = buffer.Slice(8, foldersLen);
         ReadOnlySpan<byte> filesBuffer = buffer.Slice(8 + foldersLen, filesLen);
 
-        var folders = DecodeFolders(foldersBuffer);
+        var folders = DecodeFoldersV1(foldersBuffer);
         var files = DecodeFilesV1(filesBuffer);
 
         return new IndexReader(folders, files);
@@ -37,7 +37,7 @@ internal class IndexDecoder
         ReadOnlySpan<byte> foldersBuffer = buffer.Slice(8, foldersLen);
         ReadOnlySpan<byte> filesBuffer = buffer.Slice(8 + foldersLen, filesLen);
 
-        var folders = DecodeFolders(foldersBuffer);
+        var folders = DecodeFoldersV1(foldersBuffer);
         var files = DecodeFilesV2(filesBuffer);
 
         return new IndexReader(folders, files);
@@ -50,13 +50,13 @@ internal class IndexDecoder
         ReadOnlySpan<byte> foldersBuffer = buffer.Slice(8, foldersLen);
         ReadOnlySpan<byte> filesBuffer = buffer.Slice(8 + foldersLen, filesLen);
 
-        var folders = DecodeFolders(foldersBuffer);
+        var folders = DecodeFoldersV11(foldersBuffer);
         var files = DecodeFilesV11(filesBuffer);
 
         return new IndexReader(folders, files);
     }
 
-    private static List<PZFolder> DecodeFolders(ReadOnlySpan<byte> buffer)
+    private static List<PZFolder> DecodeFoldersV1(ReadOnlySpan<byte> buffer)
     {
         List<PZFolder> folders = new();
 
@@ -77,6 +77,28 @@ internal class IndexDecoder
 
         return folders;
     }
+    private static List<PZFolder> DecodeFoldersV11(ReadOnlySpan<byte> buffer)
+    {
+        List<PZFolder> folders = new();
+
+        int position = 0;
+        while (position < buffer.Length)
+        {
+            int partLength = BitConverter.ToInt32(buffer.Slice(position, 4));
+            var partBuffer = buffer.Slice(position + 4, partLength - 4);
+
+            int id = BitConverter.ToInt32(partBuffer[..4]);
+            int pid = BitConverter.ToInt32(partBuffer[4..8]);
+            string name = Encoding.UTF8.GetString(partBuffer[8..]);
+            PZFolder folder = new(name, id, pid);
+            folders.Add(folder);
+
+            position += partLength;
+        }
+
+        return folders;
+    }
+
     private static List<PZFile> DecodeFilesV1(ReadOnlySpan<byte> buffer)
     {
         List<PZFile> files = new();
@@ -131,7 +153,7 @@ internal class IndexDecoder
         while (position < buffer.Length)
         {
             int partLength = BitConverter.ToInt32(buffer.Slice(position, 4));
-            var partBuffer = buffer.Slice(position + 4, partLength);
+            var partBuffer = buffer.Slice(position + 4, partLength - 4);
 
             int id = BitConverter.ToInt32(partBuffer[..4]);
             int pid = BitConverter.ToInt32(partBuffer[4..8]);
@@ -142,7 +164,7 @@ internal class IndexDecoder
             PZFile file = new(name, id, pid, offset, size, originSize);
             files.Add(file);
 
-            position += partLength + 4;
+            position += partLength;
         }
 
         return files;

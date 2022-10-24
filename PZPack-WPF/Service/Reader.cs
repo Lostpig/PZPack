@@ -1,6 +1,8 @@
-﻿using PZPack.Core;
-using System;
+﻿using System;
 using System.IO;
+using PZPack.Core;
+using PZPack.Core.Crypto;
+using PZPack.Core.Index;
 
 namespace PZPack.View.Service
 {
@@ -20,7 +22,7 @@ namespace PZPack.View.Service
         static public PZReader? Instance { get; private set; }
         static public bool Open(string source, string password)
         {
-            var key = PZCryptoCreater.CreateKey(password);
+            var key = PZCrypto.CreateKey(password);
             return Open(source, key);
         }
         static public bool Open(string source, byte[] key)
@@ -41,7 +43,7 @@ namespace PZPack.View.Service
 
             if (Instance != null)
             {
-                PZReaderChanged?.Invoke(null, new PZReaderChangeEventArgs(PZReaderChangeAction.OPEN, source, Instance.PZType));
+                PZReaderChanged?.Invoke(null, new PZReaderChangeEventArgs(PZReaderChangeAction.OPEN, source, Instance.Type));
                 PZHistory.Instance.PushHistory(source);
             }
 
@@ -52,8 +54,9 @@ namespace PZPack.View.Service
             if (PWBook.Current == null) return false;
 
             var fstream = new FileStream(source, FileMode.Open, FileAccess.Read);
-            string pwHash = PZReader.GetFilePwCheckHash(fstream);
-            var pwRecord = PWBook.Current.GetRecord(pwHash);
+            var fileInfo = PZFileInfo.Load(fstream);
+
+            var pwRecord = PWBook.Current.GetRecord(fileInfo.PasswordHash);
             if (pwRecord == null) return false;
 
             return Open(source, pwRecord.Key);

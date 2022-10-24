@@ -1,8 +1,6 @@
 ﻿using PZPack.Core.Crypto;
 using PZPack.Core.Exceptions;
 using PZPack.Core.Index;
-using System.Diagnostics;
-using System.Text;
 
 namespace PZPack.Core;
 
@@ -30,9 +28,10 @@ public record PZFileInfo
     }
     public static PZFileInfo Load(FileStream stream)
     {
-        using BinaryReader br = new(stream);
+        byte[] versionBytes = new byte[4];
         stream.Seek(0, SeekOrigin.Begin);
-        int version = br.ReadInt32();
+        stream.Read(versionBytes);
+        int version = BitConverter.ToInt32(versionBytes);
 
         return version switch
         {
@@ -44,7 +43,7 @@ public record PZFileInfo
 
     private static PZFileInfo LoadInfoV2(FileStream stream)
     {
-        using BinaryReader br = new(stream);
+        using BinaryReader br = new(stream, System.Text.Encoding.UTF8, true);
         stream.Seek(0, SeekOrigin.Begin);
         int version = br.ReadInt32();
         byte[] sign = br.ReadBytes(32);
@@ -67,7 +66,7 @@ public record PZFileInfo
     }
     private static PZFileInfo LoadInfoV11(FileStream stream)
     {
-        using BinaryReader br = new(stream);
+        using BinaryReader br = new(stream, System.Text.Encoding.UTF8, true);
         stream.Seek(0, SeekOrigin.Begin);
         int version = br.ReadInt32();
         byte[] sign = br.ReadBytes(32);
@@ -121,7 +120,7 @@ public record ExtractProgressArg
 
 public class PZReader : IDisposable
 {
-    public static PZReader Open(string source, string password)
+    public static PZReader Open(string source, byte[] key)
     {
         if (!File.Exists(source))
         {
@@ -131,7 +130,7 @@ public class PZReader : IDisposable
         PZFileInfo info = PZFileInfo.Load(sourceStream);
 
         PZTypes type = GetFileType(info);
-        IPZCrypto crypto = PZCrypto.CreateCrypto(password, info.Version, 0);
+        IPZCrypto crypto = PZCrypto.CreateCrypto(key, info.Version, info.BlockSize);
         if (info.PasswordHash != Convert.ToHexString(crypto.Hash))
         {
             throw new PZPasswordIncorrectException();
@@ -139,6 +138,12 @@ public class PZReader : IDisposable
 
         return new PZReader(source, sourceStream, crypto, type, info);
     }
+    public static PZReader Open(string source, string password)
+    {
+        var key = PZCrypto.CreateKey(password);
+        return Open(source, key);
+    }
+
     private static PZTypes GetFileType(PZFileInfo info)
     {
         if (info.Sign == PZCommon.HashSignHex(PZTypes.PZPACK))
@@ -193,10 +198,12 @@ public class PZReader : IDisposable
         Stream.Seek(Info.IndexOffset, SeekOrigin.Begin);
         Stream.Read(indexBytes, 0, indexBytes.Length);
 
-        return IndexDecoder.DecodeIndex(indexBytes, Version);
+        byte[] decryptBytes = Crypto.Decrypt(indexBytes);
+
+        return IndexDecoder.DecodeIndex(decryptBytes, Version);
     }
 
-    public async Task<long> ExtractFileAsync(PZFile file, string destination, IProgress<(long, long)>? progress = default, CancellationToken? cancelToken = null)
+    public async Task<long> ExtractFileAsync(PZFile file, string destination, IProgress<ExtractProgressArg>? progress = default, CancellationToken? cancelToken = null)
     {
         if (File.Exists(destination))
         {
@@ -209,9 +216,28 @@ public class PZReader : IDisposable
         }
 
         EnsureDirectory(dir);
+
+        ExtractProgressArg progressArg = new()
+        {
+            TotalFileCount = 1,
+            ProcessedFileCount = 0,
+            TotalBytes = file.Size,
+            TotalProcessedBytes = 0,
+            CurrentBytes = file.Size,
+            CurrentProcessedBytes = 0,
+        };
+        ProgressReporter<(long, long)> innerProgress = new((args) =>
+        {
+            (long readed, long total) = args;
+
+            progressArg.TotalProcessedBytes = readed;
+            progressArg.CurrentProcessedBytes = readed;
+            progress?.Report(progressArg);
+        });
+
         long length;
         using FileStream fs = File.Create(destination);
-        length = await Crypto.DecryptStreamAsync(Stream, fs, file.Offset, file.Size, progress, cancelToken);
+        length = await Crypto.DecryptStreamAsync(Stream, fs, file.Offset, file.Size, innerProgress, cancelToken);
 
         return length;
     }
@@ -225,6 +251,7 @@ public class PZReader : IDisposable
 
         var files = Index.GetFilesRecursion(folder);
         long totalBytes = files.Sum(f => f.Size);
+        long totalProcessedBytes = 0;
 
         ExtractProgressArg progressArg = new()
         {
@@ -235,26 +262,30 @@ public class PZReader : IDisposable
             CurrentBytes = 0,
             CurrentProcessedBytes = 0,
         };
-        ProgressReporter<(long, long)> innerProgress = new((args) =>
+        ProgressReporter<ExtractProgressArg> innerProgress = new((innerArg) =>
         {
-            (long readed, long total) = args;
-            progressArg.CurrentBytes = total;
-            progressArg.CurrentProcessedBytes = readed;
+            progressArg.TotalProcessedBytes = totalProcessedBytes + innerArg.CurrentProcessedBytes;
+            progressArg.CurrentBytes = innerArg.CurrentBytes;
+            progressArg.CurrentProcessedBytes = innerArg.CurrentProcessedBytes;
             progress?.Report(progressArg);
         });
 
-        foreach(var file in files)
+        foreach (var file in files)
         {
             string resolveFilePath = Index.GetResolveName(file, folder);
             string dest = Path.Combine(destination, resolveFilePath);
-            progressArg.TotalProcessedBytes += await ExtractFileAsync(file, dest, innerProgress, cancelToken);
+            totalProcessedBytes += await ExtractFileAsync(file, dest, innerProgress, cancelToken);
+            progressArg.TotalProcessedBytes = totalProcessedBytes;
             progressArg.ProcessedFileCount++;
 
             progress?.Report(progressArg);
         }
 
+        progress?.Report(progressArg);
         return progressArg.TotalProcessedBytes;
     }
+
+
     public async Task<byte[]> ReadFileAsync(PZFile file)
     {
         using MemoryStream ms = new();

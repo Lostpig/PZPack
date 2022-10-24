@@ -11,7 +11,7 @@ internal class PZCryptoV2 : IPZCrypto
     private readonly byte[] IV;
     public byte[] Hash { get { return _base.Hash; } }
 
-    public PZCryptoV2(string password) : this(PZCryptoBase.CreateKey(password)) { }
+    public PZCryptoV2(string password) : this(PZCrypto.CreateKey(password)) { }
     public PZCryptoV2(byte[] key)
     {
         byte[] iv = new byte[16];

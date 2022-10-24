@@ -1,8 +1,8 @@
-﻿using System.Linq;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
-using PZPack.Core;
+using PZPack.Core.Index;
 using PZPack.View.Service;
 using PZPack.View.Utils;
 
@@ -38,9 +38,9 @@ namespace PZPack.View
                 return;
             }
 
-            var root = Reader.Instance.GetFolderNode();
-            var videos = root.GetChildren().ToList();
-            videos.Sort(NaturalPZFolderComparer.Instance);
+            var root = Reader.Instance.Index.Root;
+            Reader.Instance.Index.GetChildren(root, out var videos, out _);
+            Array.Sort(videos, NaturalPZFolderComparer.Instance);
 
             videosContent.ItemsSource = videos;
         }
@@ -53,7 +53,7 @@ namespace PZPack.View
         {
             if (e.OriginalSource is FrameworkElement sp)
             {
-                if (sp.DataContext is IFolderNode folder)
+                if (sp.DataContext is PZFolder folder)
                 {
                     ExPlayer.Play(folder);
                 }

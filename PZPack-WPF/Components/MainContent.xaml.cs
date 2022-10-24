@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Linq;
 using System.Collections.Generic;
-using PZPack.Core;
+using PZPack.Core.Index;
 using PZPack.View.Service;
 using PZPack.View.Utils;
 
@@ -34,12 +34,13 @@ namespace PZPack.View
         private void OnFolderSelected(object sender, RoutedEventArgs e)
         {
             TreeViewItem item = (TreeViewItem)e.OriginalSource;
-            IFolderNode node = (IFolderNode)item.DataContext;
+            PZFolder node = (PZFolder)item.DataContext;
 
             if (node != null && Reader.Instance!=null)
             {
-                var files = Reader.Instance.GetFiles(node.Id).ToList();
-                files.Sort(NaturalPZFileComparer.Instance);
+                Reader.Instance.Index.GetChildren(node, out _, out var files);
+
+                Array.Sort(files, NaturalPZFileComparer.Instance);
                 filesContent.ItemsSource = files;
             }
         }
@@ -49,8 +50,8 @@ namespace PZPack.View
             {
                 if (sp.DataContext is PZFile file)
                 {
-                    List<PZFile> list = (List<PZFile>)filesContent.ItemsSource;
-                    int index = list.IndexOf(file);
+                    PZFile[] list = (PZFile[])filesContent.ItemsSource;
+                    int index = Array.IndexOf(list, file);
                     index = index < 0 ? 0 : index;
                     Dialogs.OpenViewWindow(list, index);
                 }
@@ -74,10 +75,12 @@ namespace PZPack.View
                 return;
             }
 
-            IFolderNode root = Reader.Instance!.GetFolderNode();
-            TreeViewItem treeViewItem = new();
-            treeViewItem.DataContext = root;
-            treeViewItem.Header = "root";
+            PZFolder root = Reader.Instance!.Index.Root;
+            TreeViewItem treeViewItem = new()
+            {
+                DataContext = root,
+                Header = "root"
+            };
 
             folderTree.Items.Add(treeViewItem);
             ExpandTree(treeViewItem);
@@ -91,12 +94,16 @@ namespace PZPack.View
         }
         static private void ExpandTree (TreeViewItem parent)
         {
-            IFolderNode node = (IFolderNode)parent.DataContext;
-            foreach(IFolderNode child in node.GetChildren())
+            PZFolder node = (PZFolder)parent.DataContext;
+            Reader.Instance!.Index.GetChildren(node, out var folders, out _);
+
+            foreach(var child in folders)
             {
-                TreeViewItem treeViewItem = new();
-                treeViewItem.DataContext = child;
-                treeViewItem.Header = child.Name;
+                TreeViewItem treeViewItem = new()
+                {
+                    DataContext = child,
+                    Header = child.Name
+                };
 
                 parent.Items.Add(treeViewItem);
                 ExpandTree(treeViewItem);

@@ -1,7 +1,6 @@
-﻿using System;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 using System.Diagnostics;
-using PZPack.Core;
+using PZPack.Core.Index;
 
 namespace PZPack.View.Service
 {
@@ -9,10 +8,12 @@ namespace PZPack.View.Service
     {
         static public string? OpenSelectFileDialog(string filter, string? initDir = null)
         {
-            Microsoft.Win32.OpenFileDialog dlg = new();
-            // dlg.DefaultExt = ".pzpk";
-            dlg.Filter = filter;
-            dlg.Multiselect = false;
+            Microsoft.Win32.OpenFileDialog dlg = new()
+            {
+                // dlg.DefaultExt = ".pzpk";
+                Filter = filter,
+                Multiselect = false
+            };
             if (!string.IsNullOrEmpty(initDir))
             {
                 dlg.InitialDirectory = initDir;
@@ -41,9 +42,11 @@ namespace PZPack.View.Service
         }
         static public string? OpenSaveFileDialog(string filter, string? initDir = null)
         {
-            Microsoft.Win32.SaveFileDialog dlg = new();
-            // dlg.DefaultExt = ".pzpk";
-            dlg.Filter = filter;
+            Microsoft.Win32.SaveFileDialog dlg = new()
+            {
+                // dlg.DefaultExt = ".pzpk";
+                Filter = filter
+            };
             if (!string.IsNullOrEmpty(initDir))
             {
                 dlg.InitialDirectory = initDir;
@@ -60,9 +63,11 @@ namespace PZPack.View.Service
         }
         static public string? OpenSaveExtractFileDialog(PZFile file)
         {
-            Microsoft.Win32.SaveFileDialog dlg = new();
-            dlg.DefaultExt = file.Extension;
-            dlg.FileName = file.Name;
+            Microsoft.Win32.SaveFileDialog dlg = new()
+            {
+                DefaultExt = file.Extension,
+                FileName = file.Name
+            };
 
             bool? result = dlg.ShowDialog();
 

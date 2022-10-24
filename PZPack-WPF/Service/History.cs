@@ -14,7 +14,7 @@ namespace PZPack.View.Service
         {
             get
             {
-                if (_instance == null) _instance = new PZHistory();
+                _instance ??= new PZHistory();
                 return _instance;
             }
         }

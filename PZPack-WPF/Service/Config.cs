@@ -14,7 +14,7 @@ namespace PZPack.View.Service
         {
             get
             {
-                if (_instance == null) _instance = new Config();
+                _instance ??= new Config();
                 return _instance;
             }
         }

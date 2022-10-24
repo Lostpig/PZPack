@@ -20,14 +20,14 @@ public record PZFile
         Extension = Path.GetExtension(Name);
     }
 
-    public readonly string Name;
-    public readonly int Id;
-    public readonly int Pid;
-    public readonly long Offset;
-    public readonly long Size;
-    public readonly long OriginSize;
+    public string Name { get; init; }
+    public int Id { get; init; }
+    public int Pid { get; init; }
+    public long Offset { get; init; }
+    public long Size { get; init; }
+    public long OriginSize { get; init; }
 
-    public readonly string Extension;
+    public string Extension { get; init; }
 }
 
 public record PZFolder

@@ -14,8 +14,10 @@ namespace PZPack.View
         public ReadOptionWindow(string source)
         {
             InitializeComponent();
-            VModel = new();
-            VModel.Source = source;
+            VModel = new()
+            {
+                Source = source
+            };
             this.DataContext = VModel;
         }
 

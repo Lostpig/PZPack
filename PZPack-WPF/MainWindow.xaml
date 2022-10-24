@@ -66,14 +66,8 @@
             <Separator />
             <TextBlock Text="{Binding Path=FileSize}" VerticalAlignment="Center" />
             <Separator />
-            <TextBlock Text="{Binding Path=FileInnerCounts}" VerticalAlignment="Center" />
-            <TextBlock Text="{Binding Path=(svc:Translate.Files)}" VerticalAlignment="Center" />
-            <Separator />
             <TextBlock Text="{Binding Path=(svc:Translate.File_version)}" VerticalAlignment="Center" />
             <TextBlock Text="{Binding Path=FileVersion}" VerticalAlignment="Center" />
-            <Separator />
-            <TextBlock Text="{Binding Path=(svc:Translate.Remark)}" VerticalAlignment="Center" />
-            <TextBlock Text="{Binding Path=FileDescription}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
         </StackPanel>
     </Grid>
 </Window>

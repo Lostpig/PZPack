@@ -17,8 +17,10 @@ namespace PZPack.View
             InitializeComponent();
             IsCreate = isCreate;
 
-            VModel = new();
-            VModel.Source = source;
+            VModel = new()
+            {
+                Source = source
+            };
             DataContext = VModel;
         }
 

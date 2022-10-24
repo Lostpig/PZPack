@@ -1,11 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using PZPack.Core;
+using PZPack.Core.Index;
 using PZPack.View.Service;
 
 namespace PZPack.View
@@ -33,21 +32,16 @@ namespace PZPack.View
                 return;
             }
 
-            ProgressReporter<(int, int, long, long)> reporter = new((n) =>
-            {
-                (int count, int total, long readed, long fileSize) = n;
-                model.UpdateProgress(count, total, readed, fileSize);
-            });
+            ProgressReporter<ExtractProgressArg> reporter = new(model.UpdateProgress);
             cancelSource = new CancellationTokenSource();
             CancellationToken ctoken = cancelSource.Token;
 
             try
             {
                 var startTime = DateTime.Now;
-                long size = await Reader.Instance.UnpackAll(output, reporter, ctoken);
+                long size = await Reader.Instance.ExtractBatchAsync(Reader.Instance.Index.Root, output, reporter, ctoken);
                 var usedTime = DateTime.Now - startTime;
 
-                model.UpdateProgress(Reader.Instance.FileCount, Reader.Instance.FileCount, size, size);
                 Alert.ShowMessage(Translate.Extracted_complete);
                 model.UpdateComplete(size, usedTime);
             }
@@ -77,21 +71,16 @@ namespace PZPack.View
                 return;
             }
 
-            ProgressReporter<(long, long)> reporter = new((n) =>
-            {
-                (long reader, long total) = n;
-                model.UpdateProgress(0, 1, reader, total);
-            });
+            ProgressReporter<ExtractProgressArg> reporter = new(model.UpdateProgress);
             cancelSource = new CancellationTokenSource();
             CancellationToken ctoken = cancelSource.Token;
 
             try
             {
                 var startTime = DateTime.Now;
-                long length = await Reader.Instance.UnpackFile(file, output, reporter, ctoken);
+                long length = await Reader.Instance.ExtractFileAsync(file, output, reporter, ctoken);
                 var usedTime = DateTime.Now - startTime;
 
-                model.UpdateProgress(1, 1, length, length);
                 Alert.ShowMessage(Translate.Extracted_complete);
                 model.UpdateComplete(file.Size, usedTime);
             }
@@ -143,15 +132,17 @@ namespace PZPack.View
         public string ProgressText { get; private set; } = "";
         public string FileProgressText { get; private set; } = "";
         public double ProgressValue { get; private set; } = 0;
-        public void UpdateProgress(int count, int total, long fileUsed, long fileTotal)
-        {
-            total = total == 0 ? 1 : total;
-            ProgressValue = ((double)count / total) * 100;
-            ProgressText = $"{count} / {total} ({ProgressValue:f0}%)";
+        public double FileProgressValue { get; private set; } = 0;
 
-            fileTotal = fileTotal == 0 ? 1 : fileTotal;
-            double filePercent = fileUsed / fileTotal;
-            FileProgressText = $"{FileSystem.ComputeFileSize(fileUsed)} / {FileSystem.ComputeFileSize(fileTotal)} ({filePercent:f0}%)";
+        public void UpdateProgress(ExtractProgressArg arg)
+        {
+            var currentTotal = arg.CurrentBytes == 0 ? 1 : arg.CurrentBytes;
+            ProgressValue = (double)arg.TotalProcessedBytes / arg.TotalBytes * 100;
+            FileProgressValue = (double)arg.CurrentProcessedBytes / currentTotal * 100;
+
+            ProgressText = $"{arg.ProcessedFileCount} / {arg.TotalFileCount} ({ProgressValue:f0}%)";
+            FileProgressText = $"{FileSystem.ComputeFileSize(arg.CurrentProcessedBytes)} / {FileSystem.ComputeFileSize(arg.CurrentBytes)} ({FileProgressValue:f0}%)";
+            
             NotifyPropertyChanged(nameof(ProgressText));
             NotifyPropertyChanged(nameof(ProgressValue));
             NotifyPropertyChanged(nameof(FileProgressText));

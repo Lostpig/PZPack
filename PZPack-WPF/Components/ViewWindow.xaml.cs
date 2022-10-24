@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using PZPack.Core;
+using PZPack.Core.Index;
 using PZPack.View.Service;
 using System.ComponentModel;
 using System;
@@ -104,7 +103,7 @@ namespace PZPack.View
             PZFile newFile = list[index];
             if (current != null)
             {
-                if (current.FolderId == newFile.FolderId && current.Name == newFile.Name) return;
+                if (current.Pid == newFile.Pid && current.Name == newFile.Name) return;
             }
 
             current = newFile;

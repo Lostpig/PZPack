@@ -10,7 +10,7 @@ internal class PZCryptoV4 : IPZCrypto
     private readonly PZCryptoBase _base;
     public byte[] Hash { get { return _base.Hash; } }
 
-    public PZCryptoV4(string password) : this(PZCryptoBase.CreateKey(password)) { }
+    public PZCryptoV4(string password) : this(PZCrypto.CreateKey(password)) { }
     public PZCryptoV4(byte[] key)
     {
         _base = new PZCryptoBase(key);

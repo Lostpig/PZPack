@@ -105,8 +105,6 @@ namespace PZPack.View
 
         public string FileSource { get; set; } = "-";
         public string FileSize { get; set; } = "0MB";
-        public string FileInnerCounts { get; set; } = "0";
-        public string FileDescription { get; set; } = "-";
         public string FileVersion { get; set; } = "-";
 
         public bool FileOpened
@@ -154,10 +152,8 @@ namespace PZPack.View
             if (Reader.Instance != null)
             {
                 FileSource = Reader.Instance.Source;
-                FileSize = FileSystem.ComputeFileSize(Reader.Instance.PackSize);
-                FileInnerCounts = Reader.Instance.FileCount.ToString();
-                FileDescription = Reader.Instance.Description;
-                FileVersion = Reader.Instance.FileVersion.ToString();
+                FileSize = FileSystem.ComputeFileSize(Reader.Instance.Info.FileSize);
+                FileVersion = Reader.Instance.Version.ToString();
 
                 NotifyFileInfoUpdate();
             }
@@ -166,8 +162,6 @@ namespace PZPack.View
         {
             FileSource = "-";
             FileSize = "0.0MB";
-            FileInnerCounts = "0";
-            FileDescription = "-";
             FileVersion = "-";
 
             NotifyFileInfoUpdate();
@@ -176,8 +170,6 @@ namespace PZPack.View
         {
             NotifyPropertyChanged(nameof(FileSource));
             NotifyPropertyChanged(nameof(FileSize));
-            NotifyPropertyChanged(nameof(FileInnerCounts));
-            NotifyPropertyChanged(nameof(FileDescription));
             NotifyPropertyChanged(nameof(FileVersion));
         }
 
