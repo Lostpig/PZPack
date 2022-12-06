@@ -1,25 +1,26 @@
-﻿<UserControl x:Class="PZPack.View.MainContent"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:svc="clr-namespace:PZPack.View.Service"
-             xmlns:cvt="clr-namespace:PZPack.View.Service.Converters"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="1280" Background="White">
-    <UserControl.Resources>
+﻿<Window x:Class="PZPack.View.BuilderWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:svc="clr-namespace:PZPack.View.Service"
+        xmlns:cvt="clr-namespace:PZPack.View.Service.Converters"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterOwner"
+        Title="BuilderWindow" Height="800" Width="1200">
+    <Window.Resources>
         <ResourceDictionary>
             <cvt:ExtIconConverter x:Key="ExtIconConverter" />
             <cvt:FileSizeConverter x:Key="FileSizeConverter" />
-            <cvt:FileCouldPreviewConverter x:Key="CouldPreviewConverter" />
         </ResourceDictionary>
-    </UserControl.Resources>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
             <RowDefinition />
+            <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
-        <Border BorderBrush="#FF333333" BorderThickness="1">
+        <Border Grid.Row="0" BorderBrush="#FF333333" BorderThickness="0,1,0,1">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="60" />
@@ -47,7 +48,6 @@
                     <Button Content="222" />
                 </StackPanel>
             </Grid>
-
         </Border>
         <ItemsControl x:Name="filesContent" MouseDoubleClick="OnItemSelected" Grid.Row="1">
             <ItemsControl.Template>
@@ -99,8 +99,8 @@
                         </Grid.ColumnDefinitions>
                         <Grid.ContextMenu>
                             <ContextMenu>
-                                <MenuItem Header="{Binding Path=(svc:Translate.Preview)}" Click="OnItemSelected" IsEnabled="{Binding Path=Name, Converter={StaticResource CouldPreviewConverter}}"/>
-                                <MenuItem Header="{Binding Path=(svc:Translate.Extract_to)}" Click="OnItemExtrect"/>
+                                <MenuItem Header="{Binding Path=(svc:Translate.Delete)}" Click="OnItemDelete"/>
+                                <MenuItem Header="{Binding Path=(svc:Translate.Rename)}" Click="OnItemRename"/>
                             </ContextMenu>
                         </Grid.ContextMenu>
                         <Image Grid.Column="0" Source="{Binding Converter={StaticResource ExtIconConverter}}" />
@@ -120,5 +120,26 @@
                 </Style>
             </ItemsControl.ItemContainerStyle>
         </ItemsControl>
+        <Border Grid.Row="2" BorderBrush="#FF333333" BorderThickness="1">
+            <DockPanel Margin="5,0,5,0" VerticalAlignment="Center">
+                <DockPanel.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="Height" Value="32" />
+                        <Setter Property="Padding" Value="8,0,8,0" />
+                        <Setter Property="Margin" Value="4,0,4,0" />
+                    </Style>
+                </DockPanel.Resources>
+                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Button Content="{Binding Path=(svc:Translate.Add_Files)}" Click="OnAddFiles" />
+                    <Button Content="{Binding Path=(svc:Translate.Add_Folder)}" Click="OnAddFolder" />
+                    <Button Content="{Binding Path=(svc:Translate.Make_Folder)}" Click="OnMakeFolder" />
+                    <Button Content="{Binding Path=(svc:Translate.Rename_By_Sort)}" Click="OnRenameFiles" />
+                    <Button Content="{Binding Path=(svc:Translate.Delete_All_Files)}" Click="OnDeleteAllFiles" />
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="{Binding Path=(svc:Translate.Create_Pack)}" Click="OnCreatePack" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
     </Grid>
-</UserControl>
+</Window>

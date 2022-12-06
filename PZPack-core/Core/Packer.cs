@@ -59,7 +59,7 @@ public class PZPacker
     }
     private void WritePackHead(Stream writer, long fullSize, int indexSize)
     {
-        using BinaryWriter bw = new(writer);
+        using BinaryWriter bw = new(writer, Encoding.Default, true);
         writer.Seek(0, SeekOrigin.Begin);
 
         bw.Write(PZCommon.Version);

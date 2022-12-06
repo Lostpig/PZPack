@@ -1,4 +1,6 @@
-﻿using System;
+﻿using PZPack.Core.Index;
+using PZPack.View.Utils;
+using System;
 using System.Globalization;
 using System.Windows.Data;
 
@@ -9,12 +11,11 @@ namespace PZPack.View.Service.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string fileName = "unknown.unknown";
-            if (value is string name)
+            if (value is PZFile file)
             {
-                fileName = name;
+                return ItemsType.IsPicture(file);
             }
-            return Reader.IsPicture(fileName);
+            return false;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

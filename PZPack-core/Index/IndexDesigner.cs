@@ -1,37 +1,7 @@
 ﻿using PZPack.Core.Utility;
+using System.Collections.Generic;
 
 namespace PZPack.Core.Index;
-
-public record PZDesigningFolder
-{
-    public string Name { get; internal set; }
-    public int Id { get; internal set; }
-    public int Pid { get; internal set; }
-
-    public PZDesigningFolder(string Name, int Id, int Pid)
-    {
-        this.Name = Name;
-        this.Id = Id;
-        this.Pid = Pid;
-    }
-}
-public record PZDesigningFile
-{
-    public string Name { get; internal set; }
-    public int Id { get; internal set; }
-    public int Pid { get; internal set; }
-    public string Source { get; internal set; }
-    public long Size { get; internal set; }
-
-    public PZDesigningFile(string Name, int Id, int Pid, string Source, long Size)
-    {
-        this.Name = Name;
-        this.Id = Id;
-        this.Pid = Pid;
-        this.Source = Source;
-        this.Size = Size;
-    }
-}
 
 public class IndexDesigner
 {
@@ -40,6 +10,7 @@ public class IndexDesigner
     readonly Dictionary<int, PZDesigningFile> _files = new();
     readonly PZDesigningFolder _root;
     public PZDesigningFolder Root { get => _root; }
+    public bool IsEmpty { get => _files.Count == 0; }
 
     public IndexDesigner()
     {
@@ -48,7 +19,7 @@ public class IndexDesigner
 
     private void CheckFolderExists(PZDesigningFolder folder)
     {
-        if (!_folders.ContainsKey(folder.Id))
+        if (!_folders.ContainsKey(folder.Id) && folder.Id != Root.Id)
         {
             throw new Exceptions.PZFolderNotFoundException(folder.Name, folder.Id);
         }
@@ -138,8 +109,10 @@ public class IndexDesigner
     }
     public void RenameFile(PZDesigningFile file, string newName)
     {
+        if (newName == file.Name) return;
+
         PZDesigningFolder folder = GetFolder(file.Pid);
-        CheckDuplicateNameFile(file.Name, folder);
+        CheckDuplicateNameFile(newName, folder);
 
         file.Name = newName;
     }
@@ -149,15 +122,18 @@ public class IndexDesigner
         {
             throw new ArgumentException("Cannot rename root folder", nameof(folder));
         }
+        if (newName == folder.Name) return;
 
         PZDesigningFolder parent = GetFolder(folder.Pid);
-        CheckDuplicateNameFolder(folder.Name, parent);
+        CheckDuplicateNameFolder(newName, parent);
 
         folder.Name = newName;
     }
 
     public PZDesigningFolder GetFolder(int id)
     {
+        if (id == Root.Id) return Root;
+
         if (!_folders.ContainsKey(id))
         {
             throw new Exceptions.PZFolderNotFoundException("", id);
@@ -181,6 +157,26 @@ public class IndexDesigner
     public List<PZDesigningFile> GetFiles(PZDesigningFolder folder)
     {
         return _files.Values.Where(f => f.Pid == folder.Id).ToList();
+    }
+
+    public List<PZDesigningFolder> GetFolderResolveList(PZDesigningFolder folder, PZDesigningFolder? resolveFolder)
+    {
+        List<PZDesigningFolder> list = new();
+        PZDesigningFolder current = folder;
+
+        while (current.Id != PZCommon.IndexRootId)
+        {
+            list.Add(current);
+            if (resolveFolder?.Id == current.Id)
+            {
+                break;
+            }
+
+            current = GetFolder(current.Pid);
+        }
+
+        list.Reverse();
+        return list;
     }
 
     public List<PZDesigningFile> GetAllFiles()

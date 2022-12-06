@@ -24,7 +24,7 @@ namespace PZPack.View
             DataContext = model;
         }
 
-        public async void StartExtractAll(string output)
+        public async void StartExtractFolder(PZFolder folder, string output)
         {
             if (Reader.Instance == null)
             {
@@ -39,7 +39,7 @@ namespace PZPack.View
             try
             {
                 var startTime = DateTime.Now;
-                long size = await Reader.Instance.ExtractBatchAsync(Reader.Instance.Index.Root, output, reporter, ctoken);
+                long size = await Reader.Instance.ExtractBatchAsync(folder, output, reporter, ctoken);
                 var usedTime = DateTime.Now - startTime;
 
                 Alert.ShowMessage(Translate.Extracted_complete);

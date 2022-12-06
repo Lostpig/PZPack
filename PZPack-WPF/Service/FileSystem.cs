@@ -10,7 +10,7 @@ namespace PZPack.View.Service
         {
             Microsoft.Win32.OpenFileDialog dlg = new()
             {
-                // dlg.DefaultExt = ".pzpk";
+                DefaultExt = ".pzpk",
                 Filter = filter,
                 Multiselect = false
             };
@@ -25,6 +25,27 @@ namespace PZPack.View.Service
             {
                 string filename = dlg.FileName;
                 return filename;
+            }
+            return null;
+        }
+        static public string[]? OpenSelectFilesDialog(string filter, string? initDir = null)
+        {
+            Microsoft.Win32.OpenFileDialog dlg = new()
+            {
+                Filter = filter,
+                Multiselect = true
+            };
+            if (!string.IsNullOrEmpty(initDir))
+            {
+                dlg.InitialDirectory = initDir;
+            }
+
+            bool? result = dlg.ShowDialog();
+
+            if (result == true)
+            {
+                string[] filenames = dlg.FileNames;
+                return filenames;
             }
             return null;
         }

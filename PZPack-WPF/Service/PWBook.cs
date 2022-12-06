@@ -129,7 +129,7 @@ internal class PWBook
             throw new OutputFileAlreadyExistsException(filename);
         }
 
-        var crypto = PZCrypto.CreateCrypto(masterPassword, PZVersion.Current, (int)BlockSizes.X1MB);
+        var crypto = PZCrypto.CreateCrypto(masterPassword, PZVersion.Current, 1024 * 1024 * 4);
         var newInstance = new PWBook(filename, crypto, null);
 
         Close(true);
@@ -145,7 +145,7 @@ internal class PWBook
         }
 
         var fstream = new FileStream(filename, FileMode.Open, FileAccess.Read);
-        var crypto = PZCrypto.CreateCrypto(masterPassword, PZVersion.Current, (int)BlockSizes.X1MB);
+        var crypto = PZCrypto.CreateCrypto(masterPassword, PZVersion.Current, 1024 * 1024 * 4);
         byte[] data = Decode(fstream, crypto);
         var newInstance = new PWBook(filename, crypto, data);
 

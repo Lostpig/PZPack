@@ -1,12 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace PZPack.Core.Index;
 
-namespace PZPack.Core.Index;
+public interface IPZFile
+{
+    public string Name { get; }
+    public int Id { get; }
+    public int Pid { get; }
+    public long Size { get; }
+    public string Extension { get; }
+}
+public interface IPZFolder
+{
+    public string Name { get; }
+    public int Id { get; }
+    public int Pid { get; }
+}
 
-public record PZFile
+public record PZFile : IPZFile
 {
     public PZFile(string Name, int Id, int Pid, long Offset, long Size, long OriginSize)
     {
@@ -30,16 +39,51 @@ public record PZFile
     public string Extension { get; init; }
 }
 
-public record PZFolder
+public record PZFolder : IPZFolder
 {
-    public readonly string Name;
-    public readonly int Id;
-    public readonly int Pid;
+    public string Name { get; init; }
+    public int Id { get; init; }
+    public int Pid { get; init; }
 
     public PZFolder(string Name, int Id, int Pid)
     {
         this.Name = Name;
         this.Id = Id;
         this.Pid = Pid;
+    }
+}
+
+public record PZDesigningFolder : IPZFolder
+{
+    public string Name { get; internal set; }
+    public int Id { get; internal set; }
+    public int Pid { get; internal set; }
+
+    public PZDesigningFolder(string Name, int Id, int Pid)
+    {
+        this.Name = Name;
+        this.Id = Id;
+        this.Pid = Pid;
+    }
+}
+
+public record PZDesigningFile : IPZFile
+{
+    public string Name { get; internal set; }
+    public int Id { get; internal set; }
+    public int Pid { get; internal set; }
+    public string Source { get; internal set; }
+    public long Size { get; internal set; }
+    public string Extension { get; init; }
+
+    public PZDesigningFile(string Name, int Id, int Pid, string Source, long Size)
+    {
+        this.Name = Name;
+        this.Id = Id;
+        this.Pid = Pid;
+        this.Source = Source;
+        this.Size = Size;
+
+        Extension = Path.GetExtension(Name);
     }
 }

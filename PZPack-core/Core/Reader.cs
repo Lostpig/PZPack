@@ -1,6 +1,7 @@
 ﻿using PZPack.Core.Crypto;
 using PZPack.Core.Exceptions;
 using PZPack.Core.Index;
+using PZPack.Core.Utility;
 
 namespace PZPack.Core;
 
@@ -304,6 +305,18 @@ public class PZReader : IDisposable
         Stream.Seek(offset, SeekOrigin.Begin);
         Stream.Read(bytes, 0, bytes.Length);
         return bytes;
+    }
+
+    public PZFileStream GetFileStream(PZFile file)
+    {
+        if (Crypto is PZCryptoV11 v11)
+        {
+            return v11.CreatePZFileStream(Stream, file);
+        }
+        else
+        {
+            throw new FileVersionNotCompatiblityException(Version, "PZFileStream need pack version >= 11");
+        }
     }
 
     public void Dispose()

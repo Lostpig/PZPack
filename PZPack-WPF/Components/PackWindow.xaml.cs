@@ -6,6 +6,8 @@ using PZPack.Core;
 using System.Threading;
 using System;
 using System.Diagnostics;
+using PZPack.Core.Index;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace PZPack.View
 {
@@ -16,22 +18,17 @@ namespace PZPack.View
     {
         private CancellationTokenSource? cancelSource;
         private readonly PackWindowModel model;
-        public PackWindow()
+        private readonly IndexDesigner designer;
+
+        public PackWindow(IndexDesigner designer)
         {
             InitializeComponent();
 
             model = new();
             DataContext = model;
+            this.designer = designer;
         }
 
-        private void OnChooseSource(object sender, RoutedEventArgs e)
-        {
-            string? source = FileSystem.OpenSelectDirectryDialog();
-            if (source != null)
-            {
-                model.UpdateSource(source);
-            }
-        }
         private void OnChooseTarget(object sender, RoutedEventArgs e)
         {
             string? target = FileSystem.OpenSaveFileDialog("PZPack File (.pzpk)|*.pzpk", Config.Instance.LastSaveDirectory);
@@ -42,7 +39,7 @@ namespace PZPack.View
         }
         private void OnStart(object sender, RoutedEventArgs e)
         {
-            model.UpdateProgress(0, 1, 0, 1);
+            model.Start();
             StartPacking();
         }
         private bool CheckSetting()
@@ -50,16 +47,6 @@ namespace PZPack.View
             if (string.IsNullOrWhiteSpace(model.Password))
             {
                 Alert.ShowWarning(Translate.MSG_Password_empty);
-                return false;
-            }
-            if (string.IsNullOrWhiteSpace(model.Source))
-            {
-                Alert.ShowWarning(Translate.MSG_Source_directory_empty);
-                return false;
-            }
-            if (!Directory.Exists(model.Source))
-            {
-                Alert.ShowWarning(string.Format(Translate.EX_DirectoryNotFound, model.Source));
                 return false;
             }
             if (string.IsNullOrWhiteSpace(model.Target))
@@ -75,7 +62,7 @@ namespace PZPack.View
 
             return true;
         }
-        private void StartPacking()
+        private async void StartPacking()
         {
             if (!CheckSetting()) return;
             Config.Instance.LastSaveDirectory = Path.GetDirectoryName(model.Target) ?? "";
@@ -84,19 +71,19 @@ namespace PZPack.View
             cancelSource = new CancellationTokenSource();
             CancellationToken token = cancelSource.Token;
 
-            ProgressReporter<(int, int, long, long)> reporter = new((n) =>
+            ProgressReporter<PackProgressArg> reporter = new((args) =>
             {
-                (int count, int total, long fileUsed, long fileTotal) = n;
-                model.UpdateProgress(count, total, fileUsed, fileTotal);
+                model.UpdateProgress(args);
             });
 
             try
             {
                 var startTime = DateTime.Now;
-                // long size = await PZPacker.Pack(model.Source, model.Target, reporter, token);
+                long size = await PZPacker.Pack(model.Target, designer, model.Password, model.BlockSize, reporter, token);
                 var usedTime = DateTime.Now - startTime;
 
                 Alert.ShowMessage(Translate.Packing_complete);
+                model.UpdateComplete(size, usedTime);
             }
             catch (OperationCanceledException)
             {
@@ -151,36 +138,62 @@ namespace PZPack.View
             NotifyPropertyChanged(nameof(CompleteVisible));
         }
 
-        public string ProgressText { get; private set; } = "";
-        public string FileProgressText { get; private set; } = "";
-        public double ProgressValue { get; private set; } = 0;
-        public void UpdateProgress(int count, int total, long fileUsed, long fileTotal)
-        {
-            total = total == 0 ? 1 : total;
-            ProgressValue = ((double)count / total) * 100;
-            ProgressText = $"{count} / {total} ({ProgressValue:f0}%)";
+        public DateTime startTime = DateTime.MinValue;
+        public int updateInterval = 200;
+        private long lastUpdateTime = 0;
 
-            fileTotal = fileTotal == 0 ? 1 : fileTotal;
-            double filePercent = ((double)fileUsed / fileTotal) * 100;
-            FileProgressText = $"{FileSystem.ComputeFileSize(fileUsed)} / {FileSystem.ComputeFileSize(fileTotal)} ({filePercent:f0}%)";
-            NotifyPropertyChanged(nameof(ProgressText));
-            NotifyPropertyChanged(nameof(ProgressValue));
+        public string UsedTime { get; private set; } = "";
+        public string FileCountText { get; private set; } = "";
+        public string TotalProgressText { get; private set; } = "";
+        public string FileProgressText { get; private set; } = "";
+        public double TotalProgressValue { get; private set; } = 0;
+        public double FileProgressValue { get; private set; } = 0;
+        
+        public void Start()
+        {
+            startTime = DateTime.Now;
+        }
+        public void UpdateProgress(PackProgressArg progress)
+        {
+            DateTime now = DateTime.Now;
+            if (now.Ticks - lastUpdateTime < updateInterval) return;
+
+            TimeSpan usedTime = now - startTime;
+            UsedTime = Math.Floor(usedTime.TotalHours).ToString("f0") + usedTime.ToString(@"\:mm\:ss");
+            FileCountText = $"{progress.ProcessedFileCount} / {progress.TotalFileCount}";
+
+            string totalBytes = FileSystem.ComputeFileSize(progress.TotalBytes);
+            string totalProcessed = FileSystem.ComputeFileSize(progress.TotalProcessedBytes);
+            TotalProgressValue = ((double)progress.TotalProcessedBytes / progress.TotalBytes) * 100;
+            TotalProgressText = $"{totalBytes} / {totalProcessed} ({TotalProgressValue:f1}%)";
+
+            string fileBytes = FileSystem.ComputeFileSize(progress.CurrentProcessedBytes);
+            string fileProcessed = FileSystem.ComputeFileSize(progress.CurrentBytes);
+            FileProgressValue = ((double)progress.CurrentProcessedBytes / progress.CurrentBytes) * 100;
+            FileProgressText = $"{fileBytes} / {fileProcessed} ({FileProgressValue:f1}%)";
+
+            NotifyPropertyChanged(nameof(UsedTime));
+            NotifyPropertyChanged(nameof(FileCountText));
+            NotifyPropertyChanged(nameof(TotalProgressText));
             NotifyPropertyChanged(nameof(FileProgressText));
+            NotifyPropertyChanged(nameof(TotalProgressValue));
+            NotifyPropertyChanged(nameof(FileProgressValue));
+
+            lastUpdateTime = now.Ticks;
         }
 
         private string _password = "";
         public string Password { get => _password; set { _password = value; NotifyPropertyChanged(nameof(Password)); } }
-
-        private string _remark = "";
-        public string Remark { get => _remark; set { _remark = value; NotifyPropertyChanged(nameof(Remark)); } }
+        private int _blockSize = 4 * 1024 * 1024;
+        public int BlockSize { get => _blockSize; set { _blockSize = value; NotifyPropertyChanged(nameof(BlockSize)); } }
 
         public string CompleteSizeInfo { get; private set; } = "0.0 MB";
-        public string CompleteTimeInfo { get; private set; } = "00:00:00.0";
+        public string CompleteTimeInfo { get; private set; } = "00:00:00";
         public string CompleteSpeedInfo { get; private set; } = "0.0 MB/s";
         public void UpdateComplete(long size, TimeSpan time)
         {
             CompleteSizeInfo = FileSystem.ComputeFileSize(size);
-            CompleteTimeInfo = Math.Floor(time.TotalHours).ToString("f0") + time.ToString(@"\:mm\:ss\.f");
+            CompleteTimeInfo = Math.Floor(time.TotalHours).ToString("f0") + time.ToString(@"\:mm\:ss");
             CompleteSpeedInfo = FileSystem.ComputeFileSize(size / time.TotalSeconds) + "/s";
 
             NotifyPropertyChanged(nameof(CompleteSizeInfo));
@@ -190,16 +203,10 @@ namespace PZPack.View
         }
 
         public string Target { get; private set; } = "";
-        public string Source { get; private set; } = "";
         public void UpdateTarget(string target)
         {
             Target = target;
             NotifyPropertyChanged(nameof(Target));
-        }
-        public void UpdateSource(string source)
-        {
-            Source = source;
-            NotifyPropertyChanged(nameof(Source));
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

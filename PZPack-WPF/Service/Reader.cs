@@ -74,20 +74,6 @@ namespace PZPack.View.Service
             }
         }
 
-        static public bool IsPicture(PZFile file)
-        {
-            return IsPicture(file.Name);
-        }
-        static public bool IsPicture(string filename)
-        {
-            string ext = System.IO.Path.GetExtension(filename);
-            return ext switch
-            {
-                ".jpg" or ".jpeg" or ".png" or ".bmp" or ".gif" or ".webp" => true,
-                _ => false
-            };
-        }
-
         public static event EventHandler<PZReaderChangeEventArgs>? PZReaderChanged;
     }
     internal class PZReaderChangeEventArgs : EventArgs

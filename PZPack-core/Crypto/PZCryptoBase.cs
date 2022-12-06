@@ -1,7 +1,4 @@
 ﻿using System.Security.Cryptography;
-using System.Diagnostics;
-using PZPack.Core.Utility;
-using PZPack.Core.Index;
 
 namespace PZPack.Core.Crypto;
 
@@ -139,7 +136,6 @@ internal class PZCryptoBase : IDisposable
         GC.SuppressFinalize(this);
     }
 }
-
 
 internal class StreamBlockWrapper
 {

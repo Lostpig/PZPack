@@ -6,46 +6,24 @@ using System.IO;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using System.Collections.Generic;
+using PZPack.Core.Index;
+using PZPack.View.Utils;
 
 namespace PZPack.View.Service.Converters
 {
     internal class ExtIconConverter : IValueConverter
     {
-        enum IconType
+        private static readonly Dictionary<PZItemType, BitmapImage> imageCache = new();
+        static public BitmapImage GetIconImage(PZItemType iconType)
         {
-            Picture,
-            Video,
-            Audio,
-            Other
-        }
-
-        private static readonly Dictionary<IconType, BitmapImage> imageCache = new();
-        private static IconType GetExtensionType(string ext)
-        {
-            return ext switch
-            {
-                ".jpg" or ".jpeg" or ".png" or ".bmp" or ".gif" or ".webp"
-                    => IconType.Picture,
-                ".mp4" or ".avi" or ".mkv" or ".wmv"
-                    => IconType.Video,
-                ".mp3" or ".ogg" or ".flac" or ".ape"
-                    => IconType.Audio,
-                _ => IconType.Other
-            };
-        }
-        static public BitmapImage GetExtensionIcon(string ext)
-        {
-            IconType iconType = GetExtensionType(ext);
             if (!imageCache.ContainsKey(iconType))
             {
-                Bitmap bitmap = ext switch
+                Bitmap bitmap = iconType switch
                 {
-                    ".jpg" or ".jpeg" or ".png" or ".bmp" or ".gif" or ".webp"
-                        => View.StaticResources.file_picture,
-                    ".mp4" or ".avi" or ".mkv" or ".wmv"
-                        => View.StaticResources.file_video,
-                    ".mp3" or ".ogg" or ".flac" or ".ape"
-                        => View.StaticResources.file_audio,
+                    PZItemType.Picture => View.StaticResources.file_picture,
+                    PZItemType.Video => View.StaticResources.file_video,
+                    PZItemType.Audio => View.StaticResources.file_audio,
+                    PZItemType.Folder => View.StaticResources.folder,
                     _ => View.StaticResources.file_other
                 };
                 using MemoryStream ms = new();
@@ -60,18 +38,21 @@ namespace PZPack.View.Service.Converters
                 imageCache.Add(iconType, image);
             }
 
-
             return imageCache[iconType];
         }
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string fileExt = ".unknown";
-            if (value is string ext)
+            PZItemType icon = PZItemType.Other;
+            if (value is IPZFile file)
             {
-                fileExt = ext;
+                icon = ItemsType.GetItemType(file.Extension);
+            }
+            else if (value is IPZFolder)
+            {
+                icon = PZItemType.Folder;
             }
 
-            return GetExtensionIcon(fileExt);
+            return GetIconImage(icon);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

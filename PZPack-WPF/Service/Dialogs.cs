@@ -3,12 +3,15 @@ using System.Linq;
 using System.IO;
 using System.Collections.Generic;
 using PZPack.Core.Index;
+using System;
+using static System.Net.WebRequestMethods;
+using PZPack.View.Utils;
 
 namespace PZPack.View.Service
 {
     internal class Dialogs
     {
-        static private ViewWindow? viewPtr;
+        static private ViewWindow? imageViewPtr;
         public static void TryOpenPZFile()
         {
             string? path = FileSystem.OpenSelectFileDialog("PZPack Files|*.pzpk;*.pzmv", Config.Instance.LastOpenDirectory);
@@ -27,39 +30,68 @@ namespace PZPack.View.Service
             ReadOptionWindow win = new(path) { Owner = Application.Current.MainWindow };
             win.ShowDialog();
         }
-        public static void OpenPackWindow()
+        public static void OpenBuilderWindow()
         {
-            PackWindow win = new() { Owner = Application.Current.MainWindow };
+            BuilderWindow win = new() { Owner = Application.Current.MainWindow };
             win.ShowDialog();
         }
-        public static void OpenViewWindow(PZFile[] list, int index)
+        public static void OpenViewWindow(PZFile file)
         {
-            PZFile file = list[index];
-            if (!Reader.IsPicture(file)) return;
-
-            if (viewPtr == null)
+            var tp = ItemsType.GetItemType(file);
+            if (tp == PZItemType.Picture)
             {
-                viewPtr = new();
-                viewPtr.Closed += ViewPtr_Closed;
+                OpenImageViewWindow(file);
+            }
+            else if (tp == PZItemType.Video)
+            {
+                OpenVideoViewWindow(file);
+            }
+        }
+
+        private static void OpenImageViewWindow(PZFile file)
+        {
+            if (!ItemsType.IsPicture(file) || Reader.Instance is null) return;
+
+            var parentFolder = Reader.Instance.Index.GetFolder(file.Pid);
+            Reader.Instance.Index.GetChildren(parentFolder, out var _, out var files);
+            int index = Array.IndexOf(files, file);
+            index = index < 0 ? 0 : index;
+
+            if (imageViewPtr == null)
+            {
+                imageViewPtr = new();
+                imageViewPtr.Closed += ViewPtr_Closed;
             }
 
-            List<PZFile> pictures = list.Where(f => Reader.IsPicture(f)).ToList();
-            viewPtr.BindFiles(file, pictures);
+            List<PZFile> pictures = files.Where(f => ItemsType.IsPicture(f)).ToList();
+            imageViewPtr.BindFiles(file, pictures);
 
-            if (viewPtr.IsVisible)
+            if (imageViewPtr.IsVisible)
             {
-                viewPtr.Activate();
-                if (viewPtr.WindowState == WindowState.Minimized)
+                imageViewPtr.Activate();
+                if (imageViewPtr.WindowState == WindowState.Minimized)
                 {
-                    viewPtr.WindowState = WindowState.Normal;
+                    imageViewPtr.WindowState = WindowState.Normal;
                 }
             }
             else
             {
-                viewPtr.Show();
-                viewPtr.WindowState = WindowState.Maximized;
+                imageViewPtr.Show();
+                imageViewPtr.WindowState = WindowState.Maximized;
             }
         }
+        private static void OpenVideoViewWindow(PZFile file)
+        {
+            if (!ItemsType.IsVideo(file) || Reader.Instance is null) return;
+
+            VideoWindow win = new();
+
+            win.WindowState = WindowState.Maximized;
+            win.SetFile(file);
+
+            win.ShowDialog();
+        }
+
         public static void OpenSettingWindow()
         {
             SettingWindow win = new() { Owner = Application.Current.MainWindow };
@@ -95,13 +127,13 @@ namespace PZPack.View.Service
             win.ShowDialog();
         }
 
-        public static void OpenExtractAllWindow()
+        public static void OpenExtractFolderWindow(PZFolder folder)
         {
             string? output = FileSystem.OpenSelectDirectryDialog();
             if (output == null) return;
 
             ExtractWindow win = new() { Owner = Application.Current.MainWindow };
-            win.StartExtractAll(output);
+            win.StartExtractFolder(folder, output);
             win.ShowDialog();
         }
         public static void OpenExtractWindow(PZFile file)
@@ -116,17 +148,17 @@ namespace PZPack.View.Service
 
         public static void CloseViewWindow()
         {
-            if (viewPtr != null)
+            if (imageViewPtr != null)
             {
-                viewPtr.Close();
+                imageViewPtr.Close();
             }
         }
         private static void ViewPtr_Closed(object? sender, System.EventArgs e)
         {
-            if (viewPtr != null)
+            if (imageViewPtr != null)
             {
-                viewPtr.Closed -= ViewPtr_Closed;
-                viewPtr = null;
+                imageViewPtr.Closed -= ViewPtr_Closed;
+                imageViewPtr = null;
             }
         }
     }

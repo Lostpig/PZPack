@@ -4,9 +4,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:svc="clr-namespace:PZPack.View.Service"
+        xmlns:uvc="clr-namespace:PZPack.View.Utils"
+        xmlns:cvt="clr-namespace:PZPack.View.Service.Converters"
         mc:Ignorable="d"
         WindowStartupLocation="CenterOwner"
-        Title="PackWindow" Height="280" Width="800" WindowStyle="None">
+        Title="PackWindow" Height="400" Width="800" WindowStyle="None">
+    <Window.Resources>
+        <uvc:BlockSizes x:Key="blockSizes"/>
+        <cvt:FileSizeConverter x:Key="FileSizeConverter" />
+    </Window.Resources>
     <Grid>
         <Grid x:Name="optionPanel" Visibility="{Binding Path=OptionPanelVisible}">
             <Grid.ColumnDefinitions>
@@ -15,18 +21,12 @@
                 <ColumnDefinition Width="150"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition/>
+                <RowDefinition Height="30"/>
                 <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-
-            <Label FontSize="16" Content="{Binding Path=(svc:Translate.Source_directory)}" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-            <TextBox IsReadOnly="True" Grid.Column="1" Grid.Row="0"  VerticalAlignment="Center" Height="30" VerticalContentAlignment="Center"
-                 Text="{Binding Path=Source, Mode=OneWay}" Padding="8,0,8,0"/>
-            <Button Content="{Binding Path=(svc:Translate.Browse)}" Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16"
-                Padding="15,5,15,5" Click="OnChooseSource"/>
 
             <Label FontSize="16" Content="{Binding Path=(svc:Translate.Target_file)}" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             <TextBox IsReadOnly="True" Grid.Column="1" Grid.Row="1"  VerticalAlignment="Center" Height="30" VerticalContentAlignment="Center"
@@ -38,9 +38,15 @@
             <TextBox Grid.Column="1" Grid.Row="2"  VerticalAlignment="Center" Height="30"  VerticalContentAlignment="Center"
                  Text="{Binding Path=Password}" Padding="8,0,8,0"/>
 
-            <Label FontSize="16" Content="{Binding Path=(svc:Translate.Remark)}" Grid.Column="0" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-            <TextBox Grid.Column="1" Grid.Row="3"  VerticalAlignment="Center" Height="30"  VerticalContentAlignment="Center"
-                 Text="{Binding Path=Remark}" Padding="8,0,8,0"/>
+            <Label FontSize="16" Content="{Binding Path=(svc:Translate.BlockSize)}" Grid.Column="0" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <ComboBox Grid.Column="1" Grid.Row="3" Padding="8,0,8,0" Height="30" VerticalAlignment="Center" VerticalContentAlignment="Center"
+                      ItemsSource="{StaticResource blockSizes}" SelectedValue="{Binding Path=BlockSize}"  >
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock VerticalAlignment="Center" Text="{Binding Converter={StaticResource FileSizeConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
 
             <Grid Grid.ColumnSpan="3" Grid.Row="4">
                 <Grid.ColumnDefinitions>
@@ -50,61 +56,80 @@
                     <ColumnDefinition Width="2*" />
                 </Grid.ColumnDefinitions>
                 <Button Content="{Binding Path=(svc:Translate.Start)}"  FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"
-                Padding="15,5,15,5" Click="OnStart"/>
+                    Padding="15,5,15,5" Click="OnStart"/>
                 <Button Content="{Binding Path=(svc:Translate.Cancel)}"  VerticalAlignment="Center" FontSize="16" HorizontalAlignment="Center" Grid.Column="2"
-                Padding="15,5,15,5" Click="OnClose"/>
+                    Padding="15,5,15,5" Click="OnClose"/>
             </Grid>
         </Grid>
-        <Grid x:Name="progressPanel" Visibility="{Binding Path=ProgressPanelVisible}">
+        <Grid x:Name="progressPanel" Visibility="{Binding Path=PackingVisible}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="90"/>
                 <ColumnDefinition />
-                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="90"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="30"/>
                 <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
                 <RowDefinition Height="30"/>
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" Visibility="{Binding Path=PackingVisible}">
-                <TextBlock TextAlignment="Center" FontSize="20" Text="{Binding Path=(svc:Translate.Packing)}" />
-                <TextBlock TextAlignment="Center" FontSize="16" Text="{Binding Path=ProgressText}" />
-                <TextBlock TextAlignment="Center" FontSize="16" Text="{Binding Path=FileProgressText}" />
+            <TextBlock Grid.Row="1" Grid.Column="1" TextAlignment="Left" FontSize="20" Text="{Binding Path=(svc:Translate.Packing)}" />
+            <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,10">
+                <TextBlock TextAlignment="Left" Width="100" FontSize="16" Text="{Binding Path=(svc:Translate.Used_time)}" />
+                <TextBlock TextAlignment="Left" FontSize="16" Text="{Binding Path=UsedTime}" />
             </StackPanel>
-            <Grid Grid.Row="1" Grid.Column="1" Visibility="{Binding Path=CompleteVisible}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Column="0" Grid.Row="0" TextAlignment="Right" FontSize="16" 
-                           Text="{Binding Path=(svc:Translate.Packed_size)}" />
-                <TextBlock Grid.Column="1" Grid.Row="0" TextAlignment="Left" FontSize="16" Margin="10,0,0,0"
-                           Text="{Binding Path=CompleteSizeInfo}" />
-                <TextBlock Grid.Column="0" Grid.Row="1" TextAlignment="Right" FontSize="16" 
-                           Text="{Binding Path=(svc:Translate.Used_time)}" />
-                <TextBlock Grid.Column="1" Grid.Row="1" TextAlignment="Left" FontSize="16" Margin="10,0,0,0"
-                           Text="{Binding Path=CompleteTimeInfo}" />
-                <TextBlock Grid.Column="0" Grid.Row="2" TextAlignment="Right" FontSize="16" 
-                           Text="{Binding Path=(svc:Translate.Processing_rate)}" />
-                <TextBlock Grid.Column="1" Grid.Row="2" TextAlignment="Left" FontSize="16" Margin="10,0,0,0"
-                           Text="{Binding Path=CompleteSpeedInfo}" />
-            </Grid>
 
-            <ProgressBar Grid.Row="2" Grid.Column="1" Value="{Binding Path=ProgressValue, Mode=OneWay}" Height="20" />
-            <Button Grid.Row="3" Grid.Column="1" Content="{Binding Path=(svc:Translate.Stop)}"  
-                    Visibility="{Binding Path=PackingVisible}"
+            <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
+                <TextBlock TextAlignment="Left" Width="100" FontSize="16" Text="{Binding Path=(svc:Translate.Files_Count)}" />
+                <TextBlock TextAlignment="Left" FontSize="16" Text="{Binding Path=FileCountText}" />
+            </StackPanel>
+            <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
+                <TextBlock TextAlignment="Left" Width="100" FontSize="16" Text="{Binding Path=(svc:Translate.Current_File)}" />
+                <TextBlock TextAlignment="Left" FontSize="16" Text="{Binding Path=FileProgressText}" />
+            </StackPanel>
+            <ProgressBar Grid.Row="5" Grid.Column="1" Value="{Binding Path=FileProgressValue, Mode=OneWay}" Height="20" />
+
+            <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal" Margin="0,10,0,0">
+                <TextBlock TextAlignment="Left" Width="100" FontSize="16" Text="{Binding Path=(svc:Translate.Total)}" />
+                <TextBlock TextAlignment="Left" FontSize="16" Text="{Binding Path=TotalProgressText}" />
+            </StackPanel>
+            <ProgressBar Grid.Row="7" Grid.Column="1" Value="{Binding Path=TotalProgressValue, Mode=OneWay}" Height="20" />
+
+            <Button Grid.Row="8" Grid.Column="1" Content="{Binding Path=(svc:Translate.Stop)}"  
                     Padding="15,5,15,5" HorizontalAlignment="Center" VerticalAlignment="Center"
                     Click="OnStop" />
-            <Button Grid.Row="3" Grid.Column="1" Content="{Binding Path=(svc:Translate.Complete)}"  
-                    Visibility="{Binding Path=CompleteVisible}"
+        </Grid>
+        <Grid Visibility="{Binding Path=CompleteVisible}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Column="0" Grid.Row="0" TextAlignment="Right" FontSize="16" 
+                           Text="{Binding Path=(svc:Translate.Packed_size)}" />
+            <TextBlock Grid.Column="1" Grid.Row="0" TextAlignment="Left" FontSize="16" Margin="10,0,0,0"
+                           Text="{Binding Path=CompleteSizeInfo}" />
+            <TextBlock Grid.Column="0" Grid.Row="1" TextAlignment="Right" FontSize="16" 
+                           Text="{Binding Path=(svc:Translate.Used_time)}" />
+            <TextBlock Grid.Column="1" Grid.Row="1" TextAlignment="Left" FontSize="16" Margin="10,0,0,0"
+                           Text="{Binding Path=CompleteTimeInfo}" />
+            <TextBlock Grid.Column="0" Grid.Row="2" TextAlignment="Right" FontSize="16" 
+                           Text="{Binding Path=(svc:Translate.Processing_rate)}" />
+            <TextBlock Grid.Column="1" Grid.Row="2" TextAlignment="Left" FontSize="16" Margin="10,0,0,0"
+                           Text="{Binding Path=CompleteSpeedInfo}" />
+            <Button Grid.Row="3" Grid.ColumnSpan="2" Content="{Binding Path=(svc:Translate.Complete)}"
                     Padding="15,5,15,5" HorizontalAlignment="Center" VerticalAlignment="Center"
                     Click="OnClose" />
         </Grid>

@@ -1,4 +1,5 @@
-﻿using PZPack.Core.Utility;
+﻿using PZPack.Core.Index;
+using PZPack.Core.Utility;
 
 namespace PZPack.Core.Crypto;
 
@@ -60,6 +61,11 @@ internal class PZCryptoV11 : IPZCrypto
         BlockReader reader = new(wrapper, progress);
 
         return await _base.DecryptStreamBlockAsync(reader, destination, cancelToken ?? CancellationToken.None);
+    }
+
+    public PZFileStream CreatePZFileStream(FileStream source, PZFile file)
+    {
+        return new PZFileStream(file, source, _base, _blockSize);
     }
 
     public void Dispose()

@@ -40,6 +40,7 @@ public class IndexReader
 
     public PZFolder GetFolder(int id)
     {
+        if (id == Root.Id) return Root;
         if (!_folders.ContainsKey(id))
         {
             throw new Exceptions.PZFolderNotFoundException("", id);

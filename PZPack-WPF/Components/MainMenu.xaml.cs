@@ -49,7 +49,7 @@ namespace PZPack.View
         }
         private void OnSelectPack(object sender, RoutedEventArgs e)
         {
-            Dialogs.OpenPackWindow();
+            Dialogs.OpenBuilderWindow();
         }
         private void OnSelectExit(object sender, RoutedEventArgs e)
         {
@@ -57,7 +57,10 @@ namespace PZPack.View
         }
         private void OnExtractPack(object sender, RoutedEventArgs e)
         {
-            Dialogs.OpenExtractAllWindow();
+            if (Reader.Instance is not null)
+            {
+                Dialogs.OpenExtractFolderWindow(Reader.Instance.Index.Root);
+            }
         }
 
         private void OnSetiingOpen(object sender, RoutedEventArgs e)

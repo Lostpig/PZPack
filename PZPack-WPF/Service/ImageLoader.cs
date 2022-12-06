@@ -15,6 +15,7 @@ namespace PZPack.View.Service
             if (Reader.Instance == null) return source;
 
             bool success = false;
+
             byte[] data = await Reader.Instance.ReadFileAsync(file);
             using var stream = new MemoryStream(data);
             try

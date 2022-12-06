@@ -1,12 +1,20 @@
-﻿namespace PZPack.View.Utils
+﻿using System.Collections.ObjectModel;
+
+namespace PZPack.View.Utils
 {
-    internal enum BlockSizes
+    class BlockSizes : ObservableCollection<int>
     {
-        X1MB = 1024 * 1024,
-        X4MB = 4 * 1024 * 1024,
-        X8MB = 8 * 1024 * 1024,
-        X16MB = 16 * 1024 * 1024,
-        X32MB = 32 * 1024 * 1024,
-        X64MB = 64 * 1024 * 1024,
+        public BlockSizes()
+        {
+            Add(64 * 1024);
+            Add(256 * 1024);
+            Add(1024 * 1024);
+            Add(2 * 1024 * 1024);
+            Add(4 * 1024 * 1024);
+            Add(8 * 1024 * 1024);
+            Add(16 * 1024 * 1024);
+            Add(32 * 1024 * 1024);
+            Add(64 * 1024 * 1024);
+        }
     }
 }

@@ -26,22 +26,15 @@ namespace PZPack.View
         private void Reader_PZReaderChanged(object? sender, PZReaderChangeEventArgs e)
         {
             VModel.Update(e);
-            if (e.Type == Core.PZTypes.PZPACK)
+            if (e.Type == Core.PZTypes.PZPACK || e.Type == Core.PZTypes.PZVIDEO)
             {
                 mainContent.Visibility = Visibility.Visible;
                 mainContent.Update(true);
             }
-            else if (e.Type == Core.PZTypes.PZVIDEO)
-            {
-                videoContent.Visibility = Visibility.Visible;
-                videoContent.Update(true);
-            }
             else
             {
                 mainContent.Visibility = Visibility.Collapsed;
-                videoContent.Visibility = Visibility.Collapsed;
                 mainContent.Update(false);
-                videoContent.Update(false);
             }
         }
         private void PWBook_PWBookChanged(object? sender, PZPwBookChangeEventArgs e)
@@ -55,10 +48,6 @@ namespace PZPack.View
             Service.Reader.PZReaderChanged += Reader_PZReaderChanged;
             Service.PWBook.PWBookChanged += PWBook_PWBookChanged;
             mainContent.Visibility = Visibility.Collapsed;
-            videoContent.Visibility = Visibility.Collapsed;
-
-            /// TEST: DELETE BEFORE RELEASE
-            // Service.Reader.Open(@"D:\Media\pictures2.pzpk", "4294967296");
         }
 
         protected override void OnClosing(CancelEventArgs e)

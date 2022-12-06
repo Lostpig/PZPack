@@ -62,6 +62,7 @@ namespace PZPack.View.Service
             [TranslateBind("MSG Preview image failed")] public static string MSG_Preview_image_failed { get; set; }
             [TranslateBind("Setting")] public static string Setting { get; set; }
             [TranslateBind("External player")] public static string External_player { get; set; }
+            [TranslateBind("Open external player")] public static string Open_external_player { get; set; }
             [TranslateBind("Save")] public static string Save { get; set; }
             [TranslateBind("Duration")] public static string Duration { get; set; }
             [TranslateBind("Play")] public static string Play { get; set; }
@@ -78,6 +79,20 @@ namespace PZPack.View.Service
             [TranslateBind("New Password")] public static string New_Password { get; set; }
             [TranslateBind("Password Book Not Opened")] public static string Password_Book_Not_Opened { get; set; }
             [TranslateBind("Save Completed")] public static string Save_Completed { get; set; }
+            [TranslateBind("Name")] public static string Name { get; set; }
+            [TranslateBind("Add Files")] public static string Add_Files { get; set; }
+            [TranslateBind("Add Folder")] public static string Add_Folder { get; set; }
+            [TranslateBind("Make Folder")] public static string Make_Folder { get; set; }
+            [TranslateBind("Rename")] public static string Rename { get; set; }
+            [TranslateBind("Rename By Sort")] public static string Rename_By_Sort { get; set; }
+            [TranslateBind("Create Pack")] public static string Create_Pack { get; set; }
+            [TranslateBind("Folder Name")] public static string Folder_Name { get; set; }
+            [TranslateBind("Delete All Files")] public static string Delete_All_Files { get; set; }
+            [TranslateBind("MSG Folder name empty")] public static string MSG_Folder_name_empty { get; set; }
+            [TranslateBind("BlockSize")] public static string BlockSize { get; set; }
+            [TranslateBind("Files Count")] public static string Files_Count { get; set; }
+            [TranslateBind("Current File")] public static string Current_File { get; set; }
+            [TranslateBind("Total")] public static string Total { get; set; }
             [TranslateBind("History")] public static string History { get; set; }
             [TranslateBind("Empty")] public static string Empty { get; set; }
             [TranslateBind("Clear")] public static string Clear { get; set; }

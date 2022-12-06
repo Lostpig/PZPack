@@ -22,21 +22,21 @@ internal sealed class NaturalComparer : IComparer<string>
     }
 }
 
-internal sealed class NaturalPZFileComparer : IComparer<PZFile>
+internal sealed class NaturalPZFileComparer : IComparer<IPZFile>
 {
     private static NaturalPZFileComparer? _instance;
     public static NaturalPZFileComparer Instance { get { return _instance ??= new NaturalPZFileComparer(); } }
-    public int Compare(PZFile? a, PZFile? b)
+    public int Compare(IPZFile? a, IPZFile? b)
     {
         return SafeNativeMethods.StrCmpLogicalW(a?.Name ?? "", b?.Name ?? "");
     }
 }
 
-internal sealed class NaturalPZFolderComparer : IComparer<PZFolder>
+internal sealed class NaturalPZFolderComparer : IComparer<IPZFolder>
 {
     private static NaturalPZFolderComparer? _instance;
     public static NaturalPZFolderComparer Instance { get { return _instance ??= new NaturalPZFolderComparer(); } }
-    public int Compare(PZFolder? a, PZFolder? b)
+    public int Compare(IPZFolder? a, IPZFolder? b)
     {
         return SafeNativeMethods.StrCmpLogicalW(a?.Name ?? "", b?.Name ?? "");
     }

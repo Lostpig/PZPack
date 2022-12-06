@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Windows;
 using PZPack.View.Service;
+using System.Windows.Input;
 
 namespace PZPack.View
 {
@@ -20,7 +21,11 @@ namespace PZPack.View
             };
             this.DataContext = VModel;
         }
-
+        protected override void OnInitialized(EventArgs e)
+        {
+            base.OnInitialized(e);
+            pwText.Focus();
+        }
         private void OnOpenFile(object sender, RoutedEventArgs e)
         {
             string password = VModel.Password;
@@ -44,6 +49,14 @@ namespace PZPack.View
 
         private string Source { get => VModel.Source; }
         private string Password { get => VModel.Password; }
+
+        private void pwText_KeyUp(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.Enter)
+            {
+                OnOpenFile(sender, e);
+            }
+        }
     }
 
     internal class ROWindowModel : INotifyPropertyChanged

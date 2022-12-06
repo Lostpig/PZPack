@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using PZPack.Core.Index;
 using PZPack.View.Service;
 using PZPack.View.Utils;
+using System.Xml.Linq;
 
 namespace PZPack.View
 {
@@ -14,6 +15,8 @@ namespace PZPack.View
     /// </summary>
     public partial class MainContent : UserControl
     {
+        private PZFolder? currentFolder;
+
         public MainContent()
         {
             InitializeComponent();
@@ -21,43 +24,31 @@ namespace PZPack.View
 
         public void Update(bool fileOpened)
         {
-            if (fileOpened)
+            if (fileOpened && Reader.Instance is not null)
             {
-                BuildTree();
-            }
+                OpenFolder(Reader.Instance.Index.Root);
+            } 
             else
             {
-                ClearTree();
+                currentFolder = null;
             }
         }
 
-        private void OnFolderSelected(object sender, RoutedEventArgs e)
-        {
-            TreeViewItem item = (TreeViewItem)e.OriginalSource;
-            PZFolder node = (PZFolder)item.DataContext;
-
-            if (node != null && Reader.Instance!=null)
-            {
-                Reader.Instance.Index.GetChildren(node, out _, out var files);
-
-                Array.Sort(files, NaturalPZFileComparer.Instance);
-                filesContent.ItemsSource = files;
-            }
-        }
-        private void OnFileSelected(object sender, RoutedEventArgs e)
+        private void OnItemSelected(object sender, RoutedEventArgs e)
         {
             if (e.OriginalSource is FrameworkElement sp)
             {
                 if (sp.DataContext is PZFile file)
                 {
-                    PZFile[] list = (PZFile[])filesContent.ItemsSource;
-                    int index = Array.IndexOf(list, file);
-                    index = index < 0 ? 0 : index;
-                    Dialogs.OpenViewWindow(list, index);
+                    Dialogs.OpenViewWindow(file);
+                }
+                else if (sp.DataContext is PZFolder folder)
+                {
+                    OpenFolder(folder);
                 }
             }
         }
-        private void OnFileExtrect(object sender, RoutedEventArgs e)
+        private void OnItemExtrect(object sender, RoutedEventArgs e)
         {
             if (e.OriginalSource is FrameworkElement sp)
             {
@@ -65,49 +56,75 @@ namespace PZPack.View
                 {
                     Dialogs.OpenExtractWindow(file);
                 }
+                else if (sp.DataContext is PZFolder folder)
+                {
+                    Dialogs.OpenExtractFolderWindow(folder);
+                }
             }
         }
 
-        private void BuildTree ()
+        private void OpenFolder(PZFolder folder)
         {
-            if (!Reader.IsOpened)
+            if (folder != null && Reader.Instance != null)
+            {
+                Reader.Instance.Index.GetChildren(folder, out var folders, out var files);
+
+                Array.Sort(folders, NaturalPZFolderComparer.Instance);
+                Array.Sort(files, NaturalPZFileComparer.Instance);
+
+                object[] items = folders.Concat<object>(files).ToArray();
+                filesContent.ItemsSource = items;
+                CreateFolderStack(folder);
+
+                currentFolder = folder;
+            }
+        }
+
+        private void CreateFolderStack(PZFolder folder)
+        {
+            if (Reader.Instance is null)
             {
                 return;
             }
 
-            PZFolder root = Reader.Instance!.Index.Root;
-            TreeViewItem treeViewItem = new()
+            var stacks = Reader.Instance.Index.GetFolderResolveList(folder, null);
+
+            folderStack.Children.Clear();
+            Button rootBtn = new() { Content = "Root", Tag = Reader.Instance.Index.Root.Id };
+            rootBtn.Click += FolderStackClick;
+            TextBlock arrow = new() { Text = " > " };
+            folderStack.Children.Add(rootBtn);
+            folderStack.Children.Add(arrow);
+
+            foreach(var item in stacks)
             {
-                DataContext = root,
-                Header = "root"
-            };
-
-            folderTree.Items.Add(treeViewItem);
-            ExpandTree(treeViewItem);
-
-            treeViewItem.IsSelected = true;
-        }
-        private void ClearTree()
-        {
-            folderTree.Items.Clear();
-            filesContent.ItemsSource = null;
-        }
-        static private void ExpandTree (TreeViewItem parent)
-        {
-            PZFolder node = (PZFolder)parent.DataContext;
-            Reader.Instance!.Index.GetChildren(node, out var folders, out _);
-
-            foreach(var child in folders)
-            {
-                TreeViewItem treeViewItem = new()
-                {
-                    DataContext = child,
-                    Header = child.Name
-                };
-
-                parent.Items.Add(treeViewItem);
-                ExpandTree(treeViewItem);
+                Button itemBtn = new() { Content = item.Name, Tag = item.Id };
+                TextBlock arrowBtn = new() { Text = " > " };
+                itemBtn.Click += FolderStackClick;
+                folderStack.Children.Add(itemBtn);
+                folderStack.Children.Add(arrowBtn);
             }
+        }
+
+        private void FolderStackClick(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && Reader.Instance is not null)
+            {
+                var id = (int)btn.Tag;
+                var folder = Reader.Instance.Index.GetFolder(id);
+                OpenFolder(folder);
+            }
+        }
+
+        private void OnPrev(object sender, EventArgs e)
+        {
+            if (currentFolder is null || Reader.Instance is null || currentFolder.Id == Reader.Instance.Index.Root.Id)
+            {
+                return;
+            }
+
+            var parentFolder = Reader.Instance.Index.GetFolder(currentFolder.Pid);
+            OpenFolder(parentFolder);
         }
     }
 }
