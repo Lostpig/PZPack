@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<Version>1.0.9-beta2</Version>
+	<Version>1.0.11</Version>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
     <RootNamespace>PZPack.View</RootNamespace>
@@ -10,6 +10,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <PackageIcon>i-128.png</PackageIcon>
     <ApplicationIcon>bitbug_favicon.ico</ApplicationIcon>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <!--<PublishSingleFile>true</PublishSingleFile>-->
     <!--<PublishReadyToRun>true</PublishReadyToRun>-->
     <!--<RuntimeIdentifier>win-x64</RuntimeIdentifier>-->
@@ -31,10 +32,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FFME.Windows" Version="4.4.350" />
     <PackageReference Include="ini-parser-netstandard" Version="2.5.2" />
-    <PackageReference Include="LibVLCSharp.WPF" Version="3.6.7" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.18" />
   </ItemGroup>
 
   <ItemGroup>

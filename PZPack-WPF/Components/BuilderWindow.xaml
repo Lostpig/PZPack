@@ -12,6 +12,7 @@
         <ResourceDictionary>
             <cvt:ExtIconConverter x:Key="ExtIconConverter" />
             <cvt:FileSizeConverter x:Key="FileSizeConverter" />
+            <cvt:IsPZFolder x:Key="IsPZFolder" />
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
@@ -101,6 +102,8 @@
                             <ContextMenu>
                                 <MenuItem Header="{Binding Path=(svc:Translate.Delete)}" Click="OnItemDelete"/>
                                 <MenuItem Header="{Binding Path=(svc:Translate.Rename)}" Click="OnItemRename"/>
+                                <MenuItem Header="{Binding Path=(svc:Translate.Extract_and_delete)}" Click="OnItemExtract"
+                                          IsEnabled="{Binding DataContext, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource IsPZFolder}}" />
                             </ContextMenu>
                         </Grid.ContextMenu>
                         <Image Grid.Column="0" Source="{Binding Converter={StaticResource ExtIconConverter}}" />

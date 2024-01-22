@@ -99,7 +99,8 @@
                         </Grid.ColumnDefinitions>
                         <Grid.ContextMenu>
                             <ContextMenu>
-                                <MenuItem Header="{Binding Path=(svc:Translate.Preview)}" Click="OnItemSelected" IsEnabled="{Binding Path=Name, Converter={StaticResource CouldPreviewConverter}}"/>
+                                <MenuItem Header="{Binding Path=(svc:Translate.Preview)}" Click="OnItemSelected" 
+                                          IsEnabled="{Binding DataContext, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource CouldPreviewConverter}}"/>
                                 <MenuItem Header="{Binding Path=(svc:Translate.Extract_to)}" Click="OnItemExtrect"/>
                             </ContextMenu>
                         </Grid.ContextMenu>

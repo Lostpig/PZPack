@@ -50,7 +50,7 @@ public class IndexReader
     }
     public PZFile GetFile(int id)
     {
-        if (!_folders.ContainsKey(id))
+        if (!_files.ContainsKey(id))
         {
             throw new Exceptions.PZFileNotFoundException("", id);
         }

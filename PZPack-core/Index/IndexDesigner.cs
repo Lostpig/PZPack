@@ -17,14 +17,14 @@ public class IndexDesigner
         _root = new PZDesigningFolder("", PZCommon.IndexRootId, 0);
     }
 
-    private void CheckFolderExists(PZDesigningFolder folder)
+    public void CheckFolderExists(PZDesigningFolder folder)
     {
         if (!_folders.ContainsKey(folder.Id) && folder.Id != Root.Id)
         {
             throw new Exceptions.PZFolderNotFoundException(folder.Name, folder.Id);
         }
     }
-    private void CheckDuplicateNameFile(string name, PZDesigningFolder parent)
+    public void CheckDuplicateNameFile(string name, PZDesigningFolder parent)
     {
         var files = GetFiles(parent);
         if (files.Exists(f => f.Name == name))
@@ -32,7 +32,7 @@ public class IndexDesigner
             throw new Exceptions.DuplicateNameException(name);
         }
     }
-    private void CheckDuplicateNameFolder(string name, PZDesigningFolder parent)
+    public void CheckDuplicateNameFolder(string name, PZDesigningFolder parent)
     {
         var folders = GetFolders(parent);
         if (folders.Exists(f => f.Name == name))

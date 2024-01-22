@@ -32,8 +32,6 @@ namespace PZPack.View.Service
             try
             {
                 Instance = PZReader.Open(source, key);
-                DashServer.Instance.Binding(Instance);
-                DashServer.Instance.Start();
             }
             catch (Exception ex)
             {
@@ -66,7 +64,6 @@ namespace PZPack.View.Service
         {
             if (Instance != null)
             {
-                DashServer.Instance.Binding(null);
                 Instance.Dispose();
                 Instance = null;
 

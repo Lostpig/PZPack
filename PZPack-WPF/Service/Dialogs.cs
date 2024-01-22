@@ -6,6 +6,7 @@ using PZPack.Core.Index;
 using System;
 using static System.Net.WebRequestMethods;
 using PZPack.View.Utils;
+using PZPack.View.Components;
 
 namespace PZPack.View.Service
 {
@@ -37,6 +38,8 @@ namespace PZPack.View.Service
         }
         public static void OpenViewWindow(PZFile file)
         {
+            if (!FFME.CheckSetting()) return;
+
             var tp = ItemsType.GetItemType(file);
             if (tp == PZItemType.Picture)
             {
@@ -44,6 +47,7 @@ namespace PZPack.View.Service
             }
             else if (tp == PZItemType.Video)
             {
+                Alert.ShowMessage("test");
                 OpenVideoViewWindow(file);
             }
         }
@@ -80,16 +84,13 @@ namespace PZPack.View.Service
                 imageViewPtr.WindowState = WindowState.Maximized;
             }
         }
+
         private static void OpenVideoViewWindow(PZFile file)
         {
             if (!ItemsType.IsVideo(file) || Reader.Instance is null) return;
 
-            VideoWindow win = new();
-
-            win.WindowState = WindowState.Maximized;
-            win.SetFile(file);
-
-            win.ShowDialog();
+            var videoWin = new VideoPlayerWindow(file);
+            videoWin.ShowDialog();
         }
 
         public static void OpenSettingWindow()

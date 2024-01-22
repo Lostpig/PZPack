@@ -20,7 +20,6 @@ namespace PZPack.View
                 Service.Reader.Close();
             }
             Service.PZHistory.Instance.Save();
-            Service.DashServer.Close();
 
             base.OnExit(e);
         }

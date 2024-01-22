@@ -63,6 +63,7 @@
   "Save": "保存",
   "Duration": "时长",
   "Play": "播放",
+  "Pause": "暂停",
   "Play All": "全部播放",
   "Fullscreen": "全屏",
   "To Fullscreen": "全屏显示",
@@ -97,6 +98,7 @@
   "Empty": "空",
   "Clear": "清空",
   "CONFIRM File not exists": "文件【{0}】不存在，是否删除该条历史记录？",
+  "Extract and delete": "提取子项后删除",
 
   "EX ServerNotBinding": "错误：DASH服务器未正确启动",
   "EX ExternalPlayerNotSet": "错误：没有设置外部播放器",
@@ -111,5 +113,8 @@
   "EX DirectoryNotFound": "错误：未找到目录【{0}】",
   "EX PZFileNotOpened": "错误：文件未打开",
   "EX Exception": "错误: {0}",
-  "EX Unknown": "错误: 未知错误"
+  "EX Unknown": "错误: 未知错误",
+
+  "EX FfmpegDirectoryNotSet": "错误：没有设置ffmpeg目录",
+  "EX FfmpegDirectoryInvalid": "错误：设置的ffmpeg目录验证错误，请检查是否存在【{0}】文件"
 }

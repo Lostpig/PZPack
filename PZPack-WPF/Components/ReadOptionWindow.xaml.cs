@@ -24,19 +24,18 @@ namespace PZPack.View
         protected override void OnInitialized(EventArgs e)
         {
             base.OnInitialized(e);
-            pwText.Focus();
+            passwordCtrl.Focus();
         }
         private void OnOpenFile(object sender, RoutedEventArgs e)
         {
-            string password = VModel.Password;
+            string password = passwordCtrl.Password;
             if (string.IsNullOrWhiteSpace(password))
             {
                 Alert.ShowMessage(Translate.MSG_Password_empty);
                 return;
             }
 
-            bool success = Reader.Open(Source, Password);
-
+            bool success = Reader.Open(Source, password);
             if (success)
             {
                 Close();
@@ -48,9 +47,7 @@ namespace PZPack.View
         }
 
         private string Source { get => VModel.Source; }
-        private string Password { get => VModel.Password; }
-
-        private void pwText_KeyUp(object sender, KeyEventArgs e)
+        private void Pw_KeyUp(object sender, KeyEventArgs e)
         {
             if(e.Key == Key.Enter)
             {
@@ -61,13 +58,10 @@ namespace PZPack.View
 
     internal class ROWindowModel : INotifyPropertyChanged
     {
-        private string _password;
-        public string Password { get => _password; set { _password = value; NotifyPropertyChanged(nameof(Password)); } }
         private string _source;
         public string Source { get => _source; set { _source = value; NotifyPropertyChanged(nameof(Source)); } }
         public ROWindowModel()
         {
-            _password = "";
             _source = "";
         }
 

@@ -31,6 +31,16 @@ namespace PZPack.View.Service
             }
         }
 
+        public string FFMpegDirectory
+        {
+            get { return _data[NS_UserSetting][nameof(FFMpegDirectory)]; }
+            set
+            {
+                _data[NS_UserSetting][nameof(FFMpegDirectory)] = value;
+                Save();
+            }
+        }
+
         public string Language
         {
             get { return _data[NS_UserSetting][nameof(Language)]; }

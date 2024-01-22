@@ -66,6 +66,7 @@ namespace PZPack.View.Service
             [TranslateBind("Save")] public static string Save { get; set; }
             [TranslateBind("Duration")] public static string Duration { get; set; }
             [TranslateBind("Play")] public static string Play { get; set; }
+            [TranslateBind("Pause")] public static string Pause { get; set; }
             [TranslateBind("Play All")] public static string Play_All { get; set; }
             [TranslateBind("Fullscreen")] public static string Fullscreen { get; set; }
             [TranslateBind("To Fullscreen")] public static string To_Fullscreen { get; set; }
@@ -97,6 +98,7 @@ namespace PZPack.View.Service
             [TranslateBind("Empty")] public static string Empty { get; set; }
             [TranslateBind("Clear")] public static string Clear { get; set; }
             [TranslateBind("CONFIRM File not exists")] public static string CONFIRM_File_not_exists { get; set; }
+            [TranslateBind("Extract and delete")] public static string Extract_and_delete { get; set; }
             [TranslateBind("EX ServerNotBinding")] public static string EX_ServerNotBinding { get; set; }
             [TranslateBind("EX ExternalPlayerNotSet")] public static string EX_ExternalPlayerNotSet { get; set; }
             [TranslateBind("EX ExternalPlayerPathNotExists")] public static string EX_ExternalPlayerPathNotExists { get; set; }
@@ -111,6 +113,8 @@ namespace PZPack.View.Service
             [TranslateBind("EX PZFileNotOpened")] public static string EX_PZFileNotOpened { get; set; }
             [TranslateBind("EX Exception")] public static string EX_Exception { get; set; }
             [TranslateBind("EX Unknown")] public static string EX_Unknown { get; set; }
+            [TranslateBind("EX FfmpegDirectoryNotSet")] public static string EX_FfmpegDirectoryNotSet { get; set; }
+            [TranslateBind("EX FfmpegDirectoryInvalid")] public static string EX_FfmpegDirectoryInvalid { get; set; }
         #pragma warning restore CS8618
     }
 }

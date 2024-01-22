@@ -8,6 +8,7 @@ using System.IO;
 using System.Windows.Controls;
 using System.Linq;
 using static System.Net.WebRequestMethods;
+using System.Diagnostics;
 
 namespace PZPack.View
 {
@@ -133,14 +134,13 @@ namespace PZPack.View
         }
         private void OnItemDelete(object sender, RoutedEventArgs e)
         {
-            if (e.OriginalSource is FrameworkElement sp && filesContent.ItemsSource is List<object> list)
+            if (e.OriginalSource is FrameworkElement sp)
             {
                 if (sp.DataContext is PZDesigningFolder folder)
                 {
                     bool removed = _designer.RemoveFolder(folder);
                     if (removed)
                     {
-                        list.Remove(folder);
                         UpdateList();
                     }
                 }
@@ -149,7 +149,6 @@ namespace PZPack.View
                     bool removed = _designer.RemoveFile(file);
                     if (removed)
                     {
-                        list.Remove(file);
                         UpdateList();
                     }
                 }
@@ -186,7 +185,50 @@ namespace PZPack.View
                 Alert.ShowException(ex);
             }
         }
+        private void OnItemExtract(object sender, RoutedEventArgs e)
+        {
+            if (e.OriginalSource is FrameworkElement sp)
+            {
+                if (sp.DataContext is PZDesigningFolder folder)
+                {
+                    var childFolders = _designer.GetFolders(folder);
+                    var childFiles = _designer.GetFiles(folder);
+                    var parent = _designer.GetFolder(folder.Pid);
 
+                    try
+                    {
+                        foreach (var cfolder in childFolders)
+                        {
+                            if (cfolder.Name == folder.Name) continue;
+                            _designer.CheckDuplicateNameFolder(cfolder.Name, parent);
+                        }
+                        foreach (var cfile in childFiles)
+                        {
+                            _designer.CheckDuplicateNameFile(cfile.Name, parent);
+                        }
+                    } 
+                    catch(Exception ex)
+                    {
+                        Alert.ShowException(ex);
+                        return;
+                    }
+
+                    _designer.RenameFolder(folder, "______temp_before_delete_" + DateTime.Now.Millisecond.ToString());
+
+                    foreach (var cfolder in childFolders)
+                    {
+                        _designer.MoveFolder(cfolder, parent);
+                    }
+                    foreach (var cfile in childFiles)
+                    {
+                        _designer.MoveFile(cfile, parent);
+                    }
+
+                    _designer.RemoveFolder(folder);
+                    UpdateList();
+                }
+            }
+        }
         private void OnAddFiles(object sender, EventArgs e)
         {
             string[]? files = FileSystem.OpenSelectFilesDialog("");
@@ -218,10 +260,12 @@ namespace PZPack.View
         private void OnAddFolder(object sender, EventArgs e)
         {
             string? folder = FileSystem.OpenSelectDirectryDialog();
+
             if (folder is not null)
             {
                 try
                 {
+                    Debug.WriteLine(folder);
                     ScanAndAddFolder(folder, Current);
                 }
                 catch (Exception ex)
