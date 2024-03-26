@@ -76,8 +76,8 @@ namespace PZPack.View.Utils
                     if (fileName[i] == '.')
                     {
                         // potential extension - consult dictionary
-                        string mimeType;
-                        if (_mappings.TryGetValue(fileName.Substring(i), out mimeType))
+                        // string mimeType;
+                        if (_mappings.TryGetValue(fileName.Substring(i), out string? mimeType))
                         {
                             // found!
                             return mimeType;

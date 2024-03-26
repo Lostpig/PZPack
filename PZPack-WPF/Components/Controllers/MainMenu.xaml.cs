@@ -6,7 +6,7 @@ using System.Windows.Media;
 using System.IO;
 using System.Collections.Generic;
 
-namespace PZPack.View
+namespace PZPack.View.Controllers
 {
     /// <summary>
     /// MainMenu.xaml 的交互逻辑

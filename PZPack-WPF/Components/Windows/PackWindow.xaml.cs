@@ -9,7 +9,7 @@ using System.Diagnostics;
 using PZPack.Core.Index;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
-namespace PZPack.View
+namespace PZPack.View.Windows
 {
     /// <summary>
     /// PackWindow.xaml 的交互逻辑

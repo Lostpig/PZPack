@@ -20,8 +20,8 @@ namespace PZPack.View.Utils
         public Uri StreamUri { get; }
         public bool CanSeek { get; }
         public int ReadBufferLength => 1024 * 16;
-        public InputStreamInitializing OnInitializing { get; }
-        public InputStreamInitialized OnInitialized { get; }
+        public InputStreamInitializing? OnInitializing { get; }
+        public InputStreamInitialized? OnInitialized { get; }
 
         public PZPKMediaStream(PZFile file, PZReader reader)
         {

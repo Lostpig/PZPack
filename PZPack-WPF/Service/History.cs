@@ -33,7 +33,7 @@ namespace PZPack.View.Service
 
             if (Items.Count > MAX_COUNT)
             {
-                int removeCount = MAX_COUNT - Items.Count;
+                int removeCount = Items.Count - MAX_COUNT;
                 Items.RemoveRange(0, removeCount);
             }
 

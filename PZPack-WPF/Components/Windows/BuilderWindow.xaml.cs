@@ -6,11 +6,9 @@ using System;
 using PZPack.View.Service;
 using System.IO;
 using System.Windows.Controls;
-using System.Linq;
-using static System.Net.WebRequestMethods;
 using System.Diagnostics;
 
-namespace PZPack.View
+namespace PZPack.View.Windows
 {
     /// <summary>
     /// BuilderWindow.xaml 的交互逻辑

@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Windows;
 
-namespace PZPack.View
+namespace PZPack.View.Windows
 {
     /// <summary>
     /// SettingWindow.xaml 的交互逻辑
@@ -19,7 +19,7 @@ namespace PZPack.View
             DataContext = VModel;
         }
 
-        private void OnSelectFile(object sender, RoutedEventArgs e)
+        private void SelectExPlayer(object sender, RoutedEventArgs e)
         {
             string currentDir =
                 Path.GetDirectoryName(Config.Instance.ExternalPlayer)
@@ -28,6 +28,14 @@ namespace PZPack.View
             if (path != null)
             {
                 VModel.ExPlayer = path;
+            }
+        }
+        private void SelectFFMpeg(object sender, RoutedEventArgs e)
+        {
+            string? path = FileSystem.OpenSelectDirectryDialog();
+            if (path != null)
+            {
+                VModel.FFMpegDir = path;
             }
         }
         private void OnSave(object sender, RoutedEventArgs e)
@@ -59,11 +67,14 @@ namespace PZPack.View
 
     internal class SettingWindowModel : INotifyPropertyChanged
     {
+        private string _ffpmeg;
         private string _explayer;
         public string ExPlayer { get => _explayer; set { _explayer = value; NotifyPropertyChanged(nameof(ExPlayer)); } }
+        public string FFMpegDir { get => _ffpmeg; set { _ffpmeg = value; NotifyPropertyChanged(nameof(FFMpegDir)); } }
         public SettingWindowModel()
         {
             _explayer = Service.Config.Instance.ExternalPlayer;
+            _ffpmeg = Service.Config.Instance.FFMpegDirectory;
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

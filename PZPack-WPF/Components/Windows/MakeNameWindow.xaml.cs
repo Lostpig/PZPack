@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 
-namespace PZPack.View
+namespace PZPack.View.Windows
 {
     /// <summary>
     /// MakeFolderWindow.xaml 的交互逻辑

@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:PZPack.View"
+        xmlns:ctrls="clr-namespace:PZPack.View.Controllers"
         xmlns:svc="clr-namespace:PZPack.View.Service"
         mc:Ignorable="d"
         Title="{Binding Path=(svc:Translate.Title)}" Height="720" Width="1280">
@@ -26,7 +26,7 @@
             <RowDefinition Height="20" />
         </Grid.RowDefinitions>
 
-        <local:MainMenu Grid.ColumnSpan="2" Grid.Row="0" />
+        <ctrls:MainMenu Grid.ColumnSpan="2" Grid.Row="0" />
         <Grid Grid.ColumnSpan="2" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" 
               Visibility="{Binding Path=BackdropVisible, Mode=OneWay}">
             <Grid.ColumnDefinitions>
@@ -45,7 +45,7 @@
                     Content="{Binding Path=(svc:Translate.Open_file), Mode=OneWay}"
                     Click="OnOpenFile"/>
         </Grid>
-        <local:MainContent x:Name="mainContent" Grid.ColumnSpan="2" Grid.Row="1" />
+        <ctrls:MainContent x:Name="mainContent" Grid.ColumnSpan="2" Grid.Row="1" />
 
         <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.ColumnSpan="2">
             <StackPanel.Resources>

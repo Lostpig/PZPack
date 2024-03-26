@@ -4,15 +4,14 @@ using System.IO;
 using System.Collections.Generic;
 using PZPack.Core.Index;
 using System;
-using static System.Net.WebRequestMethods;
 using PZPack.View.Utils;
-using PZPack.View.Components;
+using PZPack.View.Windows;
 
 namespace PZPack.View.Service
 {
     internal class Dialogs
     {
-        static private ViewWindow? imageViewPtr;
+        static private ImagePreviewWindow? imagePreviewPtr;
         public static void TryOpenPZFile()
         {
             string? path = FileSystem.OpenSelectFileDialog("PZPack Files|*.pzpk;*.pzmv", Config.Instance.LastOpenDirectory);
@@ -45,10 +44,10 @@ namespace PZPack.View.Service
             {
                 OpenImageViewWindow(file);
             }
-            else if (tp == PZItemType.Video)
+            else if (tp == PZItemType.Video || tp == PZItemType.Audio)
             {
-                Alert.ShowMessage("test");
-                OpenVideoViewWindow(file);
+                // Alert.ShowMessage("test");
+                OpenMediaPlayerWindow(file);
             }
         }
 
@@ -61,36 +60,39 @@ namespace PZPack.View.Service
             int index = Array.IndexOf(files, file);
             index = index < 0 ? 0 : index;
 
-            if (imageViewPtr == null)
+            if (imagePreviewPtr == null)
             {
-                imageViewPtr = new();
-                imageViewPtr.Closed += ViewPtr_Closed;
+                imagePreviewPtr = new();
+                imagePreviewPtr.Closed += ViewPtr_Closed;
             }
 
             List<PZFile> pictures = files.Where(f => ItemsType.IsPicture(f)).ToList();
-            imageViewPtr.BindFiles(file, pictures);
+            imagePreviewPtr.BindFiles(file, pictures);
 
-            if (imageViewPtr.IsVisible)
+            if (imagePreviewPtr.IsVisible)
             {
-                imageViewPtr.Activate();
-                if (imageViewPtr.WindowState == WindowState.Minimized)
+                imagePreviewPtr.Activate();
+                if (imagePreviewPtr.WindowState == WindowState.Minimized)
                 {
-                    imageViewPtr.WindowState = WindowState.Normal;
+                    imagePreviewPtr.WindowState = WindowState.Normal;
                 }
             }
             else
             {
-                imageViewPtr.Show();
-                imageViewPtr.WindowState = WindowState.Maximized;
+                imagePreviewPtr.Show();
+                imagePreviewPtr.WindowState = WindowState.Maximized;
             }
         }
 
-        private static void OpenVideoViewWindow(PZFile file)
+        private static void OpenMediaPlayerWindow(PZFile file)
         {
-            if (!ItemsType.IsVideo(file) || Reader.Instance is null) return;
+            if (Reader.Instance is null) return;
 
-            var videoWin = new VideoPlayerWindow(file);
-            videoWin.ShowDialog();
+            if (ItemsType.IsVideo(file) || ItemsType.IsAudio(file))
+            {
+                var mediaWin = new MediaPlayerWindow(file);
+                mediaWin.ShowDialog();
+            }
         }
 
         public static void OpenSettingWindow()
@@ -149,17 +151,17 @@ namespace PZPack.View.Service
 
         public static void CloseViewWindow()
         {
-            if (imageViewPtr != null)
+            if (imagePreviewPtr != null)
             {
-                imageViewPtr.Close();
+                imagePreviewPtr.Close();
             }
         }
         private static void ViewPtr_Closed(object? sender, System.EventArgs e)
         {
-            if (imageViewPtr != null)
+            if (imagePreviewPtr != null)
             {
-                imageViewPtr.Closed -= ViewPtr_Closed;
-                imageViewPtr = null;
+                imagePreviewPtr.Closed -= ViewPtr_Closed;
+                imagePreviewPtr = null;
             }
         }
     }

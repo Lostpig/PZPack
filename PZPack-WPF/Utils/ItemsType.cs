@@ -39,5 +39,9 @@ namespace PZPack.View.Utils
         {
             return GetItemType(file) == PZItemType.Video;
         }
+        public static bool IsAudio(PZFile file)
+        {
+            return GetItemType(file) == PZItemType.Audio;
+        }
     }
 }

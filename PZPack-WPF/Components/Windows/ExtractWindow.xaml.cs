@@ -7,7 +7,7 @@ using PZPack.Core;
 using PZPack.Core.Index;
 using PZPack.View.Service;
 
-namespace PZPack.View
+namespace PZPack.View.Windows
 {
     /// <summary>
     /// ExtractWindow.xaml 的交互逻辑

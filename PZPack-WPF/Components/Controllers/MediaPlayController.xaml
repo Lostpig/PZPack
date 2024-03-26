@@ -1,0 +1,76 @@
+﻿<UserControl x:Class="PZPack.View.Controllers.MediaPlayController"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:windows="clr-namespace:PZPack.View.Windows"
+             xmlns:cvt="clr-namespace:PZPack.View.Service.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <cvt:TimeSpanToSecondsConverter x:Key="TimeSpanToSecondsConverter" />
+            <cvt:TimeSpanFormatConverter x:Key="TimeSpanFormatConverter" />
+            <cvt:VisibilityConverter x:Key="VisibilityConverter" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid Visibility="Visible" Height="100" Background="{x:Null}">
+        <Canvas IsHitTestVisible="False" Background="{DynamicResource ShadedBackgroundBrush}"/>
+        <Grid VerticalAlignment="Bottom">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"></RowDefinition>
+                <RowDefinition Height="40"></RowDefinition>
+                <RowDefinition Height="10"></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <Slider Name="PositionSlider" Grid.Row="0" Margin="10,0" Cursor="Hand"
+                Style="{DynamicResource PositionSliderStyle}"
+                IsEnabled="{Binding MediaElement.IsOpen}"
+                IsSnapToTickEnabled="False"
+                SmallChange="{Binding MediaElement.PositionStep, Converter={StaticResource TimeSpanToSecondsConverter}}"
+                LargeChange="{Binding MediaElement.PositionStep, Converter={StaticResource TimeSpanToSecondsConverter}}"
+                Minimum="{Binding MediaElement.PlaybackStartTime, Converter={StaticResource TimeSpanToSecondsConverter}}"
+                Maximum="{Binding MediaElement.PlaybackEndTime, Converter={StaticResource TimeSpanToSecondsConverter}}" 
+                Value="{Binding MediaElement.Position, Converter={StaticResource TimeSpanToSecondsConverter}}" />
+
+            <Grid Name="ControlsPanel" Grid.Row="1" Margin="20,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <DockPanel Name="InfomationPanel" HorizontalAlignment="Left" Grid.Column="0">
+                    <Button Visibility="{Binding IsPlaying, Converter={StaticResource VisibilityConverter}, ConverterParameter=reverse}" 
+                            Style="{DynamicResource ModernButtonStyle}" Click="PlayButtonClick">
+                        <Image Source="{StaticResource PlayIcon}" />
+                    </Button>
+                    <Button Visibility="{Binding IsPlaying, Converter={StaticResource VisibilityConverter}}" 
+                            Style="{DynamicResource ModernButtonStyle}" Click="PauseButtonClick">
+                        <Image Source="{StaticResource PauseIcon}" />
+                    </Button>
+                    <Button Style="{DynamicResource ModernButtonStyle}" Click="StopButtonClick">
+                        <Image Source="{StaticResource StopIcon}" />
+                    </Button>
+                    <Separator />
+                    <TextBlock VerticalAlignment="Center" Margin="5,0"
+                           Foreground="{StaticResource CustomSliderHighlightBrush}" 
+                           Text="{Binding MediaElement.Position, Converter={StaticResource TimeSpanFormatConverter}, Mode=OneWay}" />
+                    <TextBlock VerticalAlignment="Center" Foreground="{StaticResource CustomSliderHighlightBrush}" Text="/" />
+                    <TextBlock VerticalAlignment="Center" Margin="5,0" 
+                           Foreground="{StaticResource CustomSliderHighlightBrush}" 
+                           Text="{Binding MediaElement.NaturalDuration, Converter={StaticResource TimeSpanFormatConverter}, Mode=OneWay}" />
+                </DockPanel>
+                <DockPanel HorizontalAlignment="Right" Grid.Column="2">
+                    <Image Source="{StaticResource VolumeIcon}" Width="20" Height="20" />
+                    <Slider Name="VolumeSlider" Margin="10,0" Cursor="Hand" Width="120" Height="15"
+                        Style="{DynamicResource CustomSliderStyle}"
+                        IsEnabled="{Binding MediaElement.IsOpen}"
+                        IsSnapToTickEnabled="False"
+                        Minimum="0"
+                        Maximum="1" 
+                        Value="{Binding MediaElement.Volume}" />
+                </DockPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

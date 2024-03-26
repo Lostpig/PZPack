@@ -2,7 +2,7 @@
 using System.Windows;
 using PZPack.View.Service;
 
-namespace PZPack.View
+namespace PZPack.View.Windows
 {
     /// <summary>
     /// PWBookWindow.xaml 的交互逻辑

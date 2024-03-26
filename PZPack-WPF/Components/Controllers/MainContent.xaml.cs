@@ -2,13 +2,11 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Linq;
-using System.Collections.Generic;
 using PZPack.Core.Index;
 using PZPack.View.Service;
 using PZPack.View.Utils;
-using System.Xml.Linq;
 
-namespace PZPack.View
+namespace PZPack.View.Controllers
 {
     /// <summary>
     /// MainContent.xaml 的交互逻辑

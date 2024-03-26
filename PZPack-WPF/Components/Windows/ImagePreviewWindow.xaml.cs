@@ -8,26 +8,26 @@ using System;
 using System.Windows.Input;
 using System.Diagnostics;
 
-namespace PZPack.View
+namespace PZPack.View.Windows
 {
     /// <summary>
     /// ViewWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class ViewWindow : Window
+    public partial class ImagePreviewWindow : Window
     {
         private PZFile? current;
         private bool fileChangeFlag = false;
         private int index = 0;
         private List<PZFile> list;
-        private readonly ViewWindowModel model;
+        private readonly ImagePreviewWindowModel model;
         private double scale = 1;
         static readonly double[] scalelist = new double[] { 0.1, 0.2, 0.3, 0.4, 0.5, 0.75, 1, 1.25, 1.5, 2, 2.5, 3, 4, 5 };
         private WindowState rememberState;
 
-        public ViewWindow()
+        public ImagePreviewWindow()
         {
             InitializeComponent();
-            model = new ViewWindowModel();
+            model = new ImagePreviewWindowModel();
             list = new List<PZFile>();
 
             this.DataContext = model;
@@ -354,7 +354,7 @@ namespace PZPack.View
         }
     }
 
-    internal class ViewWindowModel : INotifyPropertyChanged
+    internal class ImagePreviewWindowModel : INotifyPropertyChanged
     {
         private Size _size;
         private Size _originSize;
@@ -434,7 +434,7 @@ namespace PZPack.View
         }
 
 
-        public ViewWindowModel()
+        public ImagePreviewWindowModel()
         {
             _size = new Size(0, 0);
             _originSize = new Size(0, 0);
