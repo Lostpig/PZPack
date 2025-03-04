@@ -31,7 +31,7 @@ public class PZCrypto
         {
             1 or 2 => new PZCryptoV2(key),
             4 => new PZCryptoV4(key),
-            11 => new PZCryptoV11(key, blockSize),
+            11 or 12 => new PZCryptoV11(key, blockSize),
             _ => throw new Exceptions.FileVersionNotCompatiblityException(version)
         };
     }
@@ -41,7 +41,7 @@ public class PZCrypto
         {
             1 or 2 => new PZCryptoV2(password),
             4 => new PZCryptoV4(password),
-            11 => new PZCryptoV11(password, blockSize),
+            11 or 12 => new PZCryptoV11(password, blockSize),
             _ => throw new Exceptions.FileVersionNotCompatiblityException(version)
         };
     }

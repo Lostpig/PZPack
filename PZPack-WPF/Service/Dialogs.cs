@@ -37,8 +37,6 @@ namespace PZPack.View.Service
         }
         public static void OpenViewWindow(PZFile file)
         {
-            if (!FFME.CheckSetting()) return;
-
             var tp = ItemsType.GetItemType(file);
             if (tp == PZItemType.Picture)
             {
@@ -46,6 +44,7 @@ namespace PZPack.View.Service
             }
             else if (tp == PZItemType.Video || tp == PZItemType.Audio)
             {
+                if (!FFME.CheckSetting()) return;
                 // Alert.ShowMessage("test");
                 OpenMediaPlayerWindow(file);
             }
@@ -90,7 +89,12 @@ namespace PZPack.View.Service
 
             if (ItemsType.IsVideo(file) || ItemsType.IsAudio(file))
             {
-                var mediaWin = new MediaPlayerWindow(file);
+                var parentFolder = Reader.Instance.Index.GetFolder(file.Pid);
+                Reader.Instance.Index.GetChildren(parentFolder, out var _, out var files);
+                List<PZFile> medias = files.Where(f => ItemsType.IsVideo(f) || ItemsType.IsAudio(f)).ToList();
+
+                var mediaWin = new MediaPlayerWindow();
+                mediaWin.OpenMediaFile(file, medias);
                 mediaWin.ShowDialog();
             }
         }

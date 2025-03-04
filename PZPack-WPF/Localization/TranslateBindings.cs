@@ -99,6 +99,12 @@ namespace PZPack.View.Service
             [TranslateBind("Clear")] public static string Clear { get; set; }
             [TranslateBind("CONFIRM File not exists")] public static string CONFIRM_File_not_exists { get; set; }
             [TranslateBind("Extract and delete")] public static string Extract_and_delete { get; set; }
+            [TranslateBind("Is resize image")] public static string Is_resize_image { get; set; }
+            [TranslateBind("Image max size")] public static string Image_max_size { get; set; }
+            [TranslateBind("Image Quality")] public static string Image_Quality { get; set; }
+            [TranslateBind("Lossless")] public static string Lossless { get; set; }
+            [TranslateBind("MSG Maxsize Number")] public static string MSG_Maxsize_Number { get; set; }
+            [TranslateBind("MSG Quality Number")] public static string MSG_Quality_Number { get; set; }
             [TranslateBind("EX ServerNotBinding")] public static string EX_ServerNotBinding { get; set; }
             [TranslateBind("EX ExternalPlayerNotSet")] public static string EX_ExternalPlayerNotSet { get; set; }
             [TranslateBind("EX ExternalPlayerPathNotExists")] public static string EX_ExternalPlayerPathNotExists { get; set; }

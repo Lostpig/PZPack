@@ -8,6 +8,8 @@ using System.Windows.Input;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using Unosquare.FFME;
+using System.Collections.Generic;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace PZPack.View.Windows
 {
@@ -16,36 +18,59 @@ namespace PZPack.View.Windows
     /// </summary>
     public partial class MediaPlayerWindow : Window
     {
-        readonly PZFile videoFile;
-        readonly PZPKMediaStream stream;
         readonly MediaPlayerWindowModel viewModel;
+        List<PZFile> files;
+        PZFile currentFile;
+        PZPKMediaStream stream;
 
-        public MediaPlayerWindow(PZFile file)
+        public MediaPlayerWindow()
         {
-            videoFile = file;
+            InitializeComponent();
+
+            viewModel = new MediaPlayerWindowModel(Media);
+            DataContext = viewModel;
+
+            InitializeController();
+            BindHotkey();
+        }
+
+        public void OpenMediaFile(PZFile file, List<PZFile> files)
+        {
             if (Reader.Instance == null)
             {
                 throw new Exception(Translate.EX_PZFileNotOpened);
             }
 
-            InitializeComponent();
 
-            stream = new PZPKMediaStream(videoFile, Reader.Instance);
+            this.files = files;
 
-            viewModel = new MediaPlayerWindowModel(Media);
-            DataContext = viewModel;
-
-            InitializeMedia();
-            InitializeController();
+            PlayFile(file);
         }
 
-        private async void InitializeMedia()
+        public async void PlayFile(PZFile file)
         {
-            // Media.LoadedBehavior = Unosquare.FFME.Common.MediaPlaybackState.Play;
+            if (stream != null)
+            {
+                await Media.Close();
+                stream.Dispose();
+            }
+
+            currentFile = file;
+            stream = new PZPKMediaStream(currentFile, Reader.Instance);
             await Media.Open(stream);
 
-            viewModel.UpdateState();
-            Title = videoFile.Name;
+            int currentIndex = files.IndexOf(currentFile);
+
+            if (WindowState != WindowState.Maximized)
+            {
+                Height = Media.NaturalVideoHeight;
+                Width = Media.NaturalVideoWidth;
+            }
+
+            viewModel.UpdateState(currentIndex + 1, files.Count);
+            Title = currentFile.Name;
+
+            Media.Play();
         }
 
         #region controller
@@ -58,6 +83,8 @@ namespace PZPack.View.Windows
         private DispatcherTimer MouseMoveTimer;
         private void InitializeController()
         {
+            ControllerPanel.ChangeFile += OnChangeFile;
+
             Loaded += (s, e) =>
             {
                 Storyboard.SetTarget(HideControllerAnimation, ControllerPanel);
@@ -116,7 +143,96 @@ namespace PZPack.View.Windows
 
             MouseMoveTimer.Start();
         }
+
+        private void OnChangeFile(int move)
+        {
+            if (files.Count <= 1) return;
+
+            int currentIndex = files.IndexOf(currentFile);
+
+            if (move > 0)
+            {
+                int next = currentIndex + 1;
+                if (next < files.Count) PlayFile(files[next]);
+            }
+            else if (move < 0)
+            {
+                int prev = currentIndex - 1;
+                if (prev >= 0) PlayFile(files[prev]);
+            }
+        }
         #endregion
+
+
+        private DispatcherTimer KeyDownTimer;
+        private Key? CurrentDownKey;
+        private void BindHotkey()
+        {
+            KeyDownTimer = new DispatcherTimer(DispatcherPriority.Background)
+            {
+                Interval = TimeSpan.FromMilliseconds(333),
+                IsEnabled = true,
+            };
+
+            KeyDown += (e, s) =>
+            {
+                if (s.Key == Key.Left || s.Key == Key.Right)
+                {
+                    CurrentDownKey = s.Key;
+                    PlayMove(CurrentDownKey.Value);
+                    KeyDownTimer.Start();
+                }
+            };
+            KeyUp += (e, s) =>
+            {
+                if (s.Key == Key.Left || s.Key == Key.Right)
+                {
+                    if (s.Key == CurrentDownKey)
+                    {
+                        CurrentDownKey = null;
+                        KeyDownTimer.Stop();
+                    }
+                }
+            };
+            KeyDownTimer.Tick += (e, s) =>
+            {
+                if (CurrentDownKey.HasValue)
+                {
+                    PlayMove(CurrentDownKey.Value);
+                }
+                else
+                {
+                    KeyDownTimer.Stop();
+                }
+            };
+            LostFocus += (e, s) =>
+            {
+                if (CurrentDownKey != null)
+                {
+                    CurrentDownKey = null;
+                    KeyDownTimer.Stop();
+                }
+            };
+        }
+        private void PlayMove(Key key)
+        {
+            if (!Media.IsOpen) return;
+
+            TimeSpan? total = Media.NaturalDuration;
+            if (total.HasValue)
+            {
+                var current = Media.Position;
+
+                if (key == Key.Right) current += TimeSpan.FromSeconds(5);
+                else if (key == Key.Left) current -= TimeSpan.FromSeconds(5);
+
+                if (current < TimeSpan.Zero) current = TimeSpan.Zero;
+                else if (current > total) current = total.Value;
+
+                Media.Seek(current);
+            }
+        }
+
 
         protected override async void OnClosing(CancelEventArgs e)
         {
@@ -136,6 +252,8 @@ namespace PZPack.View.Windows
         private bool m_IsPlaying = false;
         public bool IsPlaying => m_IsPlaying;
 
+        public string PlayMedias { get; set; }
+
         public MediaPlayerWindowModel(MediaElement media)
         {
             m_MediaElement = media;
@@ -151,10 +269,13 @@ namespace PZPack.View.Windows
             // media.Volume
         }
 
-        public void UpdateState()
+        public void UpdateState(int current, int total)
         {
             m_IsPlaying = m_MediaElement.IsPlaying;
+            PlayMedias = $"{current} / {total}";
+
             NotifyPropertyChanged(nameof(IsPlaying));
+            NotifyPropertyChanged(nameof(PlayMedias));
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

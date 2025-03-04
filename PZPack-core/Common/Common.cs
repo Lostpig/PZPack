@@ -12,7 +12,7 @@ public class PZCommon
     internal const int MemInitLength = 65536;
     internal const string PZPackSign = "PZPACK";
     internal const string PZVideoSign = "PZVIDEO";
-    internal const int Version = 11;
+    internal const int Version = 12;
     internal const int IndexRootId = 10000;
 
     static byte[]? pzpackHashCache;

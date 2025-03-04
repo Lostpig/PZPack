@@ -166,4 +166,43 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <!-- DefaultButtonStyle -->
+    <Style x:Key="DefaultButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="MinWidth" Value="120"/>
+        <Setter Property="Height" Value="30"/>
+        <Setter Property="FontSize" Value="14"></Setter>
+        <Setter Property="Padding" Value="12,4,12,4"/>
+    </Style>
+
+    <!-- TextboxStyle -->
+    <Style x:Key="TextboxStyle" TargetType="{x:Type TextBox}">
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="MinWidth" Value="300"/>
+        <Setter Property="Height" Value="30"/>
+        <Setter Property="FontSize" Value="14"></Setter>
+        <Setter Property="VerticalAlignment" Value="Center"></Setter>
+        <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+        <Setter Property="Padding" Value="8,0,8,0"></Setter>
+    </Style>
+    <Style x:Key="PasswordboxStyle" TargetType="{x:Type PasswordBox}">
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="MinWidth" Value="300"/>
+        <Setter Property="Height" Value="30"/>
+        <Setter Property="FontSize" Value="14"></Setter>
+        <Setter Property="VerticalAlignment" Value="Center"></Setter>
+        <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+        <Setter Property="Padding" Value="8,0,8,0"></Setter>
+    </Style>
+
+    <!-- ComboBoxStyle -->
+    <Style x:Key="ComboBoxStyle" TargetType="{x:Type ComboBox}">
+        <Setter Property="MinWidth" Value="300"/>
+        <Setter Property="Height" Value="30"/>
+        <Setter Property="FontSize" Value="14"></Setter>
+        <Setter Property="VerticalAlignment" Value="Center"></Setter>
+        <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+        <Setter Property="Padding" Value="8,0,8,0"></Setter>
+    </Style>
 </ResourceDictionary>

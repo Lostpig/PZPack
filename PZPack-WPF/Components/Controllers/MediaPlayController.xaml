@@ -3,8 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:windows="clr-namespace:PZPack.View.Windows"
-             xmlns:cvt="clr-namespace:PZPack.View.Service.Converters"
+             xmlns:cvt="clr-namespace:PZPack.View.Service.Converters" 
+             xmlns:windows="clr-namespace:PZPack.View.Windows" 
+             d:DataContext="{d:DesignInstance Type=windows:MediaPlayerWindowModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -36,8 +37,8 @@
             <Grid Name="ControlsPanel" Grid.Row="1" Margin="20,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="150" />
                 </Grid.ColumnDefinitions>
                 <DockPanel Name="InfomationPanel" HorizontalAlignment="Left" Grid.Column="0">
                     <Button Visibility="{Binding IsPlaying, Converter={StaticResource VisibilityConverter}, ConverterParameter=reverse}" 
@@ -50,6 +51,15 @@
                     </Button>
                     <Button Style="{DynamicResource ModernButtonStyle}" Click="StopButtonClick">
                         <Image Source="{StaticResource StopIcon}" />
+                    </Button>
+                    <Separator />
+                    <Button Style="{DynamicResource ModernButtonStyle}" Click="PrevButtonClick">
+                        <Image Source="{StaticResource StepBackwardIcon}" />
+                    </Button>
+                    <TextBlock VerticalAlignment="Center" Margin="5,0" Foreground="{StaticResource CustomSliderHighlightBrush}" 
+                               Text="{Binding PlayMedias, Mode=OneWay}" />
+                    <Button Style="{DynamicResource ModernButtonStyle}" Click="NextButtonClick">
+                        <Image Source="{StaticResource StepForwardIcon}" />
                     </Button>
                     <Separator />
                     <TextBlock VerticalAlignment="Center" Margin="5,0"

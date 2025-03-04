@@ -11,7 +11,7 @@ internal class IndexDecoder
         {
             1 => DecodeIndexV1(buffer),
             2 or 4 => DecodeIndexV2(buffer),
-            11 => DecodeIndexV11(buffer),
+            11 or 12 => DecodeIndexV11(buffer),
             _ => throw new Exceptions.FileVersionNotCompatiblityException(version)
         };
     }

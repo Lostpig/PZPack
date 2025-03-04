@@ -6,132 +6,168 @@
         xmlns:svc="clr-namespace:PZPack.View.Service"
         xmlns:uvc="clr-namespace:PZPack.View.Utils"
         xmlns:cvt="clr-namespace:PZPack.View.Service.Converters"
+        xmlns:ctrls="clr-namespace:PZPack.View.Controllers"
         mc:Ignorable="d"
         WindowStartupLocation="CenterOwner"
-        Title="PackWindow" Height="400" Width="800" WindowStyle="None">
+        Title="PackWindow" Height="400" Width="800" WindowStyle="None" ResizeMode="NoResize">
     <Window.Resources>
         <uvc:BlockSizes x:Key="blockSizes"/>
+        <uvc:ResizeImageOptions x:Key="ResizeImageOptions"/>
+        <uvc:Spacing x:Key="Spacing"/>
         <cvt:FileSizeConverter x:Key="FileSizeConverter" />
+        <Style x:Key="lableText" TargetType="Label">
+            <Setter Property="Width" Value="120"></Setter>
+            <Setter Property="FontSize" Value="16"></Setter>
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+            <Setter Property="HorizontalContentAlignment" Value="Right"></Setter>
+        </Style>
+        <Style x:Key="textBox" BasedOn="{StaticResource TextboxStyle}" TargetType="TextBox">
+            <Setter Property="Width" Value="450"></Setter>
+        </Style>
+        <Style x:Key="selectbox" BasedOn="{StaticResource ComboBoxStyle}" TargetType="ComboBox">
+            <Setter Property="Width" Value="450"></Setter>
+        </Style>
     </Window.Resources>
-    <Grid>
-        <Grid x:Name="optionPanel" Visibility="{Binding Path=OptionPanelVisible}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="120"/>
-                <ColumnDefinition />
-                <ColumnDefinition Width="150"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="30"/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
-
-            <Label FontSize="16" Content="{Binding Path=(svc:Translate.Target_file)}" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-            <TextBox IsReadOnly="True" Grid.Column="1" Grid.Row="1"  VerticalAlignment="Center" Height="30" VerticalContentAlignment="Center"
-                 Text="{Binding Path=Target, Mode=OneWay}" Padding="8,0,8,0"/>
-            <Button Content="{Binding Path=(svc:Translate.Browse)}" Grid.Column="2" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16"
-                Padding="15,5,15,5" Click="OnChooseTarget"/>
-
-            <Label FontSize="16" Content="{Binding Path=(svc:Translate.Password)}" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-            <TextBox Grid.Column="1" Grid.Row="2"  VerticalAlignment="Center" Height="30"  VerticalContentAlignment="Center"
-                 Text="{Binding Path=Password}" Padding="8,0,8,0"/>
-
-            <Label FontSize="16" Content="{Binding Path=(svc:Translate.BlockSize)}" Grid.Column="0" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-            <ComboBox Grid.Column="1" Grid.Row="3" Padding="8,0,8,0" Height="30" VerticalAlignment="Center" VerticalContentAlignment="Center"
-                      ItemsSource="{StaticResource blockSizes}" SelectedValue="{Binding Path=BlockSize}"  >
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock VerticalAlignment="Center" Text="{Binding Converter={StaticResource FileSizeConverter}}" />
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-
-            <Grid Grid.ColumnSpan="3" Grid.Row="4">
+    <Border BorderThickness="1" BorderBrush="#ff666666" Padding="12,12">
+        <Grid>
+            <Grid DataContext="{Binding Path=Options}" Visibility="{Binding Path=PanelVisible}">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="30"/>
                     <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="30"/>
                 </Grid.ColumnDefinitions>
-                <Button Content="{Binding Path=(svc:Translate.Start)}"  FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"
-                    Padding="15,5,15,5" Click="OnStart"/>
-                <Button Content="{Binding Path=(svc:Translate.Cancel)}"  VerticalAlignment="Center" FontSize="16" HorizontalAlignment="Center" Grid.Column="2"
-                    Padding="15,5,15,5" Click="OnClose"/>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="70"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" uvc:Spacing.Horizontal="5">
+                    <Label Style="{StaticResource lableText}" Content="{Binding Path=(svc:Translate.Target_file)}"/>
+                    <TextBox Style="{StaticResource textBox}" IsReadOnly="True" Text="{Binding Path=Target, Mode=OneWay}" />
+                    <Button Style="{StaticResource DefaultButtonStyle}" Content="{Binding Path=(svc:Translate.Browse)}" Click="OnChooseTarget"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" uvc:Spacing.Horizontal="5">
+                    <Label Style="{StaticResource lableText}" Content="{Binding Path=(svc:Translate.Password)}"/>
+                    <TextBox Style="{StaticResource textBox}" Text="{Binding Path=Password}" />
+                </StackPanel>
+
+                <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" uvc:Spacing.Horizontal="5">
+                    <Label Style="{StaticResource lableText}" Content="{Binding Path=(svc:Translate.BlockSize)}"/>
+                    <ComboBox Style="{StaticResource selectbox}" ItemsSource="{StaticResource blockSizes}" SelectedValue="{Binding Path=BlockSize}"  >
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock VerticalAlignment="Center" Text="{Binding Converter={StaticResource FileSizeConverter}}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" uvc:Spacing.Horizontal="5">
+                    <Label Style="{StaticResource lableText}" Content="{Binding Path=(svc:Translate.Is_resize_image)}"/>
+                    <ComboBox Style="{StaticResource selectbox}" ItemsSource="{StaticResource ResizeImageOptions}" SelectedValue="{Binding Path=ResizeImage}" 
+                          DisplayMemberPath="Name"
+                          SelectedValuePath="Value"
+                          />
+                </StackPanel>
+
+                <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal" Visibility="{Binding Path=ImageMaxSizeVisible}" uvc:Spacing.Horizontal="5">
+                    <Label Style="{StaticResource lableText}" Content="{Binding Path=(svc:Translate.Image_max_size)}"/>
+                    <ctrls:NumberBox Style="{StaticResource textBox}" Text="{Binding Path=ImageMaxSize}" />
+                </StackPanel>
+                <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal" Visibility="{Binding Path=QualityVisible}" uvc:Spacing.Horizontal="5">
+                    <Label Style="{StaticResource lableText}" Content="{Binding Path=(svc:Translate.Image_Quality)}" />
+                    <ctrls:NumberBox Style="{StaticResource textBox}" Text="{Binding Path=Quality}" />
+                </StackPanel>
+                <StackPanel Grid.Row="7" Grid.Column="1" Orientation="Horizontal" Visibility="{Binding Path=LosslessVisible}" uvc:Spacing.Horizontal="5">
+                    <Label Style="{StaticResource lableText}" Content="{Binding Path=(svc:Translate.Lossless)}" />
+                    <CheckBox IsChecked="{Binding Path=Lossless}" Margin="10,0,0,0" VerticalAlignment="Center" />
+                </StackPanel>
+
+                <StackPanel Grid.Row="8" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" uvc:Spacing.Horizontal="5">
+                    <Button Style="{StaticResource DefaultButtonStyle}" Content="{Binding Path=(svc:Translate.Start)}" Click="OnStart" />
+                    <Button Style="{StaticResource DefaultButtonStyle}" Content="{Binding Path=(svc:Translate.Cancel)}" Click="OnClose" />
+                </StackPanel>
             </Grid>
-        </Grid>
-        <Grid x:Name="progressPanel" Visibility="{Binding Path=PackingVisible}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="90"/>
-                <ColumnDefinition />
-                <ColumnDefinition Width="90"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="30"/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition Height="30"/>
-            </Grid.RowDefinitions>
+            <Grid DataContext="{Binding Path=Packing}" Visibility="{Binding Path=PanelVisible}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="90"/>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="90"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="1" Grid.Column="1" TextAlignment="Left" FontSize="20" Text="{Binding Path=(svc:Translate.Packing)}" />
-            <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,10">
-                <TextBlock TextAlignment="Left" Width="100" FontSize="16" Text="{Binding Path=(svc:Translate.Used_time)}" />
-                <TextBlock TextAlignment="Left" FontSize="16" Text="{Binding Path=UsedTime}" />
-            </StackPanel>
+                <TextBlock Grid.Row="1" Grid.Column="1" TextAlignment="Left" FontSize="20" Text="{Binding Path=(svc:Translate.Packing)}" />
+                <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,10">
+                    <TextBlock TextAlignment="Left" Width="100" FontSize="16" Text="{Binding Path=(svc:Translate.Used_time)}" />
+                    <TextBlock TextAlignment="Left" FontSize="16" Text="{Binding Path=UsedTime}" />
+                </StackPanel>
 
-            <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
-                <TextBlock TextAlignment="Left" Width="100" FontSize="16" Text="{Binding Path=(svc:Translate.Files_Count)}" />
-                <TextBlock TextAlignment="Left" FontSize="16" Text="{Binding Path=FileCountText}" />
-            </StackPanel>
-            <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
-                <TextBlock TextAlignment="Left" Width="100" FontSize="16" Text="{Binding Path=(svc:Translate.Current_File)}" />
-                <TextBlock TextAlignment="Left" FontSize="16" Text="{Binding Path=FileProgressText}" />
-            </StackPanel>
-            <ProgressBar Grid.Row="5" Grid.Column="1" Value="{Binding Path=FileProgressValue, Mode=OneWay}" Height="20" />
+                <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
+                    <TextBlock TextAlignment="Left" Width="100" FontSize="16" Text="{Binding Path=(svc:Translate.Files_Count)}" />
+                    <TextBlock TextAlignment="Left" FontSize="16" Text="{Binding Path=FileCountText}" />
+                </StackPanel>
+                <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
+                    <TextBlock TextAlignment="Left" Width="100" FontSize="16" Text="{Binding Path=(svc:Translate.Current_File)}" />
+                    <TextBlock TextAlignment="Left" FontSize="16" Text="{Binding Path=FileProgressText}" />
+                </StackPanel>
+                <ProgressBar Grid.Row="5" Grid.Column="1" Value="{Binding Path=FileProgressValue, Mode=OneWay}" Height="20" />
 
-            <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal" Margin="0,10,0,0">
-                <TextBlock TextAlignment="Left" Width="100" FontSize="16" Text="{Binding Path=(svc:Translate.Total)}" />
-                <TextBlock TextAlignment="Left" FontSize="16" Text="{Binding Path=TotalProgressText}" />
-            </StackPanel>
-            <ProgressBar Grid.Row="7" Grid.Column="1" Value="{Binding Path=TotalProgressValue, Mode=OneWay}" Height="20" />
+                <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal" Margin="0,10,0,0">
+                    <TextBlock TextAlignment="Left" Width="100" FontSize="16" Text="{Binding Path=(svc:Translate.Total)}" />
+                    <TextBlock TextAlignment="Left" FontSize="16" Text="{Binding Path=TotalProgressText}" />
+                </StackPanel>
+                <ProgressBar Grid.Row="7" Grid.Column="1" Value="{Binding Path=TotalProgressValue, Mode=OneWay}" Height="20" />
 
-            <Button Grid.Row="8" Grid.Column="1" Content="{Binding Path=(svc:Translate.Stop)}"  
+                <Button Grid.Row="8" Grid.Column="1" Content="{Binding Path=(svc:Translate.Stop)}"  
                     Padding="15,5,15,5" HorizontalAlignment="Center" VerticalAlignment="Center"
                     Click="OnStop" />
-        </Grid>
-        <Grid Visibility="{Binding Path=CompleteVisible}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <TextBlock Grid.Column="0" Grid.Row="0" TextAlignment="Right" FontSize="16" 
+            </Grid>
+            <Grid DataContext="{Binding Path=Completed}" Visibility="{Binding Path=PanelVisible}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Column="0" Grid.Row="0" TextAlignment="Right" FontSize="16" 
                            Text="{Binding Path=(svc:Translate.Packed_size)}" />
-            <TextBlock Grid.Column="1" Grid.Row="0" TextAlignment="Left" FontSize="16" Margin="10,0,0,0"
+                <TextBlock Grid.Column="1" Grid.Row="0" TextAlignment="Left" FontSize="16" Margin="10,0,0,0"
                            Text="{Binding Path=CompleteSizeInfo}" />
-            <TextBlock Grid.Column="0" Grid.Row="1" TextAlignment="Right" FontSize="16" 
+                <TextBlock Grid.Column="0" Grid.Row="1" TextAlignment="Right" FontSize="16" 
                            Text="{Binding Path=(svc:Translate.Used_time)}" />
-            <TextBlock Grid.Column="1" Grid.Row="1" TextAlignment="Left" FontSize="16" Margin="10,0,0,0"
+                <TextBlock Grid.Column="1" Grid.Row="1" TextAlignment="Left" FontSize="16" Margin="10,0,0,0"
                            Text="{Binding Path=CompleteTimeInfo}" />
-            <TextBlock Grid.Column="0" Grid.Row="2" TextAlignment="Right" FontSize="16" 
+                <TextBlock Grid.Column="0" Grid.Row="2" TextAlignment="Right" FontSize="16" 
                            Text="{Binding Path=(svc:Translate.Processing_rate)}" />
-            <TextBlock Grid.Column="1" Grid.Row="2" TextAlignment="Left" FontSize="16" Margin="10,0,0,0"
+                <TextBlock Grid.Column="1" Grid.Row="2" TextAlignment="Left" FontSize="16" Margin="10,0,0,0"
                            Text="{Binding Path=CompleteSpeedInfo}" />
-            <Button Grid.Row="3" Grid.ColumnSpan="2" Content="{Binding Path=(svc:Translate.Complete)}"
+                <Button Grid.Row="3" Grid.ColumnSpan="2" Content="{Binding Path=(svc:Translate.Complete)}"
                     Padding="15,5,15,5" HorizontalAlignment="Center" VerticalAlignment="Center"
                     Click="OnClose" />
+            </Grid>
         </Grid>
-    </Grid>
+    </Border>
 </Window>

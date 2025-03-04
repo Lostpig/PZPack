@@ -3,6 +3,7 @@ using System.Text;
 using PZPack.Core.Crypto;
 using PZPack.Core.Index;
 using PZPack.Core.Exceptions;
+using PZPack.Core.Core;
 
 namespace PZPack.Core;
 
@@ -42,13 +43,15 @@ public class PZPacker
     private readonly IPZCrypto Crypto;
     private readonly IndexEncoder IndexEncoder;
     private readonly int _blockSize;
+    private readonly ImageResizer? ImgResizer;
 
-    public PZPacker(string destination, IndexDesigner designer, string password, int blockSize)
+    public PZPacker(string destination, IndexDesigner designer, string password, int blockSize, ImageResizer? imageResizer)
     {
         Destination = destination;
         Crypto = PZCrypto.CreateCrypto(password, PZCommon.Version, blockSize);
         IndexEncoder = new(designer);
         _blockSize = blockSize;
+        ImgResizer = imageResizer;
     }
     private void CheckDestFileExists()
     {
@@ -57,7 +60,7 @@ public class PZPacker
             throw new OutputFileAlreadyExistsException(Destination);
         }
     }
-    private void WritePackHead(Stream writer, long fullSize, int indexSize)
+    private void WritePackHead(Stream writer, long fullSize, long indexOffset)
     {
         using BinaryWriter bw = new(writer, Encoding.Default, true);
         writer.Seek(0, SeekOrigin.Begin);
@@ -68,16 +71,14 @@ public class PZPacker
         bw.Write(DateTime.Now.Ticks);
         bw.Write(fullSize);
         bw.Write(_blockSize);
-        bw.Write(indexSize);
+        bw.Write(indexOffset);
 
-        Debug.Assert(writer.Position == 92);
+        Debug.Assert(writer.Position == 96);
     }
     private void WriteIndex(Stream writer)
     {
         byte[] indexBytes = IndexEncoder.EncodeIndex();
         byte[] encryptBytes = Crypto.Encrypt(indexBytes);
-
-        writer.Seek(92, SeekOrigin.Begin);
         writer.Write(encryptBytes);
     }
 
@@ -100,8 +101,6 @@ public class PZPacker
         try
         {
             using var writer = File.OpenWrite(Destination);
-            int indexOriginSize = IndexEncoder.GetEncodedIndexSize();
-            int indexEncryptedSize = 16 - (indexOriginSize % 16) + indexOriginSize + 16;
 
             var files = IndexEncoder.GetFiles();
             long totalSize = ComputeTotalSize(files);
@@ -123,16 +122,29 @@ public class PZPacker
                 ProgressChanged?.Invoke(progressArg);
             });
 
-            writer.Seek(92 + indexEncryptedSize, SeekOrigin.Begin);
+            writer.Seek(96, SeekOrigin.Begin);
             long tempSize = 0;
             long offset = 0;
             foreach (var file in files)
             {
                 if (cancelToken.IsCancellationRequested == true) break;
+
                 using var fs = File.OpenRead(file.Source);
+
                 offset = writer.Position;
-                tempSize = await Crypto.EncryptStreamAsync(fs, writer, innerProgress, cancelToken);
-                IndexEncoder.WriteEncodingInfo(file, offset, tempSize);
+                if (ImgResizer != null && ImageResizer.IsImageFile(file))
+                {
+                    using var imgStream = ImgResizer.ResizeImage(fs);
+                    tempSize = await Crypto.EncryptStreamAsync(imgStream, writer, innerProgress, cancelToken);
+
+                    IndexEncoder.ReEncodeName(file, Path.ChangeExtension(file.Name, ImgResizer.Extension));
+                    IndexEncoder.WriteEncodingInfo(file, offset, tempSize);
+                }
+                else
+                {
+                    tempSize = await Crypto.EncryptStreamAsync(fs, writer, innerProgress, cancelToken);
+                    IndexEncoder.WriteEncodingInfo(file, offset, tempSize);
+                }
 
                 Debug.Assert(tempSize == writer.Position - offset);
 
@@ -143,9 +155,12 @@ public class PZPacker
 
             if (!cancelToken.IsCancellationRequested)
             {
-                fullSize = writer.Length;
-                WritePackHead(writer, fullSize, indexEncryptedSize);
+                long indexOffset = writer.Position;
                 WriteIndex(writer);
+                fullSize = writer.Length;
+
+                WritePackHead(writer, fullSize, indexOffset);
+
                 writer.Flush();
             }
         } 
@@ -170,9 +185,16 @@ public class PZPacker
         return Start(CancellationToken.None);
     }
 
-    public static async Task<long> Pack(string destination, IndexDesigner designer, string password, int blockSize, IProgress<PackProgressArg>? progress = default, CancellationToken? cancelToken = null)
+    public static async Task<long> Pack(
+        string destination, 
+        IndexDesigner designer, 
+        string password, 
+        int blockSize,
+        ImageResizer? imageResizer = null,
+        IProgress<PackProgressArg>? progress = default, 
+        CancellationToken? cancelToken = null)
     {
-        var instance = new PZPacker(destination, designer, password, blockSize);
+        var instance = new PZPacker(destination, designer, password, blockSize, imageResizer);
         instance.ProgressChanged += progressChanged;
         long result = await instance.Start(cancelToken ?? CancellationToken.None);
         instance.ProgressChanged -= progressChanged;

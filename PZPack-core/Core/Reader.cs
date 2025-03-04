@@ -38,6 +38,7 @@ public record PZFileInfo
         {
             1 or 2 or 4 => LoadInfoV2(stream),
             11 => LoadInfoV11(stream),
+            12 => LoadInfoV12(stream),
             _ => throw new Exceptions.FileVersionNotCompatiblityException(version)
         };
     }
@@ -86,6 +87,30 @@ public record PZFileInfo
             blockSize,
             indexSize,
             92L
+        );
+    }
+    private static PZFileInfo LoadInfoV12(FileStream stream)
+    {
+        using BinaryReader br = new(stream, System.Text.Encoding.UTF8, true);
+        stream.Seek(0, SeekOrigin.Begin);
+        int version = br.ReadInt32();
+        byte[] sign = br.ReadBytes(32);
+        byte[] passwordHash = br.ReadBytes(32);
+        long createTime = br.ReadInt64();
+        long fullSize = br.ReadInt64();
+        int blockSize = br.ReadInt32();
+        long indexOffset = br.ReadInt64();
+        int indexSize = (int)(stream.Length - indexOffset);
+
+        return new PZFileInfo(
+            version,
+            Convert.ToHexString(sign),
+            Convert.ToHexString(passwordHash),
+            createTime,
+            fullSize,
+            blockSize,
+            indexSize,
+            indexOffset
         );
     }
 }
@@ -246,7 +271,7 @@ public class PZReader : IDisposable
     {
         if (File.Exists(destination))
         {
-            throw new Exceptions.PathIsNotDirectoryException(destination);
+            throw new PathIsNotDirectoryException(destination);
         }
         EnsureDirectory(destination);
 

@@ -36,6 +36,8 @@ namespace PZPack.View
                 mainContent.Visibility = Visibility.Collapsed;
                 mainContent.Update(false);
             }
+
+            Dialogs.CloseViewWindow();
         }
         private void PWBook_PWBookChanged(object? sender, PZPwBookChangeEventArgs e)
         {
@@ -59,6 +61,7 @@ namespace PZPack.View
         {
             base.OnClosed(e);
             Service.Reader.PZReaderChanged -= Reader_PZReaderChanged;
+            Service.PWBook.PWBookChanged -= PWBook_PWBookChanged;
         }
     }
 

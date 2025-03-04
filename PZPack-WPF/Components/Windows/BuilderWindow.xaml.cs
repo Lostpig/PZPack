@@ -1,12 +1,11 @@
 ﻿using System.Windows;
-using System.Collections.Generic;
 using PZPack.Core.Index;
 using PZPack.View.Utils;
 using System;
 using PZPack.View.Service;
 using System.IO;
-using System.Windows.Controls;
 using System.Diagnostics;
+using System.Linq;
 
 namespace PZPack.View.Windows
 {
@@ -25,8 +24,8 @@ namespace PZPack.View.Windows
                 if (_current != value)
                 {
                     _current = value;
-                    UpdateList();
-                    UpdateStack();
+                    UpdateExplorer();
+                    UpdateFolderStack();
                 }
             }
         }
@@ -36,45 +35,50 @@ namespace PZPack.View.Windows
             InitializeComponent();
             _designer = new IndexDesigner();
             _current = _designer.Root;
-            UpdateList();
-            UpdateStack();
+            BindExplorer();
+            BindingFolderStack();
         }
 
-        private void UpdateStack()
+        #region folder stack panel
+        private void BindingFolderStack()
         {
-            var stacks = _designer.GetFolderResolveList(Current, null);
-
-            folderStack.Children.Clear();
-            Button rootBtn = new() { Content = "Root", Tag = _designer.Root.Id };
-            rootBtn.Click += FolderStackClick;
-            TextBlock arrow = new() { Text = " > " };
-            folderStack.Children.Add(rootBtn);
-            folderStack.Children.Add(arrow);
-
-            foreach (var item in stacks)
-            {
-                Button itemBtn = new() { Content = item.Name, Tag = item.Id };
-                TextBlock arrowBtn = new() { Text = " > " };
-                itemBtn.Click += FolderStackClick;
-                folderStack.Children.Add(itemBtn);
-                folderStack.Children.Add(arrowBtn);
-            }
+            floderStackPanel.OnPrevClick += OnPrev;
+            floderStackPanel.OnFolderClick += OpenFolder;
+            UpdateFolderStack();
         }
-        private void UpdateList()
+        private void UpdateFolderStack()
         {
-            List<object> items = new();
-
-            var files = _designer.GetFiles(Current);
-            var folders = _designer.GetFolders(Current);
-
-            files.Sort(NaturalPZFileComparer.Instance);
-            folders.Sort(NaturalPZFolderComparer.Instance);
-
-            items.AddRange(folders);
-            items.AddRange(files);
-
-            filesContent.ItemsSource = items;
+            var stacks = _designer.GetFolderResolveList(Current, null).ToList<IPZFolder>();
+            floderStackPanel.UpdateStack(stacks, _designer.Root.Id);
         }
+        private void OnPrev()
+        {
+            if (Current.Id == _designer.Root.Id) return;
+            Current = _designer.GetFolder(Current.Pid);
+        }
+        #endregion
+
+        #region explorer panel
+        private void BindExplorer()
+        {
+            explorePanel.OnFolderOpen += OpenFolder;
+            UpdateExplorer();
+        }
+        private void UpdateExplorer()
+        {
+            var files = _designer.GetFiles(Current).ToList<IPZFile>();
+            var folders = _designer.GetFolders(Current).ToList<IPZFolder>();
+
+            explorePanel.UpdateItems(files, folders);
+        }
+        #endregion
+
+        private void OpenFolder(int id)
+        {
+            var folder = _designer.GetFolder(id);
+            Current = folder;
+        }
+
         private void ScanAndAddFolder(string folderPath, PZDesigningFolder parent)
         {
             string folderName = Path.GetFileName(folderPath);
@@ -106,30 +110,6 @@ namespace PZPack.View.Windows
             return null;
         }
 
-        private void FolderStackClick(object sender, EventArgs e)
-        {
-            if (sender is Button btn)
-            {
-                var id = (int)btn.Tag;
-                var folder = _designer.GetFolder(id);
-                Current = folder;
-            }
-        }
-        private void OnPrev(object sender, EventArgs e)
-        {
-            if (Current.Id == _designer.Root.Id) return;
-            Current = _designer.GetFolder(Current.Pid);
-        }
-        private void OnItemSelected(object sender, RoutedEventArgs e)
-        {
-            if (e.OriginalSource is FrameworkElement sp)
-            {
-                if (sp.DataContext is PZDesigningFolder folder)
-                {
-                    Current = folder;
-                }
-            }
-        }
         private void OnItemDelete(object sender, RoutedEventArgs e)
         {
             if (e.OriginalSource is FrameworkElement sp)
@@ -139,7 +119,7 @@ namespace PZPack.View.Windows
                     bool removed = _designer.RemoveFolder(folder);
                     if (removed)
                     {
-                        UpdateList();
+                        UpdateExplorer();
                     }
                 }
                 else if (sp.DataContext is PZDesigningFile file)
@@ -147,7 +127,7 @@ namespace PZPack.View.Windows
                     bool removed = _designer.RemoveFile(file);
                     if (removed)
                     {
-                        UpdateList();
+                        UpdateExplorer();
                     }
                 }
             }
@@ -164,7 +144,7 @@ namespace PZPack.View.Windows
                         if (newName is not null)
                         {
                             _designer.RenameFolder(folder, newName);
-                            UpdateList();
+                            UpdateExplorer();
                         }
                     }
                     else if (sp.DataContext is PZDesigningFile file)
@@ -173,7 +153,7 @@ namespace PZPack.View.Windows
                         if (newName is not null)
                         {
                             _designer.RenameFile(file, newName);
-                            UpdateList();
+                            UpdateExplorer();
                         }
                     }
                 }
@@ -223,7 +203,7 @@ namespace PZPack.View.Windows
                     }
 
                     _designer.RemoveFolder(folder);
-                    UpdateList();
+                    UpdateExplorer();
                 }
             }
         }
@@ -250,7 +230,7 @@ namespace PZPack.View.Windows
                 {
                     if (added)
                     {
-                        UpdateList();
+                        UpdateExplorer();
                     }
                 }
             }
@@ -272,7 +252,7 @@ namespace PZPack.View.Windows
                 }
                 finally
                 {
-                    UpdateList();
+                    UpdateExplorer();
                 }
             }
         }
@@ -285,7 +265,7 @@ namespace PZPack.View.Windows
                 try
                 {
                     _designer.AddFolder(name, Current);
-                    UpdateList();
+                    UpdateExplorer();
                 }
                 catch (Exception ex)
                 {
@@ -306,7 +286,7 @@ namespace PZPack.View.Windows
                 _designer.RenameFile(file, idx + file.Extension);
             }
 
-            UpdateList();
+            UpdateExplorer();
         }
         private void OnCreatePack(object sender, EventArgs e)
         {
@@ -315,7 +295,7 @@ namespace PZPack.View.Windows
                 return;
             }
 
-            PackWindow packWin = new(_designer);
+            PackWindow packWin = new(_designer) { Owner = this };
             packWin.ShowDialog();
         }
         private void OnDeleteAllFiles(object sender, EventArgs e)
@@ -325,7 +305,7 @@ namespace PZPack.View.Windows
             {
                 _designer.RemoveFile(file);
             }
-            UpdateList();
+            UpdateExplorer();
         }
     }
 }

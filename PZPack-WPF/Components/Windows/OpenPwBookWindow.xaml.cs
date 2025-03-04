@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Input;
 using PZPack.View.Service;
 
 namespace PZPack.View.Windows
@@ -26,7 +27,7 @@ namespace PZPack.View.Windows
 
         private void OnOpen(object sender, RoutedEventArgs e)
         {
-            string password = VModel.MasterPw;
+            string password = passwordCtrl.Password;
             if (string.IsNullOrWhiteSpace(password))
             {
                 Alert.ShowMessage(Translate.MSG_Password_empty);
@@ -51,17 +52,22 @@ namespace PZPack.View.Windows
             DialogResult = false;
             Close();
         }
+        private void Pw_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                OnOpen(sender, e);
+            }
+        }
     }
 
     internal class OPBWindowModel : INotifyPropertyChanged
     {
-        private string _password;
-        public string MasterPw { get => _password; set { _password = value; NotifyPropertyChanged(nameof(MasterPw)); } }
+
         private string _source;
         public string Source { get => _source; set { _source = value; NotifyPropertyChanged(nameof(Source)); } }
         public OPBWindowModel()
         {
-            _password = "";
             _source = "";
         }
 

@@ -23,7 +23,6 @@ internal class IndexEncoder
     readonly List<PZDesigningFile> _designingFiles;
     readonly List<PZDesigningFolder> _usedFolders;
 
-
     public IndexEncoder(IndexDesigner designer)
     {
         List<PZDesigningFile> designingFiles = designer.GetAllFiles();
@@ -60,6 +59,14 @@ internal class IndexEncoder
     {
         PZEncodingInfo info = new(file.Id, offset, encryptedSize);
         _encodingInfos.Add(info.Id, info);
+    }
+
+    public void ReEncodeName(PZDesigningFile file, string newName)
+    {
+        if (_nameBuffers.ContainsKey(file.Id))
+        {
+            _nameBuffers[file.Id] = Encoding.UTF8.GetBytes(newName);
+        }
     }
 
     public int GetEncodedIndexSize()

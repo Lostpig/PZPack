@@ -1,4 +1,5 @@
 ﻿using PZPack.View.Windows;
+using System;
 using System.Windows.Controls;
 using Unosquare.FFME;
 
@@ -9,6 +10,8 @@ namespace PZPack.View.Controllers
     /// </summary>
     public partial class MediaPlayController : UserControl
     {
+        public event Action<int>? ChangeFile;
+
         public MediaPlayController()
         {
             InitializeComponent();
@@ -46,6 +49,15 @@ namespace PZPack.View.Controllers
         private void StopButtonClick(object sender, System.Windows.RoutedEventArgs e)
         {
             MediaElement.Stop();
+        }
+
+        private void PrevButtonClick(object sender, System.Windows.RoutedEventArgs e)
+        {
+            ChangeFile?.Invoke(-1);
+        }
+        private void NextButtonClick(object sender, System.Windows.RoutedEventArgs e)
+        {
+            ChangeFile?.Invoke(1);
         }
     }
 }

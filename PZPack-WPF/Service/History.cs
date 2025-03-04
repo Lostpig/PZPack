@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace PZPack.View.Service
 {
@@ -38,17 +36,24 @@ namespace PZPack.View.Service
             }
 
             HistoryChanged?.Invoke(this, EventArgs.Empty);
+
+            Save();
         }
         public void Clear ()
         {
             Items.Clear();
             HistoryChanged?.Invoke(this, EventArgs.Empty);
+
+            Save();
         }
         public bool Remove(string item)
         {
-            return Items.Remove(item);
+            bool res = Items.Remove(item);
+            if (res) Save();
+
+            return res;
         }
-        public void Save()
+        private void Save()
         {
             StringBuilder sb = new();
             foreach (string item in Items) { sb.AppendLine(item); }

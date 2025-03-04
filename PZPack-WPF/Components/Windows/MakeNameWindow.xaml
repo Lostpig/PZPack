@@ -4,34 +4,31 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:svc="clr-namespace:PZPack.View.Service"
+        xmlns:uvc="clr-namespace:PZPack.View.Utils"
         mc:Ignorable="d"
         WindowStartupLocation="CenterOwner"
-        Title="MakeFolderWindow" Height="120" Width="500" WindowStyle="None">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="120"/>
-            <ColumnDefinition />
-            <ColumnDefinition Width="120"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
-
-        <Label FontSize="16" Content="{Binding Path=(svc:Translate.Name)}" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-        <TextBox x:Name="textBox" Grid.Column="1" Grid.Row="0"  VerticalAlignment="Center" Height="30" VerticalContentAlignment="Center"
-                 Text="{Binding Path=Name}" Padding="8,0,8,0" KeyUp="OnTextKeyUp"/>
-
-        <Grid Grid.Column="1" Grid.Row="2">
+        Title="MakeFolderWindow" Height="150" Width="500" WindowStyle="None" ResizeMode="NoResize">
+    <Border BorderThickness="1" BorderBrush="#ff666666" Padding="12,12">
+        <Grid>
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="30"/>
                 <ColumnDefinition />
-                <ColumnDefinition />
+                <ColumnDefinition Width="30"/>
             </Grid.ColumnDefinitions>
-            <Button Content="{Binding Path=(svc:Translate.OK)}"  FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"
-                Padding="15,5,15,5" Click="OnOk"/>
-            <Button Content="{Binding Path=(svc:Translate.Cancel)}"  VerticalAlignment="Center" FontSize="16" HorizontalAlignment="Center" Grid.Column="1"
-                Padding="15,5,15,5" Click="OnCancel"/>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
+                <Label FontSize="16" Content="{Binding Path=(svc:Translate.Name)}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <TextBox x:Name="textBox" Style="{StaticResource TextboxStyle}" Text="{Binding Path=Name}" KeyUp="OnTextKeyUp"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" uvc:Spacing.Horizontal="15">
+                <Button Style="{StaticResource DefaultButtonStyle}" Content="{Binding Path=(svc:Translate.OK)}" Click="OnOk"/>
+                <Button Style="{StaticResource DefaultButtonStyle}" Content="{Binding Path=(svc:Translate.Cancel)}" Click="OnCancel"/>
+            </StackPanel>
         </Grid>
-    </Grid>
+    </Border>
 </Window>

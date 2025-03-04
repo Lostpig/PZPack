@@ -84,6 +84,6 @@ public record PZDesigningFile : IPZFile
         this.Source = Source;
         this.Size = Size;
 
-        Extension = Path.GetExtension(Name);
+        Extension = Path.GetExtension(Name).ToLower();
     }
 }

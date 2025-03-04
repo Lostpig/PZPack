@@ -4,39 +4,37 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:svc="clr-namespace:PZPack.View.Service"
+        xmlns:uvc="clr-namespace:PZPack.View.Utils"
         mc:Ignorable="d"
         WindowStartupLocation="CenterOwner"
-        Title="ReadOptionWindow" Height="180" Width="800" WindowStyle="None">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="120"/>
-            <ColumnDefinition />
-            <ColumnDefinition Width="150"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
-
-        <Label FontSize="16" Content="{Binding Path=(svc:Translate.Source)}" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-        <TextBox IsReadOnly="True" Grid.Column="1" Grid.Row="0"  VerticalAlignment="Center" Height="30" VerticalContentAlignment="Center"
-                 Text="{Binding Path=Source}" Padding="8,0,8,0"/>
-        <Label FontSize="16" Content="{Binding Path=(svc:Translate.Password)}" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-        <PasswordBox x:Name="passwordCtrl" Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" VerticalContentAlignment="Center"
-                     Padding="8,0,8,0" Height="30" KeyUp="Pw_KeyUp"
-                     />
-
-        <Grid Grid.Column="1" Grid.Row="2">
+        Title="ReadOptionWindow" Height="240" Width="600" WindowStyle="None" ResizeMode="NoResize">
+    <Border BorderThickness="1" BorderBrush="#ff666666" Padding="12,30">
+        <Grid>
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="30"/>
                 <ColumnDefinition />
-                <ColumnDefinition />
+                <ColumnDefinition Width="30"/>
             </Grid.ColumnDefinitions>
-            <Button Content="{Binding Path=(svc:Translate.OK)}"  FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"
-                Padding="15,5,15,5" Click="OnOpenFile"/>
-            <Button Content="{Binding Path=(svc:Translate.Cancel)}"  VerticalAlignment="Center" FontSize="16" HorizontalAlignment="Center" Grid.Column="1"
-                Padding="15,5,15,5" Click="OnCancel"/>
-        </Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition />
+                <RowDefinition Height="40"/>
+            </Grid.RowDefinitions>
 
-    </Grid>
+            <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
+                <Label Width="100" FontSize="16" Content="{Binding Path=(svc:Translate.Source)}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <TextBox Style="{StaticResource TextboxStyle}" Width="400" IsReadOnly="True" Text="{Binding Path=Source}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                <Label Width="100" FontSize="16" Content="{Binding Path=(svc:Translate.Password)}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <PasswordBox Style="{StaticResource PasswordboxStyle}" Width="400" x:Name="passwordCtrl" KeyUp="Pw_KeyUp"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" uvc:Spacing.Horizontal="15">
+                <Button Style="{StaticResource DefaultButtonStyle}" Content="{Binding Path=(svc:Translate.OK)}" Click="OnOpenFile" />
+                <Button Style="{StaticResource DefaultButtonStyle}" Content="{Binding Path=(svc:Translate.Cancel)}" Click="OnCancel" />
+            </StackPanel>
+        </Grid>
+    </Border>
 </Window>

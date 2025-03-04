@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:svc="clr-namespace:PZPack.View.Service"
              xmlns:cvt="clr-namespace:PZPack.View.Service.Converters"
+             xmlns:ctrls="clr-namespace:PZPack.View.Controllers"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="1280" Background="White">
     <UserControl.Resources>
@@ -19,107 +20,15 @@
             <RowDefinition Height="40"/>
             <RowDefinition />
         </Grid.RowDefinitions>
-        <Border BorderBrush="#FF333333" BorderThickness="1">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="60" />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <Grid.Resources>
-                    <Style TargetType="Button">
-                        <Setter Property="Margin" Value="0,0,5,0" />
-                        <Setter Property="Foreground" Value="#FF3478FF" />
-                        <Setter Property="BorderBrush" Value="#00000000" />
-                        <Setter Property="Background" Value="#00000000" />
-                        <Setter Property="Cursor" Value="Hand" />
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Foreground" Value="#FF2146FF"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Grid.Resources>
-                <Border Grid.Column="0" BorderBrush="#FF333333" BorderThickness="0,0,1,0">
-                    <Button Content="Prev" Width="50" VerticalAlignment="Center" Click="OnPrev" />
-                </Border>
-                <StackPanel x:Name="folderStack" Grid.Column="1" Orientation="Horizontal" Margin="5,5,5,5" HorizontalAlignment="Left" VerticalAlignment="Center">
-                    <Button Content="111" />
-                    <Button Content="222" />
-                </StackPanel>
-            </Grid>
-
-        </Border>
-        <ItemsControl x:Name="filesContent" MouseDoubleClick="OnItemSelected" Grid.Row="1">
-            <ItemsControl.Template>
-                <ControlTemplate TargetType="ItemsControl">
-                    <ScrollViewer
-                                CanContentScroll="True"
-                                HorizontalScrollBarVisibility="Disabled" 
-                                VerticalScrollBarVisibility="Visible">
-                        <ItemsPresenter/>
-                    </ScrollViewer>
-                </ControlTemplate>
-            </ItemsControl.Template>
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <VirtualizingStackPanel IsVirtualizing="True" Orientation="Vertical" Margin="10,0,0,0"
-                                VirtualizationMode="Recycling" />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <DataTemplate.Resources>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="FontSize" Value="14"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
-                            <Setter Property="Margin" Value="0,0,12,0"/>
-                        </Style>
-                        <Style TargetType="Image">
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                            <Setter Property="HorizontalAlignment" Value="Center"/>
-                            <Setter Property="Width" Value="24"/>
-                            <Setter Property="Height" Value="24"/>
-                        </Style>
-                        <Style TargetType="Grid">
-                            <Setter Property="Height" Value="32"/>
-                            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="#ddeeff"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </DataTemplate.Resources>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="40" />
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="120" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="{Binding Path=(svc:Translate.Preview)}" Click="OnItemSelected" 
+        <ctrls:FolderStackPanel x:Name="floderStackPanel" Grid.Row="0"/>
+        <ctrls:ExplorerPanel x:Name="explorePanel"  Grid.Row="1">
+            <ctrls:ExplorerPanel.ItemMenu>
+                <ContextMenu>
+                    <MenuItem Header="{Binding Path=(svc:Translate.Preview)}" Click="OnItemSelected" 
                                           IsEnabled="{Binding DataContext, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource CouldPreviewConverter}}"/>
-                                <MenuItem Header="{Binding Path=(svc:Translate.Extract_to)}" Click="OnItemExtrect"/>
-                            </ContextMenu>
-                        </Grid.ContextMenu>
-                        <Image Grid.Column="0" Source="{Binding Converter={StaticResource ExtIconConverter}}" />
-                        <TextBlock Grid.Column="1" Text="{Binding Path=Name}" HorizontalAlignment="Stretch" />
-                        <TextBlock Grid.Column="2" Text="{Binding Converter={StaticResource FileSizeConverter}}" 
-                                           TextAlignment="Right" Foreground="#7f7f7f" FontFamily="Consolas" />
-                    </Grid>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-            <ItemsControl.ItemContainerStyle>
-                <Style>
-                    <Style.Triggers>
-                        <Trigger Property="Control.IsMouseOver" Value="True">
-                            <Setter Property="Control.ToolTip" Value="{Binding Path=Name}"/>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </ItemsControl.ItemContainerStyle>
-        </ItemsControl>
+                    <MenuItem Header="{Binding Path=(svc:Translate.Extract_to)}" Click="OnItemExtrect"/>
+                </ContextMenu>
+            </ctrls:ExplorerPanel.ItemMenu>
+        </ctrls:ExplorerPanel>
     </Grid>
 </UserControl>
